@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { generateGuideConfigs } from "@/lib/guide-generator";
 import { GuideContent } from "@/components/features/guide-content";
-import { supabase } from "@/lib/supabase";
+import { getAnonClient } from "@/lib/supabase";
 import type { GuideConfig } from "@/lib/guide-generator";
 import type { Opportunity } from "@/lib/data";
 
@@ -30,7 +30,7 @@ function mapRow(row: Record<string, unknown>): Opportunity {
 }
 
 async function fetchAll(): Promise<Opportunity[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getAnonClient()
     .from("opportunities")
     .select("*")
     .order("close_date", { ascending: true });

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { Opportunity } from "@/lib/data";
-import { supabase } from "@/lib/supabase";
+import { getAnonClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const voterId = searchParams.get("voterId") || undefined;
 
     if (id) {
-      const { data, error } = await supabase
+      const { data, error } = await getAnonClient()
         .from("opportunities")
         .select("*")
         .eq("id", id)
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await getAnonClient()
       .from("opportunities")
       .select("*")
       .order("close_date", { ascending: true });

@@ -1,5 +1,5 @@
 import type { Opportunity } from "./data";
-import { supabase, getServiceClient } from "@/lib/supabase";
+import { getAnonClient, getServiceClient } from "@/lib/supabase";
 
 export type AdminOpportunity = Opportunity & {
   mongoId?: string;
@@ -108,7 +108,7 @@ async function getClient() {
 }
 
 export async function getOpportunitiesCollection() {
-  return supabase.from("opportunities");
+  return getAnonClient().from("opportunities");
 }
 
 export async function fetchAllAdmin(): Promise<AdminOpportunity[]> {

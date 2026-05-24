@@ -1,5 +1,5 @@
 import type { Opportunity } from "@/lib/data";
-import { supabase } from "@/lib/supabase";
+import { getAnonClient } from "@/lib/supabase";
 
 function normalizeDate(
   value: unknown
@@ -36,7 +36,7 @@ function mapRowToOpportunity(row: Record<string, unknown>): Opportunity {
 }
 
 export async function fetchAllOpportunities(): Promise<Opportunity[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getAnonClient()
     .from("opportunities")
     .select("*")
     .order("close_date", { ascending: true });
@@ -52,7 +52,7 @@ export async function fetchAllOpportunities(): Promise<Opportunity[]> {
 export async function fetchOpportunityById(
   id: string
 ): Promise<Opportunity | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getAnonClient()
     .from("opportunities")
     .select("*")
     .eq("id", id)

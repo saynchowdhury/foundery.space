@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { checkBotId } from "botid/server";
 import type { Opportunity } from "@/lib/data";
-import { supabase } from "@/lib/supabase";
+import { getAnonClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Query too long (max 500 characters)" }, { status: 400 });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await getAnonClient()
       .from("opportunities")
       .select("*")
       .or(`name.ilike.%${query.trim()}%,description.ilike.%${query.trim()}%,organizer.ilike.%${query.trim()}%,tags.cs.{${query.trim()}}`)
