@@ -1,33 +1,9 @@
-import { MongoClient, type Document } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 import { checkBotId } from "botid/server";
+import { getServiceClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
-
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB;
-const feedbackCollectionName = "feedback";
-
-if (!uri) {
-  throw new Error("MONGODB_URI is not set");
-}
-
-let clientPromise: Promise<MongoClient> | null = null;
-
-function getClient(): Promise<MongoClient> {
-  if (!clientPromise) {
-    const client = new MongoClient(uri!);
-    clientPromise = client.connect();
-  }
-  return clientPromise;
-}
-
-async function getFeedbackCollection() {
-  const client = await getClient();
-  const db = dbName ? client.db(dbName) : client.db();
-  return db.collection<Document>(feedbackCollectionName);
-}
 
 export async function POST(request: NextRequest) {
   const verification = await checkBotId();
@@ -47,30 +23,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Message too long (max 2000 characters)" }, { status: 400 });
     }
 
-    // If opportunity_id is provided, section should be 'opportunity'
     const finalSection = opportunity_id ? "opportunity" : (section || "general");
+    const client = getServiceClient();
 
-    // Store feedback in MongoDB without user info (auth removed)
-    const collection = await getFeedbackCollection();
-    const now = new Date();
-    const result = await collection.insertOne({
-      userId: null,
-      message: message.trim(),
-      section: finalSection,
-      opportunityId: opportunity_id || null,
-      // Structured feedback for opportunities
-      issues: Array.isArray(issues) ? issues : null,
-      suggestion: suggestion && typeof suggestion === "string" ? suggestion.trim() : null,
-      user: null,
-      createdAt: now,
-    });
+    const { data, error } = await client
+      .from("feedback")
+      .insert({
+        user_id: null,
+        message: message.trim(),
+        section: finalSection,
+        opportunity_id: opportunity_id || null,
+        issues: Array.isArray(issues) ? issues : null,
+        suggestion: suggestion && typeof suggestion === "string" ? suggestion.trim() : null,
+      })
+      .select("id, created_at")
+      .single();
 
-    return NextResponse.json({ 
+    if (error) throw error;
+
+    return NextResponse.json({
       success: true,
       feedback: {
-        id: result.insertedId.toString(),
-        created_at: now,
-      }
+        id: data.id,
+        created_at: data.created_at,
+      },
     });
   } catch (error) {
     console.error("Error submitting feedback:", error);

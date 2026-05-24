@@ -10,7 +10,7 @@ export default function NotFound() {
         <div className="max-w-4xl mx-auto px-5 py-3 flex items-center gap-3">
           <Link href="/" className="shrink-0">
             <span className="font-semibold tracking-tight text-[17px] hover:underline underline-offset-4 decoration-2">
-              fellows.best
+              Foundry
             </span>
           </Link>
         </div>

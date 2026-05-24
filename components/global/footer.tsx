@@ -12,14 +12,14 @@ export function Footer() {
                 <Calendar className="h-4 w-4" strokeWidth={1.5} />
               </div>
               <span className="text-lg font-medium tracking-tight">
-                fellows.best
+                Foundery.Space
               </span>
             </Link>
 
             <p className="text-muted-foreground max-w-md text-sm">
               Never miss a deadline again. Discover fellowships, grants,
               accelerators, and competitions tailored to your interests and
-              timeline.
+              timeline — all in one place.
             </p>
           </div>
 
@@ -121,7 +121,7 @@ export function Footer() {
 
         <div className="border-t mt-6 pt-4 text-left">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} fellows.best. All rights reserved.
+              &copy; {new Date().getFullYear()} Foundery.Space. All rights reserved.
           </p>
         </div>
       </div>

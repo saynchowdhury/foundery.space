@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "@vercel/og";
 import { NextRequest } from "next/server";
 import type { Opportunity } from "@/lib/data";
@@ -7,16 +8,9 @@ export const maxDuration = 10;
 
 export const fetchCache = "force-no-store";
 
-function getBaseUrl() {
-  const raw = process.env.NEXT_PUBLIC_APP_BASE_URL;
-  if (raw?.startsWith("http://") || raw?.startsWith("https://")) return raw;
-  if (raw) return `https://${raw}`;
-  return "http://localhost:3000";
-}
-
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams, origin } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
@@ -34,7 +28,7 @@ export async function GET(req: NextRequest) {
               fontSize: 100,
             }}
           >
-            fellows.best
+            Foundery.Space
           </div>
         ),
         {
@@ -47,11 +41,7 @@ export async function GET(req: NextRequest) {
     let opportunity: Opportunity | undefined;
 
     try {
-      const apiUrl = new URL(
-        `/api/opportunities?id=${id}`,
-        getBaseUrl()
-      );
-      const response = await fetch(apiUrl, { cache: "no-store" });
+      const response = await fetch(`${origin}/api/opportunities?id=${id}`, { cache: "no-store" });
 
       if (response.ok) {
         opportunity = (await response.json()) as Opportunity | undefined;
@@ -221,7 +211,7 @@ export async function GET(req: NextRequest) {
                 margin: 0,
               }}
             >
-              fellows.best
+            Foundery.Space
             </p>
           </div>
         </div>

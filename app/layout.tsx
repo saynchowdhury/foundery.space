@@ -7,46 +7,54 @@ import { QueryProvider } from "@/providers/query-provider";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { generateWebsiteSchema, generateFAQSchema } from "@/lib/schema";
 
 const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "https://fellows.best"
+    process.env.NEXT_PUBLIC_APP_URL || "https://foundery.space"
   ),
-  title: "The Biggest Tech Fellowship List | fellows.best",
+  title: "Foundery.Space — Discover Fellowships, Grants & Startup Opportunities",
   description:
-    "Discover 100+ fellowships, grants, accelerators, and competitions. Track deadlines, get reminders, and never miss an opportunity. Free to use.",
+    "Find and track 100+ tech fellowships, grants, accelerators, incubators, and competitions. Get deadline reminders, compare programs, and never miss funding opportunities for founders and startups.",
   keywords:
-    "fellowships, grants, accelerators, hackathons, competitions, deadlines, opportunities",
+    "fellowships, grants, accelerators, incubators, competitions, residencies, research programs, developer programs, startup funding, venture capital, founder opportunities, tech grants, accelerator programs",
   alternates: {
-    canonical: "https://fellows.best",
+    canonical: "https://foundery.space",
     types: {
       "text/markdown": "/index.md",
     },
   },
   openGraph: {
-    title: "The Biggest Tech Fellowship List | fellows.best",
+    title: "Foundery.Space — Discover Fellowships, Grants & Startup Opportunities",
     description:
-      "Discover 100+ fellowships, grants, accelerators, and competitions. Track deadlines, get reminders, and never miss an opportunity.",
-    url: "https://fellows.best",
-    siteName: "fellows.best",
+      "Find and track 100+ tech fellowships, grants, accelerators, incubators, and competitions. Get deadline reminders, compare programs, and never miss funding opportunities for founders and startups.",
+    url: "https://foundery.space",
+    siteName: "Foundery.Space",
     type: "website",
     images: [
       {
-        url: "https://cdn.fellows.best/og-image.jpg",
+        url: "https://foundery.space/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "fellows.best - The biggest tech fellowship list",
+        alt: "Foundery.Space — Discover Fellowships, Grants & Startup Opportunities",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Biggest Tech Fellowship List | fellows.best",
+    title: "Foundery.Space — Discover Fellowships, Grants & Startup Opportunities",
     description:
-      "Discover 100+ fellowships, grants, accelerators, and competitions. Track deadlines, get reminders, and never miss an opportunity.",
-    images: ["https://cdn.fellows.best/og-image.jpg"],
+      "Find and track 100+ tech fellowships, grants, accelerators, incubators, and competitions. Get deadline reminders, compare programs, and never miss funding opportunities for founders and startups.",
+    images: ["https://foundery.space/og-image.jpg"],
+  },
+  applicationName: "Foundery.Space",
+  referrer: "origin",
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
   },
 };
 

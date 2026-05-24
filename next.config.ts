@@ -5,12 +5,6 @@ import { withBotId } from 'botid/next/config';
 const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-      },
-    ],
     formats: ['image/avif', 'image/webp'],
   },
   poweredByHeader: false,

@@ -4,7 +4,7 @@ import type { Opportunity } from "@/lib/data";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || "https://fellows.best";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || "https://foundry.space";
   const currentDate = new Date().toISOString().split("T")[0];
 
   const staticRoutes: MetadataRoute.Sitemap = [

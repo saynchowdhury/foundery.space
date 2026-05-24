@@ -1,98 +1,39 @@
-import {
-  MongoClient,
-  ObjectId,
-  ServerApiVersion,
-  type Document,
-  type MongoClientOptions,
-} from "mongodb";
 import { NextResponse, type NextRequest } from "next/server";
 import { checkBotId } from "botid/server";
 import type { Opportunity } from "@/lib/data";
+import { supabase } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
 
-const SEARCH_MODE = process.env.NEXT_PUBLIC_SEARCH_MODE || "ai";
-
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB;
-const collectionName = process.env.MONGODB_COLLECTION!;
-
-if (!uri) {
-  throw new Error("MONGODB_URI is not set");
-}
-
-let clientPromise: Promise<MongoClient> | null = null;
-
-function getClient(): Promise<MongoClient> {
-  if (!clientPromise) {
-    const client = new MongoClient(uri!);
-    clientPromise = client.connect();
-  }
-  return clientPromise;
-}
-
-async function getCollection() {
-  const client = await getClient();
-  const db = dbName ? client.db(dbName) : client.db();
-  return db.collection<Document>(collectionName);
-}
-
-function normalizeDate(
-  value: unknown
-): Opportunity["closeDate"] | Opportunity["openDate"] {
+function normalizeDate(value: unknown): Opportunity["closeDate"] | Opportunity["openDate"] {
   if (value === undefined || value === null) return null;
   if (value === "closed") return "closed";
   if (value instanceof Date) return value.toISOString();
   return String(value);
 }
 
-function mapOpportunity(doc: Document): Opportunity {
-  const {
-    _id,
-    id,
-    name = "",
-    logoUrl = "",
-    shareImageUrl,
-    description = "",
-    fullDescription = "",
-    openDate,
-    closeDate,
-    tags = [],
-    category = "fellowship",
-    region = "",
-    country = null,
-    eligibility = "",
-    applyLink = "",
-    benefits = [],
-    organizer = "",
-    duration,
-    funding,
-    applicationVideo,
-    ...rest
-  } = doc as Record<string, unknown>;
-
+function mapRow(row: Record<string, unknown>): Opportunity {
   return {
-    id: typeof id === "string" && id.length > 0 ? id : _id?.toString() || "",
-    name: String(name),
-    logoUrl: String(logoUrl),
-    shareImageUrl: shareImageUrl ? String(shareImageUrl) : undefined,
-    description: String(description),
-    fullDescription: String(fullDescription || description),
-    openDate: normalizeDate(openDate),
-    closeDate: normalizeDate(closeDate),
-    tags: Array.isArray(tags) ? (tags as string[]) : [],
-    category: category as Opportunity["category"],
-    region: String(region),
-    country: country ? String(country) : null,
-    eligibility: String(eligibility),
-    applyLink: String(applyLink),
-    benefits: Array.isArray(benefits) ? (benefits as string[]) : [],
-    organizer: String(organizer),
-    duration: duration as Opportunity["duration"],
-    funding: funding as Opportunity["funding"],
-    applicationVideo: applicationVideo ? String(applicationVideo) : undefined,
-    ...rest,
+    id: String(row.id || ""),
+    name: String(row.name || ""),
+    logoUrl: String(row.logo_url || ""),
+    shareImageUrl: row.share_image_url ? String(row.share_image_url) : undefined,
+    description: String(row.description || ""),
+    fullDescription: String(row.full_description || row.description || ""),
+    openDate: normalizeDate(row.open_date),
+    closeDate: normalizeDate(row.close_date),
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    category: (row.category as Opportunity["category"]) || "fellowship",
+    region: String(row.region || ""),
+    country: row.country ? String(row.country) : null,
+    eligibility: String(row.eligibility || ""),
+    applyLink: String(row.apply_link || ""),
+    benefits: Array.isArray(row.benefits) ? (row.benefits as string[]) : [],
+    organizer: String(row.organizer || ""),
+    duration: row.duration as Opportunity["duration"],
+    funding: row.funding as Opportunity["funding"],
+    applicationVideo: row.application_video ? String(row.application_video) : undefined,
   };
 }
 
@@ -108,31 +49,24 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("q");
 
     if (!query || query.trim().length === 0) {
-      return NextResponse.json(
-        { error: "Query parameter 'q' is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Query parameter 'q' is required" }, { status: 400 });
     }
 
     if (query.length > 500) {
-      return NextResponse.json(
-        { error: "Query too long (max 500 characters)" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Query too long (max 500 characters)" }, { status: 400 });
     }
 
-    const collection = await getCollection();
+    const { data, error } = await supabase
+      .from("opportunities")
+      .select("*")
+      .or(`name.ilike.%${query.trim()}%,description.ilike.%${query.trim()}%,organizer.ilike.%${query.trim()}%,tags.cs.{${query.trim()}}`)
+      .order("close_date", { ascending: true });
 
-    // Use MongoDB $text operator for text search
-    const documents = await collection
-      .find(
-        { $text: { $search: query.trim() } },
-        { projection: { score: { $meta: "textScore" } } }
-      )
-      .sort({ score: { $meta: "textScore" }, closeDate: 1 })
-      .toArray();
+    if (error) {
+      throw error;
+    }
 
-    const opportunities = documents.map(mapOpportunity);
+    const opportunities = (data || []).map(mapRow);
 
     return NextResponse.json(opportunities, {
       status: 200,
@@ -143,11 +77,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error searching opportunities:", error);
-
-    // If text index doesn't exist, return helpful error
-    return NextResponse.json(
-      { error: "Failed to search opportunities" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to search opportunities" }, { status: 500 });
   }
 }

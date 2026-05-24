@@ -203,7 +203,7 @@ function AdminNewContent() {
       }
     };
     loadExisting();
-  }, [editingId]);
+  }, [editingId, token]);
 
   const loadJsonToForm = (raw: Record<string, unknown>) => {
     try {

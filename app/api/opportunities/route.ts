@@ -1,101 +1,41 @@
-import {
-  MongoClient,
-  ObjectId,
-  type Document,
-} from "mongodb";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Opportunity } from "@/lib/data";
+import { supabase } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
 
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB;
-const collectionName = process.env.MONGODB_COLLECTION!;
-
-if (!uri) {
-  throw new Error("MONGODB_URI is not set");
-}
-
-let clientPromise: Promise<MongoClient> | null = null;
-
-function getClient(): Promise<MongoClient> {
-  if (!clientPromise) {
-    const client = new MongoClient(uri!);
-    clientPromise = client.connect();
-  }
-  return clientPromise;
-}
-
-async function getCollection() {
-  const client = await getClient();
-  const db = dbName ? client.db(dbName) : client.db();
-  return db.collection<Document>(collectionName);
-}
-
-function normalizeDate(
-  value: unknown
-): Opportunity["closeDate"] | Opportunity["openDate"] {
+function normalizeDate(value: unknown): Opportunity["closeDate"] | Opportunity["openDate"] {
   if (value === undefined || value === null) return null;
   if (value === "closed") return "closed";
   if (value instanceof Date) return value.toISOString();
   return String(value);
 }
 
-function mapOpportunity(doc: Document, voterId?: string): Opportunity {
-  const {
-    _id,
-    id,
-    name = "",
-    logoUrl = "",
-    shareImageUrl,
-    description = "",
-    fullDescription = "",
-    openDate,
-    closeDate,
-    tags = [],
-    category = "fellowship",
-    region = "",
-    country = null,
-    eligibility = "",
-    applyLink = "",
-    benefits = [],
-    organizer = "",
-    duration,
-    funding,
-    applicationVideo,
-    voters,
-    votes: _votes,
-    ...rest
-  } = doc as Record<string, unknown>;
-  void _votes;
-  const voterList = Array.isArray(voters) ? (voters as string[]) : [];
-
+function mapRow(row: Record<string, unknown>, voterId?: string): Opportunity {
+  const voterList = Array.isArray(row.voters) ? (row.voters as string[]) : [];
   return {
-    id: typeof id === "string" && id.length > 0 ? id : _id?.toString() || "",
-    name: String(name),
-    logoUrl: String(logoUrl),
-    shareImageUrl: shareImageUrl ? String(shareImageUrl) : undefined,
-    description: String(description),
-    fullDescription: String(fullDescription || description),
-    openDate: normalizeDate(openDate),
-    closeDate: normalizeDate(closeDate),
-    tags: Array.isArray(tags) ? (tags as string[]) : [],
-    category: category as Opportunity["category"],
-    region: String(region),
-    country: country ? String(country) : null,
-    eligibility: String(eligibility),
-    applyLink: String(applyLink),
-    benefits: Array.isArray(benefits) ? (benefits as string[]) : [],
-    organizer: String(organizer),
-    duration: duration as Opportunity["duration"],
-    funding: funding as Opportunity["funding"],
-    applicationVideo: applicationVideo
-      ? String(applicationVideo)
-      : undefined,
+    id: String(row.id || ""),
+    name: String(row.name || ""),
+    logoUrl: String(row.logo_url || ""),
+    shareImageUrl: row.share_image_url ? String(row.share_image_url) : undefined,
+    description: String(row.description || ""),
+    fullDescription: String(row.full_description || row.description || ""),
+    openDate: normalizeDate(row.open_date),
+    closeDate: normalizeDate(row.close_date),
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    category: (row.category as Opportunity["category"]) || "fellowship",
+    region: String(row.region || ""),
+    country: row.country ? String(row.country) : null,
+    eligibility: String(row.eligibility || ""),
+    applyLink: String(row.apply_link || ""),
+    benefits: Array.isArray(row.benefits) ? (row.benefits as string[]) : [],
+    organizer: String(row.organizer || ""),
+    duration: row.duration as Opportunity["duration"],
+    funding: row.funding as Opportunity["funding"],
+    applicationVideo: row.application_video ? String(row.application_video) : undefined,
     votes: voterList.length,
     hasVoted: voterId ? voterList.includes(voterId) : false,
-    ...rest,
   };
 }
 
@@ -105,44 +45,40 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get("id");
     const voterId = searchParams.get("voterId") || undefined;
 
-    const collection = await getCollection();
-
     if (id) {
-      const filters: Document[] = [{ id }];
-      if (ObjectId.isValid(id)) {
-        filters.push({ _id: new ObjectId(id) });
+      const { data, error } = await supabase
+        .from("opportunities")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error || !data) {
+        return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
       }
 
-      const document = await collection.findOne({ $or: filters });
-      if (!document) {
-        return NextResponse.json(
-          { error: "Opportunity not found" },
-          { status: 404 }
-        );
-      }
-
-      return NextResponse.json(mapOpportunity(document, voterId), {
+      return NextResponse.json(mapRow(data, voterId), {
         status: 200,
         headers: { "Cache-Control": "no-store" },
       });
     }
 
-    const documents = await collection
-      .find({})
-      .sort({ closeDate: 1 })
-      .toArray();
+    const { data, error } = await supabase
+      .from("opportunities")
+      .select("*")
+      .order("close_date", { ascending: true });
 
-    const opportunities = documents.map((d) => mapOpportunity(d, voterId));
+    if (error) {
+      throw error;
+    }
 
-      return NextResponse.json(opportunities, {
-        status: 200,
-        headers: { "Cache-Control": "no-store" },
-      });
+    const opportunities = (data || []).map((d) => mapRow(d, voterId));
+
+    return NextResponse.json(opportunities, {
+      status: 200,
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     console.error("Error fetching opportunities:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch opportunities" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch opportunities" }, { status: 500 });
   }
 }

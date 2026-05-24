@@ -2,11 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - fellows.best",
+  title: "Terms of Service - Foundery.Space",
   description:
-    "Read the terms of service for fellows.best. Understand your rights and responsibilities when using our platform.",
+    "Read the terms of service for Foundery.Space. Understand your rights and responsibilities when using our platform.",
   alternates: {
-    canonical: "https://fellows.best/terms",
+    canonical: "https://foundery.space/terms",
     types: {
       "text/markdown": "/terms.md",
     },
@@ -28,9 +28,9 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
           <p>
-            Welcome to fellows.best (&quot;we,&quot; &quot;our,&quot; or
-            &quot;us&quot;). By accessing or using our website at fellows.best,
-            you agree to be bound by these Terms of Service. fellows.best is a
+            Welcome to Foundery.Space (&quot;we,&quot; &quot;our,&quot; or
+            &quot;us&quot;). By accessing or using our website at foundery.space,
+            you agree to be bound by these Terms of Service. Foundery.Space is a
             centralized platform for discovering and tracking fellowships,
             grants, accelerators, and competitions.
           </p>
@@ -38,7 +38,7 @@ export default function TermsPage() {
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">2. Services</h2>
-          <p>fellows.best provides the following services:</p>
+          <p>Foundery.Space provides the following services:</p>
           <ul className="list-disc pl-6 mt-2">
             <li>
               Aggregation of fellowships, grants, accelerators, hackathons,
@@ -90,7 +90,7 @@ export default function TermsPage() {
             5. Intellectual Property
           </h2>
           <p>
-            The fellows.best platform, including its design, logos, features,
+            The Foundery.Space platform, including its design, logos, features,
             and content created by us, is protected by copyright and other
             intellectual property rights. This includes:
           </p>
@@ -106,7 +106,7 @@ export default function TermsPage() {
           <h2 className="text-2xl font-semibold mb-4">
             6. Limitation of Liability
           </h2>
-          <p>While we strive to maintain accurate information, fellows.best:</p>
+          <p>While we strive to maintain accurate information, Foundery.Space:</p>
           <ul className="list-disc pl-6 mt-2">
             <li>
               Is not responsible for the accuracy of third-party opportunity

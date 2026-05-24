@@ -1,22 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import {
-  buildIdFilter,
-  getOpportunitiesCollection,
-  mapOpportunityDocument,
-  normalizeOpportunityPayload,
-} from "@/lib/opportunity-admin";
-import { uploadFileToCloudinary } from "@/lib/cloudinary";
+import { normalizeOpportunityPayload, fetchById } from "@/lib/opportunity-admin";
+import { getServiceClient } from "@/lib/supabase";
 
-// Configure route for larger file uploads
 export const runtime = "nodejs";
-export const maxDuration = 60; // 60 seconds for file uploads
+export const maxDuration = 60;
 
 type RouteParams = {
   params: Promise<{ id: string }>;
 };
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+function checkAuth(request: NextRequest): NextResponse | null {
   const adminToken = process.env.ADMIN_TOKEN;
   if (!adminToken) {
     return NextResponse.json({ error: "Admin token not configured" }, { status: 500 });
@@ -26,189 +20,127 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   if (token !== adminToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+  return null;
+}
+
+export async function PUT(request: NextRequest, { params }: RouteParams) {
+  const authErr = checkAuth(request);
+  if (authErr) return authErr;
+
   const { id: paramId } = await params;
   console.error("[admin:PUT] updating", paramId);
 
   try {
     const formData = await request.formData();
     const payload = formData.get("payload");
-    const logoFile = formData.get("logo");
-    const bannerFile = formData.get("banner");
 
     if (!payload || typeof payload !== "string") {
-      return NextResponse.json(
-        { error: "Missing payload in request" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing payload in request" }, { status: 400 });
     }
 
     let parsedPayload: Record<string, unknown>;
     try {
       parsedPayload = JSON.parse(payload) as Record<string, unknown>;
     } catch {
-      return NextResponse.json(
-        { error: "Invalid payload format" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid payload format" }, { status: 400 });
     }
 
-    let normalizedPayload;
+    let normalizedPayload: ReturnType<typeof normalizeOpportunityPayload>;
     try {
       normalizedPayload = normalizeOpportunityPayload(parsedPayload);
-    } catch (validationError) {
-      return NextResponse.json(
-        { error: "Invalid opportunity data" },
-        { status: 400 }
-      );
+    } catch {
+      return NextResponse.json({ error: "Invalid opportunity data" }, { status: 400 });
     }
 
-    let collection;
-    try {
-      collection = await getOpportunitiesCollection();
-    } catch (dbError) {
-      console.error("Error connecting to database:", dbError);
-      return NextResponse.json(
-        { error: "Database connection failed" },
-        { status: 500 }
-      );
-    }
+    const client = getServiceClient();
 
-    const filters = buildIdFilter(paramId);
-
-    let existing;
-    try {
-      existing = await collection.findOne(filters);
-    } catch (dbError) {
-      console.error("Error finding opportunity:", dbError);
-      return NextResponse.json(
-        { error: "Database query failed" },
-        { status: 500 }
-      );
-    }
-
+    const existing = await fetchById(paramId);
     if (!existing) {
       console.error("[admin:PUT] not found", paramId);
-      return NextResponse.json(
-        { error: "Opportunity not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
     }
 
     const id =
       typeof parsedPayload.id === "string" && parsedPayload.id.trim().length > 0
         ? parsedPayload.id.trim()
-        : existing.id || paramId;
+        : existing.id;
 
-    const now = new Date().toISOString();
     const updates: Record<string, unknown> = {
-      ...normalizedPayload,
-      updatedAt: now,
+      name: normalizedPayload.name,
+      description: normalizedPayload.description,
+      full_description: normalizedPayload.fullDescription,
+      open_date: normalizedPayload.openDate,
+      close_date: normalizedPayload.closeDate,
+      tags: normalizedPayload.tags,
+      category: normalizedPayload.category,
+      region: normalizedPayload.region,
+      country: normalizedPayload.country,
+      eligibility: normalizedPayload.eligibility,
+      apply_link: normalizedPayload.applyLink,
+      benefits: normalizedPayload.benefits,
+      organizer: normalizedPayload.organizer,
+      duration: normalizedPayload.duration || null,
+      funding: normalizedPayload.funding || null,
+      application_video: normalizedPayload.applicationVideo || null,
     };
 
-    if (logoFile instanceof File && logoFile.size > 0) {
-      try {
-        updates.logoUrl = await uploadFileToCloudinary(
-          logoFile,
-          `fellows/${id}/logo`
-        );
-      } catch (uploadError) {
-        console.error("Error uploading logo to Cloudinary:", uploadError);
-        return NextResponse.json(
-          { error: "Failed to upload logo" },
-          { status: 500 }
-        );
-      }
-    } else {
-      updates.logoUrl = existing.logoUrl;
-    }
+    const { data, error } = await client
+      .from("opportunities")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
 
-    if (bannerFile instanceof File && bannerFile.size > 0) {
-      try {
-        updates.shareImageUrl = await uploadFileToCloudinary(
-          bannerFile,
-          `fellows/${id}/share-image`
-        );
-      } catch (uploadError) {
-        console.error("Error uploading banner to Cloudinary:", uploadError);
-        if (existing.shareImageUrl) {
-          updates.shareImageUrl = existing.shareImageUrl;
-        }
-      }
-    } else if (existing.shareImageUrl) {
-      updates.shareImageUrl = existing.shareImageUrl;
-    }
-
-    let updated;
-    try {
-      updated = await collection.findOneAndUpdate(
-        filters,
-        { $set: updates },
-        { returnDocument: "after" }
-      );
-    } catch (dbError) {
-      console.error("Error updating opportunity in database:", dbError);
-      return NextResponse.json(
-        { error: "Failed to save opportunity to database" },
-        { status: 500 }
-      );
-    }
-
-    if (!updated) {
-      console.error("[admin:PUT] update returned no value", { paramId, filters });
-      return NextResponse.json(
-        { error: "Failed to update opportunity" },
-        { status: 500 }
-      );
+    if (error || !data) {
+      console.error("[admin:PUT] update failed", error);
+      return NextResponse.json({ error: "Failed to update opportunity" }, { status: 500 });
     }
 
     try {
       revalidatePath(`/opportunity/${id}`);
     } catch (revalidateError) {
-      // Revalidation failure shouldn't block the response
       console.warn("Failed to revalidate path:", revalidateError);
     }
 
-    return NextResponse.json(mapOpportunityDocument(updated));
+    const result = {
+      ...data,
+      mongoId: undefined,
+      logoUrl: data.logo_url,
+      shareImageUrl: data.share_image_url,
+      fullDescription: data.full_description,
+      openDate: data.open_date,
+      closeDate: data.close_date,
+      applyLink: data.apply_link,
+      applicationVideo: data.application_video,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    };
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error updating opportunity:", error);
-    return NextResponse.json(
-      { error: "Failed to update opportunity" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update opportunity" }, { status: 500 });
   }
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  const adminToken = process.env.ADMIN_TOKEN;
-  if (!adminToken) {
-    return NextResponse.json({ error: "Admin token not configured" }, { status: 500 });
-  }
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get("token");
-  if (token !== adminToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  
+  const authErr = checkAuth(request);
+  if (authErr) return authErr;
+
   const { id } = await params;
 
   try {
-    const collection = await getOpportunitiesCollection();
-    const deleteResult = await collection.deleteOne(buildIdFilter(id));
+    const client = getServiceClient();
+    const { error, count } = await client
+      .from("opportunities")
+      .delete()
+      .eq("id", id);
 
-    if (deleteResult.deletedCount === 0) {
-      return NextResponse.json(
-        { error: "Opportunity not found" },
-        { status: 404 }
-      );
-    }
+    if (error) throw error;
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
     console.error("Error deleting opportunity:", error);
-    return NextResponse.json(
-      { error: "Failed to delete opportunity" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to delete opportunity" }, { status: 500 });
   }
 }

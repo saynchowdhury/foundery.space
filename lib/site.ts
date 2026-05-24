@@ -2,7 +2,7 @@ export function getSiteUrl(): string {
   const raw =
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_APP_BASE_URL ||
-    "https://fellows.best";
+    "https://foundery.space";
   if (raw.startsWith("http://") || raw.startsWith("https://")) {
     return raw.replace(/\/$/, "");
   }

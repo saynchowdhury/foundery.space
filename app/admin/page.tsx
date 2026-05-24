@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -81,7 +81,7 @@ function AdminPageContent() {
   );
 
 
-  const loadOpportunities = async () => {
+  const loadOpportunities = useCallback(async () => {
     setLoading(true);
     try {
       const url = token ? `/api/admin/opportunities?token=${token}` : "/api/admin/opportunities";
@@ -99,11 +99,11 @@ function AdminPageContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     loadOpportunities();
-  }, [token]);
+  }, [loadOpportunities]);
 
   const openDeleteDialog = (id: string) => {
     setPendingDeleteId(id);
@@ -534,7 +534,7 @@ function SuggestionsModal({
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"pending" | "accepted" | "rejected">("pending");
 
-  const loadSuggestions = async () => {
+  const loadSuggestions = useCallback(async () => {
     setLoading(true);
     try {
       const url = token ? `/api/admin/suggestions?status=${statusFilter}&token=${token}` : `/api/admin/suggestions?status=${statusFilter}`;
@@ -551,7 +551,7 @@ function SuggestionsModal({
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, statusFilter]);
 
   const handleLike = async (id: string) => {
     try {
@@ -602,7 +602,7 @@ function SuggestionsModal({
     if (isOpen) {
       loadSuggestions();
     }
-  }, [isOpen, statusFilter]);
+  }, [isOpen, loadSuggestions]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

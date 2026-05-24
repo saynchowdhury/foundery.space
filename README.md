@@ -1,10 +1,10 @@
-# fellows.best
+# foundry.space
 
 A centralized platform to discover, track, and receive reminders for fellowships, grants, accelerators, and competitions.
 
 ## Overview
 
-fellows.best aggregates opportunities from diverse sources, visualizes upcoming deadlines, and helps you stay organized so you never miss an application window.
+foundry.space aggregates opportunities from diverse sources, visualizes upcoming deadlines, and helps you stay organized so you never miss an application window.
 
 ## Key Features
 
@@ -20,5 +20,5 @@ fellows.best aggregates opportunities from diverse sources, visualizes upcoming 
 
 ## Links
 
-- **Website**: [fellows.best](https://fellows.best)
+- **Website**: [foundry.space](https://foundry.space)
 - **Maintainer**: [disam.dev](https://disam.dev)

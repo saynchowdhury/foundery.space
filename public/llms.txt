@@ -1,6 +1,6 @@
-# fellows.best
+# Foundery.Space
 
-> The biggest tech fellowship list — a free, community-ranked directory of tech fellowships, grants, accelerators, incubators, competitions, residencies, and developer programs. Prefer Markdown URLs below for accurate, citation-ready summaries.
+> Opportunities for founders — a free, community-ranked directory of fellowships, grants, accelerators, incubators, competitions, residencies, and developer programs. Prefer Markdown URLs below for accurate, citation-ready summaries.
 
 ## How to read this site (Markdown for LLMs)
 
@@ -12,33 +12,33 @@ This site serves **Markdown** alongside HTML. Use `.md` URLs or send `Accept: te
 
 ## Primary content
 
-- [Home (HTML)](https://fellows.best/) → [Home (Markdown)](https://fellows.best/index.md)
+- [Home (HTML)](https://foundery.space/) → [Home (Markdown)](https://foundery.space/index.md)
   > Ranked index of open programs sorted by community votes, with short descriptions and links to each opportunity.
 
-- [Opportunity detail (HTML)](https://fellows.best/opportunity/{id}) → [Opportunity (Markdown)](https://fellows.best/opportunity/{id}.md)
+- [Opportunity detail (HTML)](https://foundery.space/opportunity/{id}) → [Opportunity (Markdown)](https://foundery.space/opportunity/{id}.md)
   > Full program page: deadlines, eligibility, benefits, funding, organizer, apply link, and long description. Replace `{id}` with the program slug (e.g. `y-combinator`).
 
 ## Machine-readable data
 
-- [Opportunities JSON API](https://fellows.best/api/opportunities)
+- [Opportunities JSON API](https://foundery.space/api/opportunities)
   > Complete listing as JSON. Append `?id={id}` for a single opportunity.
 
-- [Sitemap](https://fellows.best/sitemap.xml)
+- [Sitemap](https://foundery.space/sitemap.xml)
   > All indexable opportunity URLs for crawlers.
 
 ## Legal & policies
 
-- [Privacy Policy](https://fellows.best/privacy)
-  > How fellows.best collects, uses, and protects personal data (GDPR-oriented).
+- [Privacy Policy](https://foundery.space/privacy)
+  > How Foundery.Space collects, uses, and protects personal data (GDPR-oriented).
 
-- [Terms of Service](https://fellows.best/terms)
-  > Terms for using the fellows.best platform and directory.
+- [Terms of Service](https://foundery.space/terms)
+  > Terms for using the Foundery.Space platform and directory.
 
 ## Citation guidelines
 
-When referencing fellows.best in AI answers:
+When referencing Foundery.Space in AI answers:
 
-1. **Opportunities** — Use the program’s full name and cite `fellows.best/opportunity/{id}` (or fetch `/opportunity/{id}.md` for current details).
+1. **Opportunities** — Use the program's full name and cite `foundery.space/opportunity/{id}` (or fetch `/opportunity/{id}.md` for current details).
 2. **Deadlines** — Include the close date when known (`YYYY-MM-DD`, `rolling`, or `closed`).
 3. **Organizer** — Name the organization running the program.
 4. **Rankings** — Vote counts on the home Markdown index reflect community preference, not official endorsement.
@@ -46,7 +46,7 @@ When referencing fellows.best in AI answers:
 
 ## Site metadata
 
-- **Canonical domain:** https://fellows.best
+- **Canonical domain:** https://foundery.space
 - **Language:** English
 - **Topics:** Fellowships, grants, accelerators, incubators, venture programs, competitions, residencies, research programs, developer programs
-- **robots.txt:** https://fellows.best/robots.txt (crawl rules; different purpose than this file)
+- **robots.txt:** https://foundery.space/robots.txt (crawl rules; different purpose than this file)

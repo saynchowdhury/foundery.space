@@ -2,18 +2,17 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Menu,
   X,
-  Calendar,
   List,
   Plus,
   Moon,
   Sun,
   Home,
-  Github,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -64,13 +63,16 @@ export function Header() {
               >
                 <div className="relative h-8 w-8 flex items-center justify-center">
                   <div className="absolute inset-0 rounded-lg opacity-20 group-hover:opacity-100 transition-opacity duration-300 bg-foreground/10" />
-                  <Calendar
-                    className="h-5 w-5 transform group-hover:scale-110 transition-transform duration-300"
-                    strokeWidth={1.5}
+                  <Image
+                    src="/logos/foundery-logo-32.webp"
+                    alt="Foundery.Space"
+                    width={20}
+                    height={20}
+                    className="transform group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
                 <span className="text-xl font-medium tracking-tight">
-                  fellows.best
+                  Foundery.Space
                 </span>
               </Link>
             </div>
@@ -103,16 +105,6 @@ export function Header() {
                 <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                 <span className="sr-only">Toggle theme</span>
-              </Button>
-              <Button asChild>
-                <Link
-                  href="https://github.com/samuelcorsan/fellows.best"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Github className="mr-2 h-4 w-4" />
-                  Contribute
-                </Link>
               </Button>
             </div>
 
@@ -171,23 +163,7 @@ export function Header() {
                       );
                     })}
                   </div>
-
-                  <div className="mt-8 pt-8 border-t">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">
-                      Contribute
-                    </p>
-                    <Link
-                      href="https://github.com/samuelcorsan/fellows.best"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-foreground hover:bg-muted w-full text-left"
-                    >
-                      <Github className="h-5 w-5 flex-shrink-0" />
-                      <span>Contribute</span>
-                    </Link>
                   </div>
-                </div>
               </div>
             </div>
           )}

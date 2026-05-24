@@ -2,11 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - fellows.best",
+  title: "Privacy Policy - Foundery.Space",
   description:
-    "Learn how fellows.best collects, uses, and protects your personal data in accordance with GDPR and privacy laws.",
+    "Learn how Foundery.Space collects, uses, and protects your personal data in accordance with GDPR and privacy laws.",
   alternates: {
-    canonical: "https://fellows.best/privacy",
+    canonical: "https://foundery.space/privacy",
     types: {
       "text/markdown": "/privacy.md",
     },
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
           <p>
-            This Privacy Policy explains how fellows.best (&quot;we,&quot;
+            This Privacy Policy explains how Foundery.Space (&quot;we,&quot;
             &quot;our,&quot; or &quot;us&quot;) collects, uses, and protects
             your personal data in accordance with the General Data Protection
             Regulation (GDPR) and other applicable privacy laws.

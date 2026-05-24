@@ -73,13 +73,13 @@ export async function renderHomeMarkdown(): Promise<string> {
   const api = absoluteUrl("/api/opportunities");
 
   const lines: string[] = [
-    "# fellows.best",
+    "# Foundery.Space",
     "",
-    "> The biggest tech fellowship list.",
+    "> Opportunities for founders.",
     "",
-    "## What is fellows.best?",
+    "## What is Foundery.Space?",
     "",
-    "fellows.best is a free, community-ranked directory of tech fellowships, grants, accelerators, incubators, competitions, residencies, developer programs, and related opportunities.",
+    "Foundery.Space is a free, community-ranked directory of fellowships, grants, accelerators, incubators, competitions, residencies, developer programs, and related opportunities for founders.",
     "",
     "- **Browse & compare** programs with deadlines, eligibility, benefits, and apply links.",
     "- **Community ranking** — visitors upvote programs they recommend; the list below is sorted by vote count (highest first).",
@@ -125,7 +125,7 @@ export async function renderHomeMarkdown(): Promise<string> {
     "---",
     "",
     "Request Markdown: send `Accept: text/markdown` or use a `.md` URL (e.g. `/index.md`, `/opportunity/{id}.md`).",
-    "See also: [llms.txt](https://fellows.best/llms.txt)",
+    "See also: [llms.txt](https://foundery.space/llms.txt)",
     ""
   );
 
@@ -202,7 +202,7 @@ export async function renderOpportunityMarkdown(
   lines.push(
     "---",
     "",
-    `[← Back to fellows.best](${absoluteUrl("/")}) · [Home Markdown](${absoluteUrl("/index.md")})`,
+    `[← Back to Foundery.Space](${absoluteUrl("/")}) · [Home Markdown](${absoluteUrl("/index.md")})`,
     ""
   );
 

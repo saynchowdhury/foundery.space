@@ -9,14 +9,20 @@ export const maxDuration = 60;
 const LLM_MODEL = "kimi-k2-thinking-turbo";
 const GROQ_FALLBACK_MODEL = "moonshotai/kimi-k2-instruct-0905";
 
-const firecrawl = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_API_KEY,
-});
+function getFirecrawl() {
+  const key = process.env.FIRECRAWL_API_KEY;
+  if (!key) throw new Error("FIRECRAWL_API_KEY is not set");
+  return new FirecrawlApp({ apiKey: key });
+}
 
-const openai = new OpenAI({
-  baseURL: "https://internal.llmapi.ai/v1",
-  apiKey: process.env.LLM_API_KEY,
-});
+function getOpenAI() {
+  const key = process.env.LLM_API_KEY;
+  if (!key) throw new Error("LLM_API_KEY is not set");
+  return new OpenAI({
+    baseURL: "https://internal.llmapi.ai/v1",
+    apiKey: key,
+  });
+}
 
 function parseUrlFromQuery(query: string): string | null {
   const trimmed = query.trim();
@@ -74,7 +80,7 @@ async function extractOpportunityFromMarkdown(
 
   let completion;
   try {
-    completion = await openai.chat.completions.create({
+    completion = await getOpenAI().chat.completions.create({
       ...chatParams,
       model: LLM_MODEL,
     });
@@ -120,7 +126,7 @@ export async function POST(req: NextRequest) {
     let markdown: string | undefined;
 
     if (directUrl) {
-      const scrapeResponse = await firecrawl.scrape(directUrl, {
+      const scrapeResponse = await getFirecrawl().scrape(directUrl, {
         formats: ["markdown"],
       });
       markdown = scrapeResponse.markdown;
@@ -128,7 +134,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Failed to scrape URL" }, { status: 500 });
       }
     } else {
-      const searchResponse = await firecrawl.search(query, {
+      const searchResponse = await getFirecrawl().search(query, {
         limit: 1,
         scrapeOptions: {
           formats: ["markdown"],

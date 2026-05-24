@@ -1,88 +1,65 @@
-import type { Document } from "mongodb";
 import type { Opportunity } from "@/lib/data";
-import {
-  buildIdFilter,
-  getOpportunitiesCollection,
-} from "@/lib/opportunity-admin";
+import { supabase } from "@/lib/supabase";
 
 function normalizeDate(
   value: unknown
 ): Opportunity["closeDate"] | Opportunity["openDate"] {
   if (value === undefined || value === null) return null;
   if (value === "closed") return "closed";
-  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "string") return value;
   return String(value);
 }
 
-function mapPublicOpportunity(doc: Document): Opportunity {
-  const {
-    _id,
-    id,
-    name = "",
-    logoUrl = "",
-    shareImageUrl,
-    description = "",
-    fullDescription = "",
-    openDate,
-    closeDate,
-    tags = [],
-    category = "fellowship",
-    region = "",
-    country = null,
-    eligibility = "",
-    applyLink = "",
-    benefits = [],
-    organizer = "",
-    duration,
-    funding,
-    applicationVideo,
-    voters,
-    votes: _votes,
-    ...rest
-  } = doc as Record<string, unknown>;
-  void _votes;
-  const voterList = Array.isArray(voters) ? (voters as string[]) : [];
-
+function mapRowToOpportunity(row: Record<string, unknown>): Opportunity {
   return {
-    id: typeof id === "string" && id.length > 0 ? id : _id?.toString() || "",
-    name: String(name),
-    logoUrl: String(logoUrl),
-    shareImageUrl: shareImageUrl ? String(shareImageUrl) : undefined,
-    description: String(description),
-    fullDescription: String(fullDescription || description),
-    openDate: normalizeDate(openDate),
-    closeDate: normalizeDate(closeDate),
-    tags: Array.isArray(tags) ? (tags as string[]) : [],
-    category: category as Opportunity["category"],
-    region: String(region),
-    country: country ? String(country) : null,
-    eligibility: String(eligibility),
-    applyLink: String(applyLink),
-    benefits: Array.isArray(benefits) ? (benefits as string[]) : [],
-    organizer: String(organizer),
-    duration: duration as Opportunity["duration"],
-    funding: funding as Opportunity["funding"],
-    applicationVideo: applicationVideo
-      ? String(applicationVideo)
-      : undefined,
-    votes: voterList.length,
-    ...rest,
+    id: String(row.id || ""),
+    name: String(row.name || ""),
+    logoUrl: String(row.logo_url || ""),
+    shareImageUrl: row.share_image_url ? String(row.share_image_url) : undefined,
+    description: String(row.description || ""),
+    fullDescription: String(row.full_description || row.description || ""),
+    openDate: normalizeDate(row.open_date),
+    closeDate: normalizeDate(row.close_date),
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    category: (row.category as Opportunity["category"]) || "fellowship",
+    region: String(row.region || ""),
+    country: row.country ? String(row.country) : null,
+    eligibility: String(row.eligibility || ""),
+    applyLink: String(row.apply_link || ""),
+    benefits: Array.isArray(row.benefits) ? (row.benefits as string[]) : [],
+    organizer: String(row.organizer || ""),
+    duration: row.duration as Opportunity["duration"],
+    funding: row.funding as Opportunity["funding"],
+    applicationVideo: row.application_video ? String(row.application_video) : undefined,
+    votes: typeof row.votes === "number" ? row.votes : 0,
   };
 }
 
 export async function fetchAllOpportunities(): Promise<Opportunity[]> {
-  const collection = await getOpportunitiesCollection();
-  const documents = await collection.find({}).toArray();
-  return documents.map(mapPublicOpportunity);
+  const { data, error } = await supabase
+    .from("opportunities")
+    .select("*")
+    .order("closeDate", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching opportunities:", error);
+    return [];
+  }
+
+  return (data || []).map(mapRowToOpportunity);
 }
 
 export async function fetchOpportunityById(
   id: string
 ): Promise<Opportunity | null> {
-  const collection = await getOpportunitiesCollection();
-  const document = await collection.findOne(buildIdFilter(id));
-  if (!document) return null;
-  return mapPublicOpportunity(document);
+  const { data, error } = await supabase
+    .from("opportunities")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) return null;
+  return mapRowToOpportunity(data);
 }
 
 export function isOpportunityOpen(o: Opportunity): boolean {

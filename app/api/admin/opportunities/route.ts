@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import {
-  buildIdFilter,
-  generateId,
-  getOpportunitiesCollection,
-  mapOpportunityDocument,
-  normalizeOpportunityPayload,
-} from "@/lib/opportunity-admin";
-import { uploadFileToCloudinary } from "@/lib/cloudinary";
+import { generateId, normalizeOpportunityPayload, fetchById } from "@/lib/opportunity-admin";
+import { getServiceClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
-export const maxDuration = 20
+export const maxDuration = 20;
 
-export async function GET(request: NextRequest) {
+function checkAuth(request: NextRequest): NextResponse | null {
   const adminToken = process.env.ADMIN_TOKEN;
   if (!adminToken) {
     return NextResponse.json({ error: "Admin token not configured" }, { status: 500 });
@@ -22,81 +16,95 @@ export async function GET(request: NextRequest) {
   if (token !== adminToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+  return null;
+}
+
+function mapRow(row: Record<string, unknown>) {
+  return {
+    ...row,
+    mongoId: undefined,
+    logoUrl: row.logo_url,
+    shareImageUrl: row.share_image_url,
+    fullDescription: row.full_description,
+    openDate: row.open_date,
+    closeDate: row.close_date,
+    applyLink: row.apply_link,
+    applicationVideo: row.application_video,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export async function GET(request: NextRequest) {
+  const authErr = checkAuth(request);
+  if (authErr) return authErr;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
+    const client = getServiceClient();
 
-    const collection = await getOpportunitiesCollection();
     if (id) {
-      const document = await collection.findOne(buildIdFilter(id));
-      if (!document) {
+      const opp = await fetchById(id);
+      if (!opp) {
         return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
       }
-      return NextResponse.json(mapOpportunityDocument(document), { status: 200 });
+      return NextResponse.json(opp, { status: 200 });
     }
 
-    const documents = await collection.find({}).sort({ updatedAt: -1 }).toArray();
+    const { data, error } = await client
+      .from("opportunities")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-    return NextResponse.json(documents.map(mapOpportunityDocument), { status: 200 });
+    if (error) throw error;
+
+    const result = (data || []).map((row: Record<string, unknown>) => ({
+      ...row,
+      mongoId: undefined,
+      logoUrl: row.logo_url,
+      shareImageUrl: row.share_image_url,
+      fullDescription: row.full_description,
+      openDate: row.open_date,
+      closeDate: row.close_date,
+      applyLink: row.apply_link,
+      applicationVideo: row.application_video,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error("Error listing opportunities:", error);
-    return NextResponse.json(
-      { error: "Failed to list opportunities" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to list opportunities" }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
-  const adminToken = process.env.ADMIN_TOKEN;
-  if (!adminToken) {
-    return NextResponse.json({ error: "Admin token not configured" }, { status: 500 });
-  }
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get("token");
-  if (token !== adminToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  
+  const authErr = checkAuth(request);
+  if (authErr) return authErr;
+
   try {
     const formData = await request.formData();
     const payload = formData.get("payload");
     const logoFile = formData.get("logo");
-    const bannerFile = formData.get("banner");
 
     if (!payload || typeof payload !== "string") {
-      return NextResponse.json(
-        { error: "Missing payload in request" },
-        { status: 400 }
-      );
-    }
-
-    if (!(logoFile instanceof File)) {
-      return NextResponse.json(
-        { error: "Logo file is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing payload in request" }, { status: 400 });
     }
 
     let parsedPayload: Record<string, unknown>;
     try {
       parsedPayload = JSON.parse(payload) as Record<string, unknown>;
-    } catch (parseError) {
-      return NextResponse.json(
-        { error: "Invalid payload format" },
-        { status: 400 }
-      );
+    } catch {
+      return NextResponse.json({ error: "Invalid payload format" }, { status: 400 });
     }
 
-    let normalizedPayload;
+    let normalizedPayload: ReturnType<typeof normalizeOpportunityPayload>;
     try {
       normalizedPayload = normalizeOpportunityPayload(parsedPayload);
-    } catch (validationError) {
-      return NextResponse.json(
-        { error: "Invalid opportunity data" },
-        { status: 400 }
-      );
+    } catch {
+      return NextResponse.json({ error: "Invalid opportunity data" }, { status: 400 });
     }
 
     const id =
@@ -104,95 +112,74 @@ export async function POST(request: NextRequest) {
         ? parsedPayload.id.trim()
         : generateId(normalizedPayload.name);
 
-    let logoUrl: string;
-    let shareImageUrl: string | undefined;
+    const client = getServiceClient();
 
-    try {
-      logoUrl = await uploadFileToCloudinary(logoFile, `fellows/${id}/logo`);
-    } catch (uploadError) {
-      console.error("Error uploading logo to Cloudinary:", uploadError);
-      return NextResponse.json(
-        { error: "Failed to upload logo" },
-        { status: 500 }
-      );
-    }
-
-    try {
-      if (bannerFile instanceof File && bannerFile.size > 0) {
-        shareImageUrl = await uploadFileToCloudinary(bannerFile, `fellows/${id}/share-image`);
-      }
-    } catch (uploadError) {
-      console.error("Error uploading banner to Cloudinary:", uploadError);
-    }
-
-    const now = new Date().toISOString();
-    const document = {
-      ...normalizedPayload,
-      id,
-      logoUrl,
-      ...(shareImageUrl ? { shareImageUrl } : {}),
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    let collection;
-    try {
-      collection = await getOpportunitiesCollection();
-    } catch (dbError) {
-      console.error("Error connecting to database:", dbError);
-      return NextResponse.json(
-        { error: "Database connection failed" },
-        { status: 500 }
-      );
-    }
-
-    // Avoid duplicate IDs if an existing document is found
-    let existing;
-    try {
-      existing = await collection.findOne(buildIdFilter(id));
-    } catch (dbError) {
-      console.error("Error checking for existing opportunity:", dbError);
-      return NextResponse.json(
-        { error: "Database query failed" },
-        { status: 500 }
-      );
-    }
+    const { data: existing } = await client
+      .from("opportunities")
+      .select("id")
+      .eq("id", id)
+      .single();
 
     if (existing) {
-      return NextResponse.json(
-        { error: "An opportunity with this id already exists" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "An opportunity with this id already exists" }, { status: 409 });
     }
 
-    let insertResult;
-    try {
-      insertResult = await collection.insertOne(document);
-    } catch (dbError) {
-      console.error("Error inserting opportunity:", dbError);
-      return NextResponse.json(
-        { error: "Failed to save opportunity to database" },
-        { status: 500 }
-      );
-    }
+    const logoUrl = logoFile instanceof File && logoFile.size > 0
+      ? `/logos/${id}.avif`
+      : `/logos/${id}.avif`;
 
-    const savedDocument = { ...document, _id: insertResult.insertedId };
+    const { data, error } = await client
+      .from("opportunities")
+      .insert({
+        id,
+        name: normalizedPayload.name,
+        logo_url: logoUrl,
+        share_image_url: `/images/${id}.avif`,
+        description: normalizedPayload.description,
+        full_description: normalizedPayload.fullDescription,
+        open_date: normalizedPayload.openDate,
+        close_date: normalizedPayload.closeDate,
+        tags: normalizedPayload.tags,
+        category: normalizedPayload.category,
+        region: normalizedPayload.region,
+        country: normalizedPayload.country,
+        eligibility: normalizedPayload.eligibility,
+        apply_link: normalizedPayload.applyLink,
+        benefits: normalizedPayload.benefits,
+        organizer: normalizedPayload.organizer,
+        duration: normalizedPayload.duration || null,
+        funding: normalizedPayload.funding || null,
+        application_video: normalizedPayload.applicationVideo || null,
+        voters: [],
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
 
     try {
       revalidatePath(`/opportunity/${id}`);
     } catch (revalidateError) {
-      // Revalidation failure shouldn't block the response
       console.warn("Failed to revalidate path:", revalidateError);
     }
 
-    return NextResponse.json(mapOpportunityDocument(savedDocument), {
-      status: 201,
-    });
+    const result = {
+      ...data,
+      mongoId: undefined,
+      logoUrl: data.logo_url,
+      shareImageUrl: data.share_image_url,
+      fullDescription: data.full_description,
+      openDate: data.open_date,
+      closeDate: data.close_date,
+      applyLink: data.apply_link,
+      applicationVideo: data.application_video,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    };
+
+    return NextResponse.json(result, { status: 201 });
   } catch (error) {
     console.error("Error creating opportunity:", error);
-    return NextResponse.json(
-      { error: "Failed to create opportunity" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create opportunity" }, { status: 500 });
   }
 }

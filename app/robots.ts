@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/"],
     },
-    sitemap: "https://fellows.best/sitemap.xml",
+    sitemap: "https://foundery.space/sitemap.xml",
   };
 }

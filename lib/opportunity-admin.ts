@@ -1,46 +1,11 @@
-import {
-  MongoClient,
-  ObjectId,
-  ServerApiVersion,
-  type Document,
-  type MongoClientOptions,
-} from "mongodb";
 import type { Opportunity } from "./data";
+import { supabase, getServiceClient } from "@/lib/supabase";
 
 export type AdminOpportunity = Opportunity & {
   mongoId?: string;
   createdAt?: string;
   updatedAt?: string;
 };
-
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB;
-const collectionName = process.env.MONGODB_COLLECTION;
-
-if (!uri) {
-  throw new Error("MONGODB_URI is not set");
-}
-
-if (!collectionName) {
-  throw new Error("MONGODB_COLLECTION is not set");
-}
-
-let clientPromise: Promise<MongoClient> | null = null;
-
-function getClient(): Promise<MongoClient> {
-  if (!clientPromise) {
-    const client = new MongoClient(uri!);
-    clientPromise = client.connect();
-  }
-
-  return clientPromise;
-}
-
-export async function getOpportunitiesCollection() {
-  const client = await getClient();
-  const db = dbName ? client.db(dbName) : client.db();
-  return db.collection<Document>(collectionName!);
-}
 
 function normalizeDate(
   value: unknown
@@ -59,7 +24,6 @@ function parseStringArray(
   if (Array.isArray(value)) {
     return value.map(String).map((item) => item.trim()).filter(Boolean);
   }
-
   if (typeof value === "string") {
     const chosenSeparator = value.includes("\n") ? "\n" : separator;
     return value
@@ -67,7 +31,6 @@ function parseStringArray(
       .map((item) => item.trim())
       .filter(Boolean);
   }
-
   return [];
 }
 
@@ -132,68 +95,6 @@ export function normalizeOpportunityPayload(
   };
 }
 
-export function mapOpportunityDocument(doc: Document): AdminOpportunity {
-  const {
-    _id,
-    createdAt,
-    updatedAt,
-    shareImageUrl,
-    ...rest
-  } = doc as Record<string, unknown>;
-
-  const {
-    id,
-    name = "",
-    logoUrl = "",
-    description = "",
-    fullDescription = "",
-    openDate,
-    closeDate,
-    tags = [],
-    category = "fellowship",
-    region = "",
-    country = null,
-    eligibility = "",
-    applyLink = "",
-    benefits = [],
-    organizer = "",
-    duration,
-    funding,
-    applicationVideo,
-    ...extras
-  } = rest;
-
-  const opportunity: AdminOpportunity = {
-    id: typeof id === "string" && id.length > 0 ? id : _id?.toString() || "",
-    name: String(name),
-    logoUrl: String(logoUrl),
-    shareImageUrl: shareImageUrl ? String(shareImageUrl) : undefined,
-    description: String(description),
-    fullDescription: String(fullDescription || description),
-    openDate: normalizeDate(openDate),
-    closeDate: normalizeDate(closeDate),
-    tags: Array.isArray(tags) ? (tags as string[]) : [],
-    category: category as Opportunity["category"],
-    region: String(region),
-    country: country ? String(country) : null,
-    eligibility: String(eligibility),
-    applyLink: String(applyLink),
-    benefits: Array.isArray(benefits) ? (benefits as string[]) : [],
-    organizer: String(organizer),
-    duration: duration as Opportunity["duration"],
-    funding: funding as Opportunity["funding"],
-    applicationVideo: applicationVideo
-      ? String(applicationVideo)
-      : undefined,
-    mongoId: _id ? String(_id) : undefined,
-    createdAt: createdAt ? String(createdAt) : undefined,
-    updatedAt: updatedAt ? String(updatedAt) : undefined,
-    ...extras,
-  };
-
-  return opportunity;
-}
-
 export function generateId(name: string): string {
   return name
     .toLowerCase()
@@ -202,12 +103,203 @@ export function generateId(name: string): string {
     .substring(0, 50);
 }
 
-export function buildIdFilter(id: string) {
-  const filters: Document[] = [{ id }];
+async function getClient() {
+  return getServiceClient();
+}
 
-  if (ObjectId.isValid(id)) {
-    filters.push({ _id: new ObjectId(id) });
+export async function getOpportunitiesCollection() {
+  return supabase.from("opportunities");
+}
+
+export async function fetchAllAdmin(): Promise<AdminOpportunity[]> {
+  const client = await getClient();
+  const { data, error } = await client
+    .from("opportunities")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching admin opportunities:", error);
+    return [];
   }
 
-  return { $or: filters };
+  return (data || []).map(mapRowToAdminOpportunity);
+}
+
+export async function fetchById(id: string): Promise<AdminOpportunity | null> {
+  const client = await getClient();
+  const { data, error } = await client
+    .from("opportunities")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) {
+    // Also try by name match for slug-based lookups
+    const { data: byName } = await client
+      .from("opportunities")
+      .select("*")
+      .eq("id", generateId(id))
+      .single();
+
+    if (!byName) return null;
+    return mapRowToAdminOpportunity(byName);
+  }
+
+  return mapRowToAdminOpportunity(data);
+}
+
+export async function createOpportunity(
+  payload: ReturnType<typeof normalizeOpportunityPayload>,
+  id: string
+): Promise<AdminOpportunity | null> {
+  const client = await getClient();
+  const { data, error } = await client
+    .from("opportunities")
+    .insert({
+      id,
+      name: payload.name,
+      logo_url: `/logos/${id}.avif`,
+      share_image_url: payload.shareImageUrl || `/images/${id}.avif`,
+      description: payload.description,
+      full_description: payload.fullDescription,
+      open_date: payload.openDate,
+      close_date: payload.closeDate,
+      tags: payload.tags,
+      category: payload.category,
+      region: payload.region,
+      country: payload.country,
+      eligibility: payload.eligibility,
+      apply_link: payload.applyLink,
+      benefits: payload.benefits,
+      organizer: payload.organizer,
+      duration: payload.duration || null,
+      funding: payload.funding || null,
+      application_video: payload.applicationVideo || null,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating opportunity:", error);
+    return null;
+  }
+
+  return mapRowToAdminOpportunity(data);
+}
+
+export async function updateOpportunity(
+  id: string,
+  payload: Partial<ReturnType<typeof normalizeOpportunityPayload>> & {
+    logoUrl?: string;
+    shareImageUrl?: string;
+  }
+): Promise<AdminOpportunity | null> {
+  const client = await getClient();
+  const updates: Record<string, unknown> = {};
+
+  if (payload.name !== undefined) updates.name = payload.name;
+  if (payload.logoUrl !== undefined) updates.logo_url = payload.logoUrl;
+  if (payload.shareImageUrl !== undefined)
+    updates.share_image_url = payload.shareImageUrl;
+  if (payload.description !== undefined)
+    updates.description = payload.description;
+  if (payload.fullDescription !== undefined)
+    updates.full_description = payload.fullDescription;
+  if (payload.openDate !== undefined) updates.open_date = payload.openDate;
+  if (payload.closeDate !== undefined) updates.close_date = payload.closeDate;
+  if (payload.tags !== undefined) updates.tags = payload.tags;
+  if (payload.category !== undefined) updates.category = payload.category;
+  if (payload.region !== undefined) updates.region = payload.region;
+  if (payload.country !== undefined) updates.country = payload.country;
+  if (payload.eligibility !== undefined)
+    updates.eligibility = payload.eligibility;
+  if (payload.applyLink !== undefined) updates.apply_link = payload.applyLink;
+  if (payload.benefits !== undefined) updates.benefits = payload.benefits;
+  if (payload.organizer !== undefined) updates.organizer = payload.organizer;
+  if (payload.duration !== undefined) updates.duration = payload.duration;
+  if (payload.funding !== undefined) updates.funding = payload.funding;
+  if (payload.applicationVideo !== undefined)
+    updates.application_video = payload.applicationVideo;
+
+  const { data, error } = await client
+    .from("opportunities")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating opportunity:", error);
+    return null;
+  }
+
+  return mapRowToAdminOpportunity(data);
+}
+
+export async function deleteOpportunity(
+  id: string
+): Promise<boolean> {
+  const client = await getClient();
+  const { error } = await client
+    .from("opportunities")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting opportunity:", error);
+    return false;
+  }
+
+  return true;
+}
+
+function mapRowToAdminOpportunity(row: Record<string, unknown>): AdminOpportunity {
+  return {
+    id: String(row.id || ""),
+    name: String(row.name || ""),
+    logoUrl: String(row.logo_url || ""),
+    shareImageUrl: row.share_image_url ? String(row.share_image_url) : undefined,
+    description: String(row.description || ""),
+    fullDescription: String(row.full_description || row.description || ""),
+    openDate: normalizeDate(row.open_date),
+    closeDate: normalizeDate(row.close_date),
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    category: (row.category as Opportunity["category"]) || "fellowship",
+    region: String(row.region || ""),
+    country: row.country ? String(row.country) : null,
+    eligibility: String(row.eligibility || ""),
+    applyLink: String(row.apply_link || ""),
+    benefits: Array.isArray(row.benefits) ? (row.benefits as string[]) : [],
+    organizer: String(row.organizer || ""),
+    duration: row.duration as Opportunity["duration"],
+    funding: row.funding as Opportunity["funding"],
+    applicationVideo: row.application_video
+      ? String(row.application_video)
+      : undefined,
+    votes: Array.isArray(row.voters) ? (row.voters as string[]).length : 0,
+    createdAt: row.created_at ? String(row.created_at) : undefined,
+    updatedAt: row.updated_at ? String(row.updated_at) : undefined,
+  };
+}
+
+export async function searchOpportunities(
+  query: string
+): Promise<AdminOpportunity[]> {
+  const client = await getClient();
+  const { data, error } = await client
+    .from("opportunities")
+    .select("*")
+    .or(
+      `name.ilike.%${query}%,description.ilike.%${query}%,organizer.ilike.%${query}%`
+    )
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) {
+    console.error("Error searching opportunities:", error);
+    return [];
+  }
+
+  return (data || []).map(mapRowToAdminOpportunity);
 }

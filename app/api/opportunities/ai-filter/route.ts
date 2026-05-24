@@ -22,9 +22,7 @@ const TRUNCATE_LIMITS = {
   MAX_BENEFITS: 5,
 } as const;
 
-if (!process.env.LLM_API_KEY && !process.env.GROQ_API_KEY) {
-  throw new Error("LLM_API_KEY or GROQ_API_KEY environment variable must be set");
-}
+const hasLLMConfig = !!(process.env.LLM_API_KEY || process.env.GROQ_API_KEY);
 
 function createTimeoutPromise(timeoutMs: number): Promise<never> {
   return new Promise((_, reject) => {
@@ -36,7 +34,13 @@ function createTimeoutPromise(timeoutMs: number): Promise<never> {
 
 export async function POST(request: NextRequest) {
   try {
-    // If search mode is text, return error indicating text search should be used
+    if (!hasLLMConfig) {
+      return NextResponse.json(
+        { error: "AI search is not configured. LLM_API_KEY or GROQ_API_KEY must be set." },
+        { status: 500 }
+      );
+    }
+
     if (SEARCH_MODE === "text") {
       return NextResponse.json(
         {

@@ -1,27 +1,17 @@
 import type { Metadata } from "next";
 import type { Opportunity } from "@/lib/data";
 
-function getBaseUrl() {
-  const raw = process.env.NEXT_PUBLIC_APP_BASE_URL;
-  if (raw?.startsWith("http://") || raw?.startsWith("https://")) return raw;
-  if (raw) return `https://${raw}`;
-  return "http://localhost:3000";
-}
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_BASE_URL || "https://foundery.space";
   let opportunity: Opportunity | undefined;
 
   try {
-    const apiUrl = new URL(
-      `/api/opportunities?id=${id}`,
-      getBaseUrl()
-    );
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`/api/opportunities?id=${id}`, {
       cache: "no-store",
     });
 
@@ -34,14 +24,13 @@ export async function generateMetadata({
 
   if (!opportunity) {
     return {
-      title: "Opportunity Not Found - fellows.best",
+      title: "Opportunity Not Found - Foundery.Space",
       description: "The requested opportunity could not be found.",
     };
   }
 
   const title = `${opportunity.name} - Deadlines, Requirements & How to Apply`;
   
-  // Optimize description length (150-160 chars for SEO)
   const { generateOpportunityMetaDescription } = await import("@/lib/meta-optimization");
   const description = generateOpportunityMetaDescription(
     opportunity.name,
@@ -54,7 +43,7 @@ export async function generateMetadata({
     description,
     keywords: [...opportunity.tags].join(", "),
     alternates: {
-      canonical: `https://fellows.best/opportunity/${id}`,
+      canonical: `${siteUrl}/opportunity/${id}`,
       types: {
         "text/markdown": `/opportunity/${id}.md`,
       },
@@ -63,13 +52,13 @@ export async function generateMetadata({
       title: `${opportunity.name} - Deadlines, Requirements & How to Apply`,
       description: description,
       type: "article",
-      url: `https://fellows.best/opportunity/${id}`,
-      siteName: "fellows.best",
+      url: `${siteUrl}/opportunity/${id}`,
+      siteName: "Foundery.Space",
       publishedTime: opportunity.openDate || undefined,
       modifiedTime: new Date().toISOString(),
       images: [
         {
-          url: `https://fellows.best/api/og?id=${id}`,
+          url: `${siteUrl}/api/og?id=${id}`,
           width: 1200,
           height: 630,
           alt: opportunity.name,
@@ -80,7 +69,7 @@ export async function generateMetadata({
       title: `${opportunity.name} - Deadlines, Requirements & How to Apply`,
       description: description,
       card: "summary_large_image",
-      images: [`https://fellows.best/api/og?id=${id}`],
+      images: [`${siteUrl}/api/og?id=${id}`],
       creator: "@disamdev",
     },
     robots: {

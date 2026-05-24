@@ -10,12 +10,11 @@ import { getDaysUntilDeadline, type Opportunity } from "@/lib/data";
 
 const ACCENT = "#5b6cff";
 
-function getBaseUrl() {
-  const raw = process.env.NEXT_PUBLIC_APP_BASE_URL;
-  if (raw?.startsWith("http://") || raw?.startsWith("https://")) return raw;
-  if (raw) return `https://${raw}`;
-  return "http://localhost:3000";
+function getSiteUrl() {
+  return process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_BASE_URL || "https://foundery.space";
 }
+
+const siteUrl = getSiteUrl();
 
 interface OpportunityPageProps {
   params: Promise<{ id: string }>;
@@ -64,8 +63,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
   const { id } = await params;
   let opportunity: Opportunity | null = null;
   try {
-    const apiUrl = new URL(`/api/opportunities?id=${id}`, getBaseUrl());
-    const response = await fetch(apiUrl, { cache: "no-store" });
+    const response = await fetch(`/api/opportunities?id=${id}`, { cache: "no-store" });
     if (!response.ok) notFound();
     opportunity = (await response.json()) as Opportunity;
   } catch (error) {
@@ -83,7 +81,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
         : deadline.tone === "closed"
           ? "border-border bg-muted text-muted-foreground"
           : "border-border bg-card text-foreground/80";
-  const opportunityUrl = `https://fellows.best/opportunity/${opportunity.id}`;
+  const opportunityUrl = `${siteUrl}/opportunity/${opportunity.id}`;
   const currentDate = new Date().toISOString();
 
   const scholarshipSchema = {
@@ -127,10 +125,10 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
     author: { "@type": "Organization", name: opportunity.organizer },
     publisher: {
       "@type": "Organization",
-      name: "fellows.best",
+      name: "Foundery.Space",
       logo: {
         "@type": "ImageObject",
-        url: "https://cdn.fellows.best/og-image.jpg",
+        url: `${siteUrl}/og-image.jpg`,
       },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": opportunityUrl },
@@ -144,7 +142,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://fellows.best",
+        item: siteUrl,
       },
       {
         "@type": "ListItem",
@@ -178,7 +176,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
           <div className="max-w-4xl mx-auto px-5 py-3 flex items-center gap-3">
             <Link href="/" className="shrink-0">
               <span className="font-semibold tracking-tight text-[17px] hover:underline underline-offset-4 decoration-2">
-                fellows.best
+                Foundery.Space
               </span>
             </Link>
           </div>

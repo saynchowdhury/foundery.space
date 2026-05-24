@@ -1,41 +1,14 @@
-import { MongoClient, type Document } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
+import { getServiceClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
-
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB;
-const feedbackCollectionName = "feedback";
-
-if (!uri) {
-  throw new Error("MONGODB_URI is not set");
-}
-
-let clientPromise: Promise<MongoClient> | null = null;
-
-function getClient(): Promise<MongoClient> {
-  if (!clientPromise) {
-    const client = new MongoClient(uri!);
-    clientPromise = client.connect();
-  }
-  return clientPromise;
-}
-
-async function getFeedbackCollection() {
-  const client = await getClient();
-  const db = dbName ? client.db(dbName) : client.db();
-  return db.collection<Document>(feedbackCollectionName);
-}
 
 type RouteParams = {
   params: Promise<{ opportunityId: string }>;
 };
 
-export async function GET(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   const adminToken = process.env.ADMIN_TOKEN;
   if (!adminToken) {
     return NextResponse.json({ error: "Admin token not configured" }, { status: 500 });
@@ -45,27 +18,30 @@ export async function GET(
   if (token !== adminToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+
   try {
     const { opportunityId } = await params;
+    const client = getServiceClient();
 
-    const collection = await getFeedbackCollection();
-    const documents = await collection
-      .find({ opportunityId })
-      .sort({ createdAt: -1 })
-      .toArray();
+    const { data, error } = await client
+      .from("feedback")
+      .select("*")
+      .eq("opportunity_id", opportunityId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
 
     return NextResponse.json({
-      feedback: documents.map((doc) => ({
-        id: doc._id.toString(),
+      feedback: (data || []).map((doc) => ({
+        id: doc.id,
         message: doc.message,
         section: doc.section,
-        opportunity_id: doc.opportunityId,
+        opportunity_id: doc.opportunity_id,
         issues: doc.issues || null,
         suggestion: doc.suggestion || null,
-        created_at: doc.createdAt,
-        user: doc.user || {
-          id: doc.userId,
+        created_at: doc.created_at,
+        user: {
+          id: doc.user_id,
           name: null,
           email: null,
           image: null,
@@ -74,10 +50,6 @@ export async function GET(
     });
   } catch (error) {
     console.error("Error fetching feedback:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-

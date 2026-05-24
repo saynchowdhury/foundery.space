@@ -10,7 +10,7 @@ interface AppliedButtonProps {
 function getAppliedSet(): Set<string> {
   if (typeof window === "undefined") return new Set();
   try {
-    return new Set(JSON.parse(localStorage.getItem("fb_applied") || "[]"));
+    return new Set(JSON.parse(localStorage.getItem("fs_applied") || "[]"));
   } catch {
     return new Set();
   }
@@ -18,7 +18,7 @@ function getAppliedSet(): Set<string> {
 
 function setAppliedSet(set: Set<string>) {
   if (typeof window === "undefined") return;
-  localStorage.setItem("fb_applied", JSON.stringify(Array.from(set)));
+  localStorage.setItem("fs_applied", JSON.stringify(Array.from(set)));
 }
 
 export function AppliedButton({ opportunityId }: AppliedButtonProps) {
