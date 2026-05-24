@@ -76,6 +76,14 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Preconnect to Google Fonts (DM Sans) — eliminates render-blocking */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* DNS prefetch for Supabase and Cloudinary */}
+        <link rel="dns-prefetch" href="https://tpvpacwoquygbykcjqle.supabase.co" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      </head>
       <body className={`${dmSans.variable} font-sans antialiased`}>
         <Script
           id="website-structured-data"
