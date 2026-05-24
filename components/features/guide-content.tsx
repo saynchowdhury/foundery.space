@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { ArrowUpDown, SearchX } from "lucide-react";
 import {
   Select,
@@ -17,14 +18,39 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { GuideConfig } from "@/lib/guide-generator";
 import type { Opportunity } from "@/lib/data";
 
+const CATEGORY_LABELS: Record<string, string> = {
+  fellowship: "Fellowships",
+  accelerator: "Accelerators",
+  incubator: "Incubators",
+  venture_capital: "Venture Capital",
+  grant: "Grants",
+  residency: "Residencies",
+  competition: "Competitions",
+  research: "Research Programs",
+  developer_program: "Developer Programs",
+};
+
+const CATEGORY_SLUGS: Record<string, string> = {
+  fellowship: "fellowship",
+  accelerator: "accelerator",
+  incubator: "incubator",
+  venture_capital: "venture-capital",
+  grant: "grant",
+  residency: "residency",
+  competition: "competition",
+  research: "research",
+  developer_program: "developer-program",
+};
+
 interface GuideContentProps {
   config: GuideConfig;
   opportunities: Opportunity[];
+  allOpportunities?: Opportunity[];
 }
 
-type SortOption = "deadline" | "name" | "category";
+type SortOption = "deadline" | "name" | "votes" | "category";
 
-export function GuideContent({ config, opportunities }: GuideContentProps) {
+export function GuideContent({ config, opportunities, allOpportunities = [] }: GuideContentProps) {
   const [sortBy, setSortBy] = useState<SortOption>("deadline");
   const guideContent = useMemo(
     () => generateGuideContent(config, opportunities),
@@ -33,40 +59,57 @@ export function GuideContent({ config, opportunities }: GuideContentProps) {
 
   const sortedOpportunities = useMemo(() => {
     const sorted = [...opportunities];
-    
     sorted.sort((a, b) => {
       switch (sortBy) {
         case "deadline":
-          if (!a.closeDate) return 1;
-          if (!b.closeDate) return -1;
-          return (
-            new Date(a.closeDate).getTime() - new Date(b.closeDate).getTime()
-          );
+          if (!a.closeDate || a.closeDate === "closed") return 1;
+          if (!b.closeDate || b.closeDate === "closed") return -1;
+          return new Date(a.closeDate).getTime() - new Date(b.closeDate).getTime();
         case "name":
           return a.name.localeCompare(b.name);
+        case "votes":
+          return (b.votes ?? 0) - (a.votes ?? 0);
         case "category":
           return a.category.localeCompare(b.category);
         default:
           return 0;
       }
     });
-    
     return sorted;
   }, [opportunities, sortBy]);
 
-  // Prepare opportunities for carousel (shuffle for variety)
+  // Carousel: open opportunities only, shuffled
   const carouselOpportunities = useMemo(() => {
-    const shuffled = [...opportunities].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, Math.min(10, shuffled.length));
+    const open = opportunities.filter((o) => {
+      if (!o.closeDate || o.closeDate === "closed") return !o.closeDate;
+      return new Date(o.closeDate).getTime() >= Date.now();
+    });
+    return [...open].sort(() => Math.random() - 0.5).slice(0, 12);
   }, [opportunities]);
+
+  // Related categories: find other categories present in the filtered set
+  const relatedCategories = useMemo(() => {
+    if (!config.filters.categories?.length) return [];
+    const primaryCat = config.filters.categories[0];
+    // Find programs in allOpportunities that share tags with this category's programs
+    const thisCatTags = new Set(opportunities.flatMap((o) => o.tags));
+    const related = new Set<string>();
+    for (const opp of allOpportunities) {
+      if (opp.category === primaryCat) continue;
+      if (opp.tags.some((t) => thisCatTags.has(t))) {
+        related.add(opp.category);
+      }
+    }
+    return Array.from(related).slice(0, 4);
+  }, [opportunities, allOpportunities, config.filters.categories]);
 
   return (
     <>
       <GuideHeader config={config} overview={guideContent.overview} />
 
-      {/* Opportunities Carousel */}
+      {/* Carousel */}
       {carouselOpportunities.length > 0 && (
-        <div className="py-8">
+        <div className="py-6 border-b border-border">
           <InfiniteCarousel
             opportunities={carouselOpportunities}
             direction="right"
@@ -76,102 +119,132 @@ export function GuideContent({ config, opportunities }: GuideContentProps) {
         </div>
       )}
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* SEO Content Cards */}
-        <div className="mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* What You'll Find */}
-            {guideContent.whatYoullFind.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">What You'll Find</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside">
-                    {guideContent.whatYoullFind.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {/* SEO content cards */}
+        {(guideContent.whatYoullFind.length > 0 ||
+          guideContent.benefits.length > 0 ||
+          guideContent.tips.length > 0) && (
+          <div className="mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {guideContent.whatYoullFind.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">What You&apos;ll Find</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1.5 text-sm text-muted-foreground list-disc list-inside">
+                      {guideContent.whatYoullFind.map((item, i) => (
+                        <li key={i}>{item}</li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
 
-            {/* Benefits */}
-            {guideContent.benefits.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Benefits</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside">
-                    {guideContent.benefits.map((benefit, index) => (
-                      <li key={index}>{benefit}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
+              {guideContent.benefits.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Benefits</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1.5 text-sm text-muted-foreground list-disc list-inside">
+                      {guideContent.benefits.map((b, i) => (
+                        <li key={i}>{b}</li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
 
-            {/* Tips */}
-            {guideContent.tips.length > 0 && (
-              <Card className={guideContent.whatYoullFind.length > 0 && guideContent.benefits.length > 0 ? "md:col-span-2" : ""}>
-                <CardHeader>
-                  <CardTitle className="text-lg">Application Tips</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside">
-                    {guideContent.tips.map((tip, index) => (
-                      <li key={index}>{tip}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
+              {guideContent.tips.length > 0 && (
+                <Card className={
+                  guideContent.whatYoullFind.length > 0 && guideContent.benefits.length > 0
+                    ? "md:col-span-2"
+                    : ""
+                }>
+                  <CardHeader>
+                    <CardTitle className="text-base">Application Tips</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1.5 text-sm text-muted-foreground list-disc list-inside">
+                      {guideContent.tips.map((tip, i) => (
+                        <li key={i}>{tip}</li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {opportunities.length === 0 ? (
           <div className="text-center py-16">
             <SearchX className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">
-              No opportunities found
-            </h3>
-            <p className="text-muted-foreground">
-              No opportunities match the filters for this guide. Try exploring other guides or browse all opportunities.
+            <h3 className="text-xl font-semibold mb-2">No opportunities found</h3>
+            <p className="text-muted-foreground mb-6">
+              No opportunities match the filters for this guide.
             </p>
+            <Link
+              href="/browse"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-border text-sm hover:bg-muted transition-colors"
+            >
+              Browse all opportunities
+            </Link>
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Sort Controls */}
+            {/* Sort + count */}
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">
-                Showing {sortedOpportunities.length}{" "}
+                {sortedOpportunities.length}{" "}
                 {sortedOpportunities.length === 1 ? "opportunity" : "opportunities"}
               </div>
-              <div className="flex items-center gap-2">
-                <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
-                  <SelectTrigger className="w-40">
-                    <ArrowUpDown className="h-4 w-4 mr-2" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="deadline">Sort by Deadline</SelectItem>
-                    <SelectItem value="name">Sort by Name</SelectItem>
-                    <SelectItem value="category">Sort by Category</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
+                <SelectTrigger className="w-44">
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="deadline">By Deadline</SelectItem>
+                  <SelectItem value="votes">By Votes</SelectItem>
+                  <SelectItem value="name">By Name</SelectItem>
+                  <SelectItem value="category">By Category</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Opportunities Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {sortedOpportunities.map((opportunity) => (
-                <OpportunityCard
-                  key={opportunity.id}
-                  opportunity={opportunity}
-                  from="guide"
-                />
+            {/* Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {sortedOpportunities.map((opp) => (
+                <OpportunityCard key={opp.id} opportunity={opp} from="guide" />
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Related categories — cross-discovery for multi-category programs */}
+        {relatedCategories.length > 0 && (
+          <div className="mt-14 pt-10 border-t border-border">
+            <h2 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">
+              Related categories
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {relatedCategories.map((cat) => (
+                <Link
+                  key={cat}
+                  href={`/${CATEGORY_SLUGS[cat] ?? cat}`}
+                  className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-indigo-500/50 transition-colors"
+                >
+                  {CATEGORY_LABELS[cat] ?? cat}
+                </Link>
+              ))}
+              <Link
+                href="/browse"
+                className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-indigo-500/50 transition-colors"
+              >
+                Browse all →
+              </Link>
             </div>
           </div>
         )}

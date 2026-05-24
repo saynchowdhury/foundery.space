@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { QueryProvider } from "@/providers/query-provider";
+import Script from "next/script";
 
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { generateWebsiteSchema, generateFAQSchema } from "@/lib/schema";
+import { generateWebsiteSchema, generateFAQSchema, generateOrganizationSchema } from "@/lib/schema";
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -63,9 +64,28 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const websiteSchema = generateWebsiteSchema();
+  const faqSchema = generateFAQSchema();
+  const orgSchema = generateOrganizationSchema();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={geist.className}>
+        <Script
+          id="website-structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <Script
+          id="org-structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        <Script
+          id="faq-structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

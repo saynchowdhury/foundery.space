@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Opportunity } from "@/lib/data";
+import { fetchOpportunityById } from "@/lib/opportunities-public";
 
 export async function generateMetadata({
   params,
@@ -8,19 +9,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_BASE_URL || "https://foundery.space";
-  let opportunity: Opportunity | undefined;
-
-  try {
-    const response = await fetch(`/api/opportunities?id=${id}`, {
-      cache: "no-store",
-    });
-
-    if (response.ok) {
-      opportunity = (await response.json()) as Opportunity | undefined;
-    }
-  } catch (error) {
-    console.error("Error fetching opportunity metadata", error);
-  }
+  const opportunity: Opportunity | null = await fetchOpportunityById(id);
 
   if (!opportunity) {
     return {

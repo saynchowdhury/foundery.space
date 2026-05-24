@@ -4,7 +4,7 @@ import type { Opportunity } from "@/lib/data";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || "https://foundry.space";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || "https://foundery.space";
   const currentDate = new Date().toISOString().split("T")[0];
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -19,12 +19,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(currentDate),
       changeFrequency: "daily",
       priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/submit`,
-      lastModified: new Date(currentDate),
-      changeFrequency: "monthly",
-      priority: 0.7,
     },
     {
       url: `${baseUrl}/privacy`,
@@ -68,7 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  // Category pages
+  // Category pages — all 9 canonical categories
   const categoryRoutes: MetadataRoute.Sitemap = [
     "accelerator",
     "fellowship",
@@ -82,8 +76,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ].map((category) => ({
     url: `${baseUrl}/${category}`,
     lastModified: new Date(currentDate),
-    changeFrequency: "daily",
-    priority: 0.8,
+    changeFrequency: "daily" as const,
+    priority: 0.85,
   }));
 
   // Guide pages - generate dynamically based on opportunities

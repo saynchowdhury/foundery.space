@@ -5,7 +5,6 @@ import { withBotId } from 'botid/next/config';
 const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
-    formats: ['image/avif', 'image/webp'],
   },
   poweredByHeader: false,
   async headers() {
@@ -50,4 +49,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-module.exports = withBotId(nextConfig);
+export default withBotId(nextConfig);

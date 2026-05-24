@@ -56,13 +56,41 @@ export async function generateMetadata({
   params: Promise<{ category: string }>;
 }) {
   const { category } = await params;
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://foundery.space";
   const opportunities = await fetchAll();
   const configs = generateGuideConfigs(opportunities);
   const config = Object.values(configs).find((c) => c.slug === category);
   if (!config) return { title: "Not Found" };
+
+  const filtered = filterByConfig(opportunities, config);
+
   return {
-    title: config.title,
+    title: `${config.title} — Foundery.Space`,
     description: config.description,
+    alternates: {
+      canonical: `${siteUrl}/${category}`,
+    },
+    openGraph: {
+      title: `${config.title} — Foundery.Space`,
+      description: config.description,
+      url: `${siteUrl}/${category}`,
+      siteName: "Foundery.Space",
+      type: "website",
+      images: [
+        {
+          url: `${siteUrl}/api/og`,
+          width: 1200,
+          height: 630,
+          alt: config.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${config.title} — Foundery.Space`,
+      description: config.description,
+      images: [`${siteUrl}/api/og`],
+    },
   };
 }
 
@@ -80,7 +108,7 @@ export default async function CategoryPage({
   const filtered = filterByConfig(opportunities, config);
 
   return (
-    <GuideContent config={config} opportunities={filtered} />
+    <GuideContent config={config} opportunities={filtered} allOpportunities={opportunities} />
   );
 }
 

@@ -146,8 +146,8 @@ export async function POST(req: NextRequest) {
       }
 
       const firstResult = searchResponse.web[0];
-      // @ts-ignore - markdown present when scrapeOptions.formats includes markdown
-      markdown = firstResult.markdown;
+      // Firecrawl returns markdown when scrapeOptions.formats includes "markdown"
+      markdown = (firstResult as typeof firstResult & { markdown?: string }).markdown;
 
       if (!markdown) {
         return NextResponse.json({ error: "Failed to scrape content" }, { status: 500 });

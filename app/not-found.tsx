@@ -9,8 +9,8 @@ export default function NotFound() {
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/85 border-b border-border">
         <div className="max-w-4xl mx-auto px-5 py-3 flex items-center gap-3">
           <Link href="/" className="shrink-0">
-            <span className="font-semibold tracking-tight text-[17px] hover:underline underline-offset-4 decoration-2">
-              Foundry
+            <span className="font-semibold tracking-tight text-[17px] bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">
+              Foundery.Space
             </span>
           </Link>
         </div>

@@ -39,7 +39,7 @@ export async function fetchAllOpportunities(): Promise<Opportunity[]> {
   const { data, error } = await supabase
     .from("opportunities")
     .select("*")
-    .order("closeDate", { ascending: true });
+    .order("close_date", { ascending: true });
 
   if (error) {
     console.error("Error fetching opportunities:", error);

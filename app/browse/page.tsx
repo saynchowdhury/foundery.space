@@ -38,6 +38,19 @@ const CATEGORIES = [
   "developer_program",
 ];
 
+const CATEGORY_LABELS: Record<string, string> = {
+  all: "All categories",
+  fellowship: "Fellowships",
+  accelerator: "Accelerators",
+  incubator: "Incubators",
+  venture_capital: "Venture Capital",
+  grant: "Grants",
+  residency: "Residencies",
+  competition: "Competitions",
+  research: "Research Programs",
+  developer_program: "Developer Programs",
+};
+
 const REGIONS = [
   "all",
   "Global",
@@ -286,8 +299,8 @@ export default function BrowsePage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-5 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <Link href="/" className="shrink-0">
-                <span className="font-semibold tracking-tight text-[17px] hover:underline underline-offset-4 decoration-2">
-                  Foundery
+                <span className="font-semibold tracking-tight text-[17px] bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                  Foundery.Space
                 </span>
               </Link>
               <span className="text-sm text-muted-foreground hidden md:inline shrink-0">
@@ -389,45 +402,114 @@ export default function BrowsePage() {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-5 pt-3 sm:pt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="h-10 sm:h-9 w-full sm:w-[150px] bg-card text-sm">
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORIES.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c === "all" ? "All categories" : c.replace("_", " ")}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={region} onValueChange={setRegion}>
-          <SelectTrigger className="h-10 sm:h-9 w-full sm:w-[130px] bg-card text-sm">
-            <SelectValue placeholder="Region" />
-          </SelectTrigger>
-          <SelectContent>
-            {REGIONS.map((r) => (
-              <SelectItem key={r} value={r}>
-                {r === "all" ? "All regions" : r}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={status}
-          onValueChange={(v) => setStatus(v as "open" | "all")}
-        >
-          <SelectTrigger className="h-10 sm:h-9 w-full sm:w-[110px] bg-card text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="open">Open only</SelectItem>
-            <SelectItem value="all">All</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Category pills for quick filtering */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1 sm:hidden scrollbar-none">
+          {CATEGORIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategory(c)}
+              className={`shrink-0 px-3 py-1.5 text-[11px] uppercase tracking-wide border transition-colors ${
+                category === c
+                  ? "border-indigo-500/60 bg-indigo-500/10 text-indigo-400"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {c === "all" ? "All" : CATEGORY_LABELS[c]?.split(" ")[0] ?? c}
+            </button>
+          ))}
+        </div>
+        <div className="hidden sm:flex gap-2 flex-wrap">
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="h-10 sm:h-9 w-full sm:w-[170px] bg-card text-sm">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {CATEGORY_LABELS[c] ?? c.replace(/_/g, " ")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={region} onValueChange={setRegion}>
+            <SelectTrigger className="h-10 sm:h-9 w-full sm:w-[130px] bg-card text-sm">
+              <SelectValue placeholder="Region" />
+            </SelectTrigger>
+            <SelectContent>
+              {REGIONS.map((r) => (
+                <SelectItem key={r} value={r}>
+                  {r === "all" ? "All regions" : r}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={status}
+            onValueChange={(v) => setStatus(v as "open" | "all")}
+          >
+            <SelectTrigger className="h-10 sm:h-9 w-full sm:w-[110px] bg-card text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="open">Open only</SelectItem>
+              <SelectItem value="all">All</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Mobile region + status */}
+        <div className="flex gap-2 sm:hidden">
+          <Select value={region} onValueChange={setRegion}>
+            <SelectTrigger className="h-9 flex-1 bg-card text-sm">
+              <SelectValue placeholder="Region" />
+            </SelectTrigger>
+            <SelectContent>
+              {REGIONS.map((r) => (
+                <SelectItem key={r} value={r}>
+                  {r === "all" ? "All regions" : r}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={status}
+            onValueChange={(v) => setStatus(v as "open" | "all")}
+          >
+            <SelectTrigger className="h-9 w-[100px] bg-card text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="open">Open only</SelectItem>
+              <SelectItem value="all">All</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-5 py-4 sm:py-6">
+        {/* Results count */}
+        {!isLoading && (
+          <div className="flex items-center justify-between mb-3 text-[13px] text-muted-foreground">
+            <span>
+              {data?.pages[0]?.total ?? 0} opportunities
+              {category !== "all" && (
+                <> in <span className="text-foreground">{CATEGORY_LABELS[category]}</span></>
+              )}
+              {region !== "all" && (
+                <> · <span className="text-foreground">{region}</span></>
+              )}
+            </span>
+            {(category !== "all" || region !== "all" || q.trim()) && (
+              <button
+                type="button"
+                onClick={() => { setCategory("all"); setRegion("all"); setQ(""); }}
+                className="text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
         <ul className="divide-y divide-border border-b border-border">
           {isLoading &&
             Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
@@ -516,7 +598,7 @@ export default function BrowsePage() {
                       </p>
                       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 sm:gap-x-3 sm:gap-y-1 sm:mt-2 text-[13px] text-muted-foreground">
                         <span className="capitalize">
-                          {o.category.replace("_", " ")}
+                          {CATEGORY_LABELS[o.category] ?? o.category.replace(/_/g, " ")}
                         </span>
                         <span aria-hidden className="text-muted-foreground/60">
                           \u00b7

@@ -16,6 +16,18 @@ import {
 import { generateAltText } from "@/lib/image-seo";
 import { cn } from "@/lib/utils";
 
+const CATEGORY_LABELS: Record<string, string> = {
+  fellowship: "Fellowship",
+  accelerator: "Accelerator",
+  incubator: "Incubator",
+  venture_capital: "Venture Capital",
+  grant: "Grant",
+  residency: "Residency",
+  competition: "Competition",
+  research: "Research Program",
+  developer_program: "Developer Program",
+};
+
 const getDeadlineText = (days: number | null): string => {
   if (days === null) return "Apply anytime";
   if (days > 1) return `${days} days left`;
@@ -114,7 +126,7 @@ export function OpportunityCard({
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center space-x-2">
                   <Badge variant="secondary" className="text-xs rounded-lg">
-                    {opportunity.category}
+                    {CATEGORY_LABELS[opportunity.category] ?? opportunity.category.replace(/_/g, " ")}
                   </Badge>
                   <BadgeList
                     badges={opportunity.tags}
@@ -233,7 +245,7 @@ export function OpportunityCard({
             <div className="mt-auto">
               <div className="flex flex-wrap gap-1 sm:gap-2">
                 <Badge variant="outline" className="rounded-lg text-xs">
-                  {opportunity.category}
+                  {CATEGORY_LABELS[opportunity.category] ?? opportunity.category.replace(/_/g, " ")}
                 </Badge>
                 <BadgeList
                   badges={opportunity.tags}

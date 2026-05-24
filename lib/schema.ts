@@ -14,10 +14,36 @@ export function generateWebsiteSchema(): Record<string, unknown> {
     "@type": "WebSite",
     name: "Foundery.Space",
     url: "https://foundery.space/",
+    description:
+      "The community-ranked directory for ambitious founders, researchers, and builders. Discover fellowships, grants, accelerators, incubators, competitions, residencies, and developer programs.",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://foundery.space/?q={search_term_string}",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://foundery.space/browse?q={search_term_string}",
+      },
       "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+/**
+ * Generate Organization schema
+ */
+export function generateOrganizationSchema(): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Foundery.Space",
+    url: "https://foundery.space",
+    logo: "https://foundery.space/logos/foundery-logo-32.webp",
+    description:
+      "Community-ranked directory of fellowships, grants, accelerators, incubators, competitions, residencies, research programs, and developer programs for ambitious founders and builders.",
+    sameAs: [],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      url: "https://foundery.space/browse",
     },
   };
 }

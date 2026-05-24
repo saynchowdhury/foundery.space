@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { generateId, normalizeOpportunityPayload, fetchById } from "@/lib/opportunity-admin";
 import { getServiceClient } from "@/lib/supabase";
+import { uploadFileToCloudinary } from "@/lib/cloudinary";
 
 export const runtime = "nodejs";
 export const maxDuration = 20;
@@ -125,7 +126,14 @@ export async function POST(request: NextRequest) {
     }
 
     const logoUrl = logoFile instanceof File && logoFile.size > 0
-      ? `/logos/${id}.avif`
+      ? await (async () => {
+          try {
+            return await uploadFileToCloudinary(logoFile, `fellows/logos/${id}`);
+          } catch (uploadErr) {
+            console.warn("Logo upload failed, using placeholder:", uploadErr);
+            return `/logos/${id}.avif`;
+          }
+        })()
       : `/logos/${id}.avif`;
 
     const { data, error } = await client

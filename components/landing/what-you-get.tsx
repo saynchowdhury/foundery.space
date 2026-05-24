@@ -14,41 +14,41 @@ const cards = [
   {
     icon: Search,
     title: "Opportunity Aggregation",
-    subtitle: "Browse fellowships, grants, accelerators, hackathons, and funding opportunities from diverse sources all in one centralized platform.",
+    subtitle: "Browse fellowships, grants, accelerators, incubators, developer programs, competitions, residencies, and research programs — all in one ranked directory.",
     category: "Discovery",
-    span: "col-span-2 row-span-2", // Large card
+    span: "col-span-2 row-span-2",
     image: "https://res.cloudinary.com/disamtech/image/upload/v1766317468/fellows/mockups/yviwphvmvcem7ewrkrpf.png",
   },
   {
     icon: Filter,
-    title: "Advanced Search",
-    subtitle: "Filter opportunities by region, category, deadline status, keywords, and tags to find exactly what matches your interests and profile.",
+    title: "Advanced Search & Filters",
+    subtitle: "Filter by category, region, deadline status, funding range, and tags. Find exactly what matches your profile — from equity-free grants to developer programs.",
     category: "Filtering",
-    span: "col-span-2 row-span-2", // Large card at top right
+    span: "col-span-2 row-span-2",
     image: "https://res.cloudinary.com/disamtech/image/upload/v1766319991/fellows/mockups/n58tm0uiflksugnbevgs.png",
   },
   {
     icon: Clock,
     title: "Community Driven",
-    subtitle: "Submit new opportunities through our community-driven platform. Help others discover amazing fellowships and funding opportunities.",
+    subtitle: "Submit new opportunities and vote on the ones that matter. The community surfaces the best programs so you don't have to dig.",
     category: "Community",
-    span: "col-span-2 row-span-1", // Wide card on left
+    span: "col-span-2 row-span-1",
   },
   {
     icon: Bell,
-    title: "Smart Alerts",
-    subtitle: "Save opportunity deadlines directly to your calendar and never miss an application window with integrated calendar exports.",
+    title: "Deadline Reminders",
+    subtitle: "Export any deadline directly to Google Calendar, Outlook, Apple Calendar, or Yahoo. Never miss an application window.",
     category: "Reminders",
-    span: "col-span-1 row-span-1", // Small card on right
+    span: "col-span-1 row-span-1",
   },
   {
     icon: Users,
     title: "Personal Tracking",
-    subtitle: "Save fellowships you've attended in your profile, ask alumni for recommendations to join, and build your fellowship network.",
+    subtitle: "Track which programs you've applied to, bookmark favorites, and build your opportunity pipeline.",
     category: "Dashboard",
     badge: "Soon",
-    span: "col-span-1 row-span-1", // Small card on right
-    hideOnMobile: true, // Hide on mobile
+    span: "col-span-1 row-span-1",
+    hideOnMobile: true,
   },
 ];
 
@@ -455,9 +455,9 @@ export function WhatYouGetSection() {
       <style dangerouslySetInnerHTML={{ __html: cardStyles }} />
       <section id="cards-container" className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-medium mb-2 sm:mb-3 md:mb-4 px-4">What You Get</h2>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-medium mb-2 sm:mb-3 md:mb-4 px-4">Everything You Need to Win</h2>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-            Everything you need to discover and track fellowship opportunities
+            Built for ambitious founders, researchers, and builders who don&apos;t miss opportunities
           </p>
         </div>
 

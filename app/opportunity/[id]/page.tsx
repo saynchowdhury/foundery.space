@@ -7,8 +7,21 @@ import { FeedbackButton } from "@/components/global/feedback-button";
 import { AppliedButton } from "@/components/global/applied-button";
 
 import { getDaysUntilDeadline, type Opportunity } from "@/lib/data";
+import { fetchOpportunityById } from "@/lib/opportunities-public";
 
 const ACCENT = "#5b6cff";
+
+const CATEGORY_LABELS: Record<string, string> = {
+  fellowship: "Fellowship",
+  accelerator: "Accelerator",
+  incubator: "Incubator",
+  venture_capital: "Venture Capital",
+  grant: "Grant",
+  residency: "Residency",
+  competition: "Competition",
+  research: "Research Program",
+  developer_program: "Developer Program",
+};
 
 function getSiteUrl() {
   return process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_BASE_URL || "https://foundery.space";
@@ -61,15 +74,7 @@ function deadlineInfo(closeDate: Opportunity["closeDate"]) {
 
 export default async function OpportunityPage({ params }: OpportunityPageProps) {
   const { id } = await params;
-  let opportunity: Opportunity | null = null;
-  try {
-    const response = await fetch(`/api/opportunities?id=${id}`, { cache: "no-store" });
-    if (!response.ok) notFound();
-    opportunity = (await response.json()) as Opportunity;
-  } catch (error) {
-    console.error("Error fetching opportunity page data", error);
-    notFound();
-  }
+  const opportunity: Opportunity | null = await fetchOpportunityById(id);
   if (!opportunity) notFound();
 
   const deadline = deadlineInfo(opportunity.closeDate);
@@ -175,7 +180,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
         <header className="sticky top-0 z-30 backdrop-blur-md bg-background/85 border-b border-border">
           <div className="max-w-4xl mx-auto px-5 py-3 flex items-center gap-3">
             <Link href="/" className="shrink-0">
-              <span className="font-semibold tracking-tight text-[17px] hover:underline underline-offset-4 decoration-2">
+              <span className="font-semibold tracking-tight text-[17px] bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
                 Foundery.Space
               </span>
             </Link>
@@ -205,8 +210,8 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
                 {opportunity.organizer}
               </p>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-[13px] text-muted-foreground">
-                <span className="capitalize">
-                  {opportunity.category.replace("_", " ")}
+                <span>
+                  {CATEGORY_LABELS[opportunity.category] ?? opportunity.category.replace(/_/g, " ")}
                 </span>
                 <span aria-hidden>·</span>
                 <span className="inline-flex items-center gap-1">
@@ -292,8 +297,8 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
               <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
                 Category
               </div>
-              <div className="capitalize">
-                {opportunity.category.replace("_", " ")}
+              <div>
+                {CATEGORY_LABELS[opportunity.category] ?? opportunity.category.replace(/_/g, " ")}
               </div>
             </div>
           </div>

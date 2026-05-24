@@ -48,7 +48,7 @@ export function Header() {
   const navigation = [
     { name: "Home", href: "/", icon: Home },
     { name: "Browse", href: "/browse", icon: List },
-    { name: "Submit", href: "/submit", icon: Plus },
+    { name: "Submit", href: "/browse?submit=true", icon: Plus },
   ];
 
   return (
@@ -71,7 +71,7 @@ export function Header() {
                     className="transform group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                <span className="text-xl font-medium tracking-tight">
+                <span className="text-xl font-semibold tracking-tight gradient-text-animate">
                   Foundery.Space
                 </span>
               </Link>

@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   if (authErr) return authErr;
 
   const { id: paramId } = await params;
-  console.error("[admin:PUT] updating", paramId);
+  console.info("[admin:PUT] updating", paramId);
 
   try {
     const formData = await request.formData();

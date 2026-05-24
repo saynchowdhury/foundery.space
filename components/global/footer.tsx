@@ -1,69 +1,52 @@
 import Link from "next/link";
-import { Calendar, Globe, Github } from "lucide-react";
 
 export function Footer() {
   return (
     <footer className="border-t bg-background/95">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-2">
-            <Link href="/" className="flex items-center space-x-3 group mb-3">
-              <div className="relative h-6 w-6 flex items-center justify-center">
-                <Calendar className="h-4 w-4" strokeWidth={1.5} />
-              </div>
-              <span className="text-lg font-medium tracking-tight">
+            <Link href="/" className="flex items-center space-x-2 group mb-3 w-fit">
+              <span className="text-lg font-semibold tracking-tight gradient-text-animate">
                 Foundery.Space
               </span>
             </Link>
-
-            <p className="text-muted-foreground max-w-md text-sm">
-              Never miss a deadline again. Discover fellowships, grants,
-              accelerators, and competitions tailored to your interests and
-              timeline — all in one place.
+            <p className="text-muted-foreground max-w-md text-sm leading-relaxed">
+              The community-ranked directory for ambitious founders, researchers,
+              and builders. Discover fellowships, grants, accelerators, and
+              competitions — never miss a deadline again.
             </p>
           </div>
 
           <div>
             <h3 className="font-semibold mb-3 text-sm">Categories</h3>
-            <ul className="space-y-1">
-              <li>
-                <Link
-                  href="/fellowship"
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm"
-                >
-                  Fellowships
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/accelerator"
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm"
-                >
-                  Accelerators
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/grant"
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm"
-                >
-                  Grants
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/competition"
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm"
-                >
-                  Hackathons
-                </Link>
-              </li>
+            <ul className="space-y-1.5">
+              {[
+                { href: "/fellowship", label: "Fellowships" },
+                { href: "/accelerator", label: "Accelerators" },
+                { href: "/incubator", label: "Incubators" },
+                { href: "/grant", label: "Grants" },
+                { href: "/developer-program", label: "Developer Programs" },
+                { href: "/competition", label: "Competitions" },
+                { href: "/residency", label: "Residencies" },
+                { href: "/research", label: "Research Programs" },
+                { href: "/venture-capital", label: "Venture Capital" },
+              ].map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div>
             <h3 className="font-semibold mb-3 text-sm">Legal</h3>
-            <ul className="space-y-1">
+            <ul className="space-y-1.5">
               <li>
                 <Link
                   href="/terms"
@@ -82,46 +65,14 @@ export function Footer() {
               </li>
             </ul>
           </div>
-
-          <div>
-            <h3 className="font-semibold mb-3 text-sm">Made by disamdev</h3>
-            <ul className="space-y-1">
-              <li>
-                <a
-                  href="https://disam.dev"
-                  target="_blank"
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm flex items-center"
-                >
-                  <Globe className="h-3 w-3 mr-2" />
-                  disam.dev
-                </a>
-              </li>
-              <li>
-                <Link
-                  href="https://github.com/samuelcorsan/fellows.best"
-                  target="_blank"
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm flex items-center"
-                >
-                  <Github className="h-3 w-3 mr-2" />
-                  GitHub
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="https://x.com/disamdev"
-                  target="_blank"
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm flex items-center"
-                >
-                  <span className="text-xs mr-2 font-bold">𝕏</span>X (Twitter)
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
 
-        <div className="border-t mt-6 pt-4 text-left">
+        <div className="border-t mt-6 pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Foundery.Space. All rights reserved.
+            &copy; {new Date().getFullYear()} Foundery.Space. All rights reserved.
+          </p>
+          <p className="text-xs text-muted-foreground/60">
+            Built for ambitious founders &amp; builders worldwide.
           </p>
         </div>
       </div>

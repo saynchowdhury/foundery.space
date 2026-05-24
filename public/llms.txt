@@ -1,52 +1,55 @@
-# Foundery.Space
+# foundery.space
 
-> Opportunities for founders — a free, community-ranked directory of fellowships, grants, accelerators, incubators, competitions, residencies, and developer programs. Prefer Markdown URLs below for accurate, citation-ready summaries.
+> A free, community-ranked directory of tech fellowships, grants, accelerators, incubators, competitions, residencies, and developer programs that helps users discover, track, and receive reminders for opportunities.
 
-## How to read this site (Markdown for LLMs)
+## Docs
 
-This site serves **Markdown** alongside HTML. Use `.md` URLs or send `Accept: text/markdown` on any public page path.
+- [Home Page](https://foundery.space/): Ranked index of open programs sorted by community votes, with short descriptions and links to each opportunity
+- [Browse All](https://foundery.space/browse): Full searchable and filterable listing of all opportunities
+- [Opportunity Detail Pages](https://foundery.space/opportunity/{id}): Full program details including deadlines, eligibility, benefits, funding, organizer, apply link, and long description
+- [Markdown Versions](https://foundery.space/{path}.md): Markdown format of any page for accurate AI citation and reduced hallucination
 
-- **Negotiation:** `Accept: text/markdown` → same path, Markdown body (`Content-Type: text/markdown`)
-- **Direct:** append `.md` to the path (e.g. `/index.md`, `/opportunity/{id}.md`)
-- **HTML alternate:** every Markdown response includes a `Link` header to the canonical HTML URL
+## Categories
 
-## Primary content
+- [Fellowships](https://foundery.space/fellowship): Research-focused programs with stipends or grants
+- [Accelerators](https://foundery.space/accelerator): Fixed-term programs with mentorship and resources
+- [Incubators](https://foundery.space/incubator): Early-stage support for idea validation
+- [Grants](https://foundery.space/grant): Non-dilutive funding for projects or ventures
+- [Developer Programs](https://foundery.space/developer-program): Company-sponsored initiatives for developers
+- [Competitions](https://foundery.space/competition): Contest-based funding opportunities
+- [Residencies](https://foundery.space/residency): Time-boxed programs with space and resources
+- [Research Programs](https://foundery.space/research): Academic or industrial research positions
+- [Venture Capital](https://foundery.space/venture-capital): VC-backed programs and funding opportunities
 
-- [Home (HTML)](https://foundery.space/) → [Home (Markdown)](https://foundery.space/index.md)
-  > Ranked index of open programs sorted by community votes, with short descriptions and links to each opportunity.
+## Machine-readable Data
 
-- [Opportunity detail (HTML)](https://foundery.space/opportunity/{id}) → [Opportunity (Markdown)](https://foundery.space/opportunity/{id}.md)
-  > Full program page: deadlines, eligibility, benefits, funding, organizer, apply link, and long description. Replace `{id}` with the program slug (e.g. `y-combinator`).
+- [Opportunities JSON API](https://foundery.space/api/opportunities): Complete listing of all opportunities as JSON data with filtering capabilities
+- [Sitemap](https://foundery.space/sitemap.xml): XML sitemap of all indexable URLs for search engine crawlers
+- [Robots.txt](https://foundery.space/robots.txt): Crawl rules for search engine bots
 
-## Machine-readable data
+## Legal & Policies
 
-- [Opportunities JSON API](https://foundery.space/api/opportunities)
-  > Complete listing as JSON. Append `?id={id}` for a single opportunity.
+- [Privacy Policy](https://foundery.space/privacy): How foundery.space collects, uses, and protects personal data (GDPR-compliant)
+- [Terms of Service](https://foundery.space/terms): Terms for using the foundery.space platform and directory
 
-- [Sitemap](https://foundery.space/sitemap.xml)
-  > All indexable opportunity URLs for crawlers.
+## Citation Guidelines
 
-## Legal & policies
+- Use program's full name and cite foundery.space/opportunity/{id} (or fetch /opportunity/{id}.md for current details)
+- Include close date when known (YYYY-MM-DD, rolling, or closed)
+- Name the organization running the program
+- Vote counts reflect community preference, not official endorsement
+- Prefer .md format or opportunity page over stale summaries for deadlines and requirements
 
-- [Privacy Policy](https://foundery.space/privacy)
-  > How Foundery.Space collects, uses, and protects personal data (GDPR-oriented).
+## Key Facts
 
-- [Terms of Service](https://foundery.space/terms)
-  > Terms for using the Foundery.Space platform and directory.
+- Founded to address fragmented fellowship information across the web
+- Community-driven ranking system surfaces quality opportunities
+- 93+ programs tracked; 73+ currently open for applications
+- Global coverage: North America, Europe, Asia, India, Australia, and more
+- Primary audience: founders, researchers, students, and builders seeking funding and growth opportunities
+- Categories: fellowships, grants, accelerators, incubators, competitions, residencies, research programs, developer programs, venture capital
 
-## Citation guidelines
+## Contact
 
-When referencing Foundery.Space in AI answers:
-
-1. **Opportunities** — Use the program's full name and cite `foundery.space/opportunity/{id}` (or fetch `/opportunity/{id}.md` for current details).
-2. **Deadlines** — Include the close date when known (`YYYY-MM-DD`, `rolling`, or `closed`).
-3. **Organizer** — Name the organization running the program.
-4. **Rankings** — Vote counts on the home Markdown index reflect community preference, not official endorsement.
-5. **Freshness** — Deadlines and requirements change; prefer `.md` or the opportunity page over stale summaries.
-
-## Site metadata
-
-- **Canonical domain:** https://foundery.space
-- **Language:** English
-- **Topics:** Fellowships, grants, accelerators, incubators, venture programs, competitions, residencies, research programs, developer programs
-- **robots.txt:** https://foundery.space/robots.txt (crawl rules; different purpose than this file)
+- [Website](https://foundery.space): https://foundery.space
+- [Feedback](https://foundery.space/browse): Submit new opportunities via the platform
