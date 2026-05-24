@@ -23,13 +23,13 @@ export function HeroSection() {
     <section className="relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-40 pb-16 relative">
         <div className="text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-indigo-500/30 bg-indigo-500/5 text-xs text-indigo-400 tracking-widest uppercase">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-            Community-ranked opportunities
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-[var(--brand)] border-opacity-30 bg-[var(--brand)] bg-opacity-[0.06]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand-light)] animate-pulse" />
+            <span className="eyebrow text-[var(--brand-light)]">Community-ranked opportunities</span>
           </div>
-          <h1 className="text-3xl md:text-6xl font-semibold mb-6 leading-tight">
+          <h1 className="text-fluid-hero font-semibold mb-6">
             Discover Your Next <br />
-            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="wordmark">
               Breakthrough Opportunity
             </span>
           </h1>
@@ -43,7 +43,7 @@ export function HeroSection() {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-2xl mx-auto"
           >
             <div className="flex-1 w-full relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 via-violet-500/20 to-purple-500/20 blur-xl rounded-lg -z-10" />
+              <div className="absolute inset-0 bg-[var(--brand)] opacity-[0.07] blur-2xl rounded-lg -z-10" />
               <SearchInput
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -65,7 +65,7 @@ export function HeroSection() {
               <a
                 key={href}
                 href={href}
-                className="px-3 py-1 text-xs border border-border text-muted-foreground hover:text-foreground hover:border-indigo-500/50 transition-colors"
+                className="px-3 py-1 text-xs border border-border text-muted-foreground hover:text-foreground hover:border-[var(--brand)] transition-colors"
               >
                 {label}
               </a>

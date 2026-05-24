@@ -23,7 +23,7 @@ export function ViewAllOpportunitiesSection() {
           <Link
             key={href}
             href={href}
-            className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-indigo-500/50 transition-colors"
+            className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-[var(--brand)] transition-colors"
           >
             {label}
           </Link>

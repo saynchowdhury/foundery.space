@@ -71,7 +71,7 @@ export function Header() {
                     className="transform group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                <span className="text-xl font-semibold tracking-tight gradient-text-animate">
+                <span className="text-xl font-semibold wordmark">
                   Foundery.Space
                 </span>
               </Link>

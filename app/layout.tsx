@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { QueryProvider } from "@/providers/query-provider";
 import Script from "next/script";
@@ -10,7 +10,13 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { generateWebsiteSchema, generateFAQSchema, generateOrganizationSchema } from "@/lib/schema";
 
-const geist = Geist({ subsets: ["latin"] });
+// DM Sans: humanist sans — distinctive, not Inter/Geist, excellent at small sizes
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  axes: ["opsz"],
+  display: "swap",
+  variable: "--font-dm-sans",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -70,7 +76,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={geist.className}>
+      <body className={`${dmSans.variable} font-sans antialiased`}>
         <Script
           id="website-structured-data"
           type="application/ld+json"

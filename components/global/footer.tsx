@@ -7,7 +7,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center space-x-2 group mb-3 w-fit">
-              <span className="text-lg font-semibold tracking-tight gradient-text-animate">
+              <span className="text-lg font-semibold wordmark">
                 Foundery.Space
               </span>
             </Link>

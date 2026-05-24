@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import type { Opportunity } from "@/lib/data";
 
-const ACCENT = "#5b6cff";
+const ACCENT = "var(--brand)";
 const PAGE_SIZE = 20;
 
 const CATEGORIES = [
@@ -299,7 +299,7 @@ export default function BrowsePage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-5 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <Link href="/" className="shrink-0">
-                <span className="font-semibold tracking-tight text-[17px] bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                <span className="font-semibold text-[17px] wordmark">
                   Foundery.Space
                 </span>
               </Link>
@@ -409,9 +409,9 @@ export default function BrowsePage() {
               key={c}
               type="button"
               onClick={() => setCategory(c)}
-              className={`shrink-0 px-3 py-1.5 text-[11px] uppercase tracking-wide border transition-colors ${
+              className={`shrink-0 px-3 py-1.5 eyebrow border transition-colors ${
                 category === c
-                  ? "border-indigo-500/60 bg-indigo-500/10 text-indigo-400"
+                  ? "border-[var(--brand)] bg-[var(--brand)] bg-opacity-10 text-[var(--brand-light)]"
                   : "border-border text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -503,7 +503,7 @@ export default function BrowsePage() {
               <button
                 type="button"
                 onClick={() => { setCategory("all"); setRegion("all"); setQ(""); }}
-                className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                className="text-[var(--brand-light)] hover:opacity-80 transition-opacity"
               >
                 Clear filters
               </button>
@@ -543,7 +543,7 @@ export default function BrowsePage() {
                       className={`w-5 h-5 ${isVoted ? "fill-current" : ""}`}
                       strokeWidth={isVoted ? 2.5 : 2}
                     />
-                    <span className="text-[12px] tabular-nums leading-none mt-0.5">
+                    <span className="text-[12px] tabular-nums nums leading-none mt-0.5">
                       {count}
                     </span>
                   </button>

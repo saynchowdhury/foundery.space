@@ -187,7 +187,7 @@ export function GuideContent({ config, opportunities, allOpportunities = [] }: G
             </p>
             <Link
               href="/browse"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-border text-sm hover:bg-muted transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-border text-sm hover:bg-muted hover:border-[var(--brand)] transition-colors"
             >
               Browse all opportunities
             </Link>
@@ -234,14 +234,14 @@ export function GuideContent({ config, opportunities, allOpportunities = [] }: G
                 <Link
                   key={cat}
                   href={`/${CATEGORY_SLUGS[cat] ?? cat}`}
-                  className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-indigo-500/50 transition-colors"
+                  className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-[var(--brand)] transition-colors"
                 >
                   {CATEGORY_LABELS[cat] ?? cat}
                 </Link>
               ))}
               <Link
                 href="/browse"
-                className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-indigo-500/50 transition-colors"
+                className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-[var(--brand)] transition-colors"
               >
                 Browse all →
               </Link>

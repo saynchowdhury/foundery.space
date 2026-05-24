@@ -9,7 +9,7 @@ import { AppliedButton } from "@/components/global/applied-button";
 import { getDaysUntilDeadline, type Opportunity } from "@/lib/data";
 import { fetchOpportunityById } from "@/lib/opportunities-public";
 
-const ACCENT = "#5b6cff";
+const ACCENT = "var(--brand)";
 
 const CATEGORY_LABELS: Record<string, string> = {
   fellowship: "Fellowship",
@@ -180,7 +180,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
         <header className="sticky top-0 z-30 backdrop-blur-md bg-background/85 border-b border-border">
           <div className="max-w-4xl mx-auto px-5 py-3 flex items-center gap-3">
             <Link href="/" className="shrink-0">
-              <span className="font-semibold tracking-tight text-[17px] bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+              <span className="font-semibold text-[17px] wordmark">
                 Foundery.Space
               </span>
             </Link>
@@ -203,7 +203,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
             )}
 
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-semibold leading-tight">
+              <h1 className="text-fluid-title font-semibold leading-tight">
                 {opportunity.name}
               </h1>
               <p className="text-[15px] text-muted-foreground mt-1">
@@ -255,7 +255,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
               <div className="text-xs uppercase tracking-wider opacity-70 mb-1">
                 Deadline
               </div>
-              <div className="text-3xl sm:text-4xl font-semibold leading-none">
+              <div className="text-3xl sm:text-4xl font-semibold leading-none nums">
                 {deadline.big}
               </div>
               <div className="text-sm opacity-80 mt-1.5">{deadline.sub}</div>
