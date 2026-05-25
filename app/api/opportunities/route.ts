@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { Opportunity } from "@/lib/data";
 import { getAnonClient } from "@/lib/supabase";
+import { cacheHeaders } from "@/lib/api-utils";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(mapRow(data, voterId), {
         status: 200,
-        headers: { "Cache-Control": "no-store" },
+        headers: cacheHeaders(60, 300),
       });
     }
 
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(opportunities, {
       status: 200,
-      headers: { "Cache-Control": "no-store" },
+      headers: cacheHeaders(60, 300),
     });
   } catch (error) {
     console.error("Error fetching opportunities:", error);

@@ -5,6 +5,8 @@ import { getAnonClient } from "@/lib/supabase";
 import type { GuideConfig } from "@/lib/guide-generator";
 import type { Opportunity } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 function mapRow(row: Record<string, unknown>): Opportunity {
   return {
     id: String(row.id || ""),

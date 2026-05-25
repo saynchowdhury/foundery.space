@@ -67,15 +67,22 @@ const nextConfig: NextConfig = {
         ],
       },
 
-      // ── API routes — no caching by default ──────────────────────────────
+      // ── API write/admin routes — no caching ──────────────────────────────
       {
-        source: "/api/(.*)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "no-store",
-          },
-        ],
+        source: "/api/submit",
+        headers: [{ key: "Cache-Control", value: "no-store" }],
+      },
+      {
+        source: "/api/feedback",
+        headers: [{ key: "Cache-Control", value: "no-store" }],
+      },
+      {
+        source: "/api/vote",
+        headers: [{ key: "Cache-Control", value: "no-store" }],
+      },
+      {
+        source: "/api/admin/(.*)",
+        headers: [{ key: "Cache-Control", value: "no-store" }],
       },
     ];
   },

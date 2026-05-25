@@ -20,7 +20,18 @@ export function getAnonClient(): SupabaseClient {
         "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY"
       );
     }
-    _supabase = createClient(url, key);
+    _supabase = createClient(url, key, {
+      auth: { persistSession: false },
+      global: {
+        fetch: (input, init) => {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 5000);
+          return fetch(input, { ...init, signal: controller.signal }).finally(
+            () => clearTimeout(timeout)
+          );
+        },
+      },
+    });
   }
   return _supabase;
 }
