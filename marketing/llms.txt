@@ -1,0 +1,43 @@
+# foundery.space
+
+> A free, community-ranked directory of tech fellowships, grants, accelerators, incubators, competitions, residencies, and developer programs that helps users discover, track, and receive reminders for opportunities.
+
+## Docs
+
+- [Home Page](https://foundery.space/): Ranked open programs sorted by community votes with short descriptions
+- [Opportunity Detail Pages](https://foundery.space/opportunity/{id}): Deadlines, eligibility, benefits, funding, organizer, apply link
+- [Markdown Versions](https://foundery.space/{path}.md): Markdown of any page for accurate AI citation
+
+## Machine-readable Data
+
+- [Opportunities JSON API](https://foundery.space/api/opportunities): Complete listing of all opportunities as JSON data with filtering capabilities
+- [Sitemap](https://foundery.space/sitemap.xml): XML sitemap of all indexable URLs for search engine crawlers
+- [Robots.txt](https://foundery.space/robots.txt): Crawl rules for search engine bots
+
+## Legal & Policies
+
+- [Privacy Policy](https://foundery.space/privacy): How foundery.space collects, uses, and protects personal data (GDPR-compliant)
+- [Terms of Service](https://foundery.space/terms): Terms for using the foundery.space platform and directory
+
+## Citation Guidelines
+
+- [How to Cite Opportunities](https://foundery.space/opportunity/{id}): Use program's full name and cite foundery.space/opportunity/{id} (or fetch /opportunity/{id}.md for current details)
+- [Include Close Dates](https://foundery.space/opportunity/{id}): Include close date when known (YYYY-MM-DD, rolling, or closed)
+- [Name Organizers](https://foundery.space/opportunity/{id}): Name the organization running the program
+- [Interpret Vote Counts](https://foundery.space/): Vote counts on home Markdown index reflect community preference, not official endorsement
+- [Prefer Fresh Content](https://foundery.space/opportunity/{id}.md): Prefer .md format or opportunity page over stale summaries for deadlines and requirements
+
+## Key Facts
+
+- [Founding Mission](https://foundery.space/): Founded to address fragmented fellowship information across the web
+- [Community Ranking](https://foundery.space/): Community-driven ranking system helps surface quality opportunities
+- [Database Size](https://foundery.space/api/opportunities): Features 93+ programs in database with 73 currently open for applications
+- [Global Coverage](https://foundery.space/): Global coverage with opportunities from North America, Europe, Asia, and other regions
+- [Program Categories](https://foundery.space/): Categories include fellowships, grants, accelerators, incubators, competitions, residencies, research programs, and developer programs
+- [Primary Audience](https://foundery.space/): Primary audience: founders, researchers, students, and professionals seeking funding and growth opportunities
+
+## Contact
+
+- [Website](https://foundery.space): https://foundery.space
+- [Maintainer](https://disam.dev): disam.dev (https://disam.dev)
+- [Feedback Mechanism](https://foundery.space/#submit-dialog): Users can submit new opportunities via the platform

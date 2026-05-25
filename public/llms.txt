@@ -4,10 +4,9 @@
 
 ## Docs
 
-- [Home Page](https://foundery.space/): Ranked index of open programs sorted by community votes, with short descriptions and links to each opportunity
-- [Browse All](https://foundery.space/browse): Full searchable and filterable listing of all opportunities
-- [Opportunity Detail Pages](https://foundery.space/opportunity/{id}): Full program details including deadlines, eligibility, benefits, funding, organizer, apply link, and long description
-- [Markdown Versions](https://foundery.space/{path}.md): Markdown format of any page for accurate AI citation and reduced hallucination
+- [Home Page](https://foundery.space/): Ranked open programs sorted by community votes with short descriptions
+- [Opportunity Detail Pages](https://foundery.space/opportunity/{id}): Deadlines, eligibility, benefits, funding, organizer, apply link
+- [Markdown Versions](https://foundery.space/{path}.md): Markdown of any page for accurate AI citation
 
 ## Categories
 

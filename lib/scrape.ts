@@ -262,7 +262,7 @@ export async function scrapeWithFirecrawl(url: string, apiKey: string): Promise<
     },
     body: JSON.stringify({
       url,
-      formats: ["markdown", "metadata"],
+      formats: [{ type: "markdown" }],
       onlyMainContent: true,
       timeout: 15000,
     }),
@@ -276,6 +276,15 @@ export async function scrapeWithFirecrawl(url: string, apiKey: string): Promise<
     throw new Error(`Firecrawl returned unsuccessful for ${url}`);
   }
   return json.data;
+}
+
+function extractDomain(url: string): string {
+  try {
+    const u = new URL(url);
+    return u.hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
 }
 
 export function parseOpportunity(
@@ -295,6 +304,9 @@ export function parseOpportunity(
   const deadline = parseDeadline(body);
   const funding = parseFunding(body);
   const tags = extractTags(category, body);
+  const domain = extractDomain(result.url);
+  const logo = meta?.ogImage || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  const organizer = domain ? domain.split(".")[0] || null : null;
 
   return {
     name,
@@ -303,7 +315,7 @@ export function parseOpportunity(
     category,
     region: resolveRegion(country),
     country,
-    organizer: null,
+    organizer: organizer ? organizer.charAt(0).toUpperCase() + organizer.slice(1) : null,
     apply_link: applyLink,
     close_date: deadline,
     open_date: null,
@@ -312,9 +324,8 @@ export function parseOpportunity(
     benefits: null,
     duration: null,
     tags,
-    logo_url: meta?.ogImage || null,
-    share_image_url: meta?.ogImage || null,
-    application_video: null,
+    logo_url: logo,
+    share_image_url: logo,
   };
 }
 
@@ -364,29 +375,29 @@ export async function runCategoryScrape(
         }
 
         const insertRes = await fetch(
-          `${supabaseUrl}/rest/v1/opportunities?on_conflict=name`,
+          `${supabaseUrl}/rest/v1/opportunities`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               apikey: supabaseKey,
               Authorization: `Bearer ${supabaseKey}`,
-              Prefer: "resolution=merge-duplicates",
             },
             body: JSON.stringify({
+              id: opp.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60),
               name: opp.name,
               description: opp.description,
               full_description: opp.full_description,
               category: opp.category,
-              region: opp.region,
+              region: opp.region || "Global",
               country: opp.country,
               organizer: opp.organizer,
               apply_link: opp.apply_link,
               close_date: opp.close_date,
               open_date: opp.open_date,
               funding: opp.funding,
-              eligibility: opp.eligibility,
-              benefits: opp.benefits,
+              eligibility: opp.eligibility || "",
+              benefits: opp.benefits || [],
               duration: opp.duration,
               tags: opp.tags,
               logo_url: opp.logo_url,

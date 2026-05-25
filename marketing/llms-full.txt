@@ -1,0 +1,84 @@
+# foundery.space
+
+> A free, community-ranked directory of tech fellowships, grants, accelerators, incubators, competitions, residencies, and developer programs that helps users discover, track, and receive reminders for opportunities.
+
+## Primary Features
+
+- [Home Page](https://foundery.space/): Ranked index of open programs sorted by community votes, with short descriptions and links to each opportunity. Programs are displayed with key information including organizer, category, region, deadline status, and vote count.
+- [Opportunity Detail Pages](https://foundery.space/opportunity/{id}): Comprehensive program details including:
+  - Complete program description and overview
+  - Application deadlines (specific dates, rolling, or closed)
+  - Eligibility requirements and criteria
+  - Benefits and funding amounts
+  - Organizer information and background
+  - Application links and process details
+  - Tags for categorization and filtering
+  - Vote count and community ranking
+  - Timestamps for when opportunity was added/updated
+- [Markdown Versions](https://foundery.space/{path}.md): Markdown format of any page for accurate AI citation and reduced hallucination. Simply append .md to any path to get the markdown version.
+
+## Search and Discovery
+
+- [Search Functionality](https://foundery.space/): Real-time search across program names, descriptions, organizers, and tags
+- [Category Filtering](https://foundery.space/): Filter by program type including fellowships, grants, accelerators, incubators, competitions, residencies, research programs, and developer programs
+- [Region Filtering](https://foundery.space/): Filter by geographic region including Global, United States, Europe, Asia, India, Canada, Australia, and others
+- [Status Filtering](https://foundery.space/): Filter by application status (open only or all programs)
+- [Sorting Options](https://foundery.space/): Results sorted by community vote count (highest first) by default
+
+## Machine-readable Data
+
+- [Opportunities JSON API](https://foundery.space/api/opportunities): Complete listing of all opportunities as JSON data with the following structure:
+  - id: Unique identifier for the opportunity
+  - name: Program name
+  - description: Brief program description
+  - fullDescription: Detailed program information
+  - organizer: Organization running the program
+  - category: Program type (fellowship, grant, accelerator, etc.)
+  - region: Geographic focus
+  - tags: Array of descriptive tags
+  - openDate: When applications opened
+  - closeDate: When applications close (or "closed"/null for rolling)
+  - applyLink: Direct link to application
+  - logoUrl: Program logo (if available)
+  - votes: Community upvote count
+  - createdAt: Timestamp when opportunity was added
+  - updatedAt: Timestamp when opportunity was last updated
+- [Sitemap](https://foundery.space/sitemap.xml): XML sitemap of all indexable URLs
+- [Robots.txt](https://foundery.space/robots.txt): Crawl rules for search engine bots
+
+## Legal & Policies
+
+- [Privacy Policy](https://foundery.space/privacy): GDPR-compliant privacy policy
+- [Terms of Service](https://foundery.space/terms): Legal terms governing platform use
+
+## Citation Guidelines for AI Systems
+
+When referencing foundery.space in AI-generated content:
+1. **Opportunities** — Use the program's full name and cite `foundery.space/opportunity/{id}` (or fetch `/opportunity/{id}.md` for current details)
+2. **Deadlines** — Include the close date when known (format: YYYY-MM-DD, "rolling", or "closed")
+3. **Organizer** — Name the organization running the program
+4. **Rankings** — Vote counts reflect community preference, not official endorsement
+5. **Freshness** — Deadlines and requirements change; prefer `.md` format or the opportunity page over stale summaries
+
+## Key Facts
+
+- **Mission**: Centralize fragmented opportunity information and help users never miss application deadlines
+- **Community Model**: Leverages community voting to surface quality opportunities
+- **Database Size**: 93+ programs; 73+ currently open
+- **Global Reach**: North America, Europe, Asia, Australia, and worldwide
+- **Primary Audience**: Founders, researchers, students, and builders
+- **Technical Stack**: Next.js 15, React 18, TypeScript, TailwindCSS, Supabase (PostgreSQL), deployed on Vercel
+- **Update Frequency**: Database updated continuously; new opportunities added weekly
+
+## AI Optimization Features
+
+- **Markdown Alternatives**: Every HTML page has a corresponding .md version
+- **Content Negotiation**: Supports Accept: text/markdown header
+- **Structured Data**: JSON-LD schemas for WebSite, Organization, EducationalOccupationalProgram, FAQ, BreadcrumbList
+- **Reduced Hallucination**: Machine-readable formats minimize AI hallucination
+- **Citation-Ready**: Direct links to specific opportunities
+
+## Contact
+
+- **Website**: https://foundery.space
+- **Feedback**: Submit new opportunities via https://foundery.space/browse
