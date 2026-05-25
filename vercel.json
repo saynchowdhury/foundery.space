@@ -2,5 +2,47 @@
   "framework": "nextjs",
   "buildCommand": "pnpm run build",
   "installCommand": "pnpm install",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "crons": [
+    {
+      "path": "/api/cron/scrape?category=fellowship",
+      "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/cron/scrape?category=accelerator",
+      "schedule": "30 6 * * 1"
+    },
+    {
+      "path": "/api/cron/scrape?category=grant",
+      "schedule": "0 7 * * 1"
+    },
+    {
+      "path": "/api/cron/scrape?category=developer_programs",
+      "schedule": "30 7 * * 1"
+    },
+    {
+      "path": "/api/cron/scrape?category=competition",
+      "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/scrape?category=entrepreneurship",
+      "schedule": "30 8 * * 1"
+    },
+    {
+      "path": "/api/cron/scrape?category=research",
+      "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/cron/scrape?category=venture_capital",
+      "schedule": "30 9 * * 1"
+    },
+    {
+      "path": "/api/cron/scrape?category=incubator",
+      "schedule": "0 10 * * 1"
+    },
+    {
+      "path": "/api/cron/scrape?category=residency",
+      "schedule": "30 10 * * 1"
+    }
+  ]
 }
