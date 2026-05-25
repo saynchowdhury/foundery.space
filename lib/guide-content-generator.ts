@@ -11,6 +11,8 @@ const CATEGORY_NAMES: Record<string, string> = {
   competition: "Competition",
   research: "Research",
   developer_program: "Developer Program",
+  developer_programs: "Developer Programs",
+  entrepreneurship: "Entrepreneurship",
 };
 
 const CATEGORY_DESCRIPTIONS: Record<string, string[]> = {

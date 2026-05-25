@@ -108,12 +108,27 @@ function parseDeadline(text) {
   return null;
 }
 
-function parseFunding(text) {
+function parseFundingAmount(text) {
   for (const re of FUNDING_PATTERNS) {
     const m = re.exec(text);
-    if (m) return `$${m[1] || m[0]}`;
+    if (m) return m[1] || m[0];
   }
   return null;
+}
+
+function parseFundingValue(text) {
+  const raw = parseFundingAmount(text);
+  if (!raw) return null;
+  const cleaned = raw.replace(/[,$\s]/g, "").toLowerCase();
+  let amount = parseFloat(cleaned);
+  if (isNaN(amount)) {
+    if (cleaned.endsWith("million") || cleaned.endsWith("m")) amount = parseFloat(cleaned.replace(/million|m/, "")) * 1_000_000;
+    else if (cleaned.endsWith("billion") || cleaned.endsWith("b")) amount = parseFloat(cleaned.replace(/billion|b/, "")) * 1_000_000_000;
+    else if (cleaned.endsWith("k")) amount = parseFloat(cleaned.replace(/k/, "")) * 1_000;
+    else return null;
+  }
+  if (isNaN(amount) || amount <= 0) return null;
+  return { amount: Math.round(amount), currency: "USD", fundingType: "grant" };
 }
 
 function extractTags(category, text) {
@@ -155,7 +170,7 @@ async function processCategory(category) {
           const logo = meta?.ogImage || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
           const organizer = domain ? domain.split(".")[0].charAt(0).toUpperCase() + domain.split(".")[0].slice(1) : null;
           const deadline = parseDeadline(body);
-          const funding = parseFunding(body);
+          const funding = parseFundingValue(body);
           const tags = extractTags(category, body);
 
           const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);

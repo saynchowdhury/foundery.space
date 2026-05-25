@@ -28,6 +28,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   competition: "Competitions",
   research: "Research Programs",
   developer_program: "Developer Programs",
+  developer_programs: "Developer Programs",
+  entrepreneurship: "Entrepreneurship",
 };
 
 const CATEGORY_SLUGS: Record<string, string> = {
@@ -40,6 +42,8 @@ const CATEGORY_SLUGS: Record<string, string> = {
   competition: "competition",
   research: "research",
   developer_program: "developer-program",
+  developer_programs: "developer-programs",
+  entrepreneurship: "entrepreneurship",
 };
 
 interface GuideContentProps {

@@ -36,6 +36,8 @@ const CATEGORIES = [
   "competition",
   "research",
   "developer_program",
+  "developer_programs",
+  "entrepreneurship",
 ];
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -49,6 +51,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   competition: "Competitions",
   research: "Research Programs",
   developer_program: "Developer Programs",
+  developer_programs: "Developer Programs",
+  entrepreneurship: "Entrepreneurship",
 };
 
 const REGIONS = [

@@ -46,6 +46,8 @@ const categoryOptions = [
   "competition",
   "research",
   "developer_program",
+  "developer_programs",
+  "entrepreneurship",
 ];
 
 const tagGroups = {

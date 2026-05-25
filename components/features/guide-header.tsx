@@ -13,6 +13,8 @@ const CATEGORY_NAMES: Record<string, string> = {
   competition: "Competition",
   research: "Research Program",
   developer_program: "Developer Program",
+  developer_programs: "Developer Programs",
+  entrepreneurship: "Entrepreneurship",
 };
 
 interface GuideHeaderProps {

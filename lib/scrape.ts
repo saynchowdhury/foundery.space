@@ -69,7 +69,7 @@ export interface ParsedOpportunity {
   apply_link: string | null;
   close_date: string | null;
   open_date: string | null;
-  funding: string | null;
+  funding: { amount: number; currency: string; fundingType: string } | null;
   eligibility: string | null;
   benefits: string[] | null;
   duration: string | null;
@@ -208,10 +208,19 @@ function parseDeadline(text: string): string | null {
   return findMatch(text, DEADLINE_PATTERNS);
 }
 
-function parseFunding(text: string): string | null {
-  const m = findMatch(text, FUNDING_PATTERNS);
-  if (m) return `$${m}`;
-  return null;
+function parseFundingValue(text: string): { amount: number; currency: string; fundingType: string } | null {
+  const raw = findMatch(text, FUNDING_PATTERNS);
+  if (!raw) return null;
+  const cleaned = raw.replace(/[,$\s]/g, "").toLowerCase();
+  let amount = parseFloat(cleaned);
+  if (isNaN(amount)) {
+    if (cleaned.endsWith("million") || cleaned.endsWith("m")) amount = parseFloat(cleaned.replace(/million|m/, "")) * 1_000_000;
+    else if (cleaned.endsWith("billion") || cleaned.endsWith("b")) amount = parseFloat(cleaned.replace(/billion|b/, "")) * 1_000_000_000;
+    else if (cleaned.endsWith("k")) amount = parseFloat(cleaned.replace(/k/, "")) * 1_000;
+    else return null;
+  }
+  if (isNaN(amount) || amount <= 0) return null;
+  return { amount: Math.round(amount), currency: "USD", fundingType: "grant" };
 }
 
 function extractTags(category: Category, text: string): string[] {
@@ -302,7 +311,7 @@ export function parseOpportunity(
   const country = extractStr(meta?.language)?.toLowerCase() === "en" ? "US" : null;
 
   const deadline = parseDeadline(body);
-  const funding = parseFunding(body);
+  const funding = parseFundingValue(body);
   const tags = extractTags(category, body);
   const domain = extractDomain(result.url);
   const logo = meta?.ogImage || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
@@ -326,6 +335,7 @@ export function parseOpportunity(
     tags,
     logo_url: logo,
     share_image_url: logo,
+    application_video: null,
   };
 }
 
