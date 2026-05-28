@@ -33,7 +33,14 @@ export type Opportunity = {
   hasVoted: boolean
 }
 
-async function exportOpportunities() {
+export type SiteMapPage = {
+  url: string
+  type: 'home' | 'browse' | 'category' | 'opportunity'
+  category?: string
+  opportunityId?: string
+}
+
+async function exportOpportunitiesAndSiteMap() {
   const { data, error } = await supabase
     .from('opportunities')
     .select('*')
@@ -43,7 +50,7 @@ async function exportOpportunities() {
     process.exit(1)
   }
 
-  // Transform the data to match our Opportunity type (though the select * should already match)
+  // Transform the data to match our Opportunity type
   const opportunities = data.map((row: any) => ({
     id: row.id,
     name: row.name,
@@ -65,23 +72,49 @@ async function exportOpportunities() {
     funding: row.funding,
     applicationVideo: row.application_video ?? undefined,
     votes: row.voters?.length ?? 0,
-    hasVoted: false // Since we're exporting for public scraping, we don't have a specific voter
+    hasVoted: false
   }))
 
   // Ensure public/data directory exists
-  const dir = join(process.cwd(), 'public', 'data')
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true })
+  const dataDir = join(process.cwd(), 'public', 'data')
+  if (!existsSync(dataDir)) {
+    mkdirSync(dataDir, { recursive: true })
   }
 
-  // Write to JSON file
+  // Write opportunities to JSON file
   writeFileSync(
-    join(dir, 'opportunities.json'),
+    join(dataDir, 'opportunities.json'),
     JSON.stringify(opportunities, null, 2),
     'utf8'
   )
 
   console.log(`Exported ${opportunities.length} opportunities to public/data/opportunities.json`)
+
+  // Generate site map
+  const siteMap: SiteMapPage[] = [
+    { url: '/', type: 'home' },
+    { url: '/browse', type: 'browse' }
+  ]
+
+  // Add category pages (unique categories)
+  const categories = Array.from(new Set(opportunities.map(o => o.category)))
+  categories.forEach(category => {
+    siteMap.push({ url: `/${category}`, type: 'category', category })
+  })
+
+  // Add opportunity detail pages
+  opportunities.forEach(opportunity => {
+    siteMap.push({ url: `/opportunity/${opportunity.id}`, type: 'opportunity', opportunityId: opportunity.id })
+  })
+
+  // Write site map to JSON file
+  writeFileSync(
+    join(process.cwd(), 'public', 'site-map.json'),
+    JSON.stringify(siteMap, null, 2),
+    'utf8'
+  )
+
+  console.log(`Generated site map with ${siteMap.length} pages to public/site-map.json`)
 }
 
-exportOpportunities()
+exportOpportunitiesAndSiteMap()

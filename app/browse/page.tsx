@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Search, ChevronUp } from "lucide-react";
+import { Sun, Moon, Search, ChevronUp, ArrowUpDown } from "lucide-react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Select,
@@ -12,19 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import type { Opportunity } from "@/lib/data";
 
 const ACCENT = "var(--brand)";
 const PAGE_SIZE = 20;
 
+// Canonical 9 categories only — rogue values (developer_programs, entrepreneurship)
+// are normalised in the API mapRow; we don't expose them as filter options
 const CATEGORIES = [
   "all",
   "fellowship",
@@ -36,8 +30,6 @@ const CATEGORIES = [
   "competition",
   "research",
   "developer_program",
-  "developer_programs",
-  "entrepreneurship",
 ];
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -51,8 +43,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   competition: "Competitions",
   research: "Research Programs",
   developer_program: "Developer Programs",
-  developer_programs: "Developer Programs",
-  entrepreneurship: "Entrepreneurship",
 };
 
 const REGIONS = [
@@ -65,6 +55,14 @@ const REGIONS = [
   "Canada",
   "Australia",
 ];
+
+type SortOption = "votes" | "deadline" | "name";
+
+const SORT_LABELS: Record<SortOption, string> = {
+  votes: "Top voted",
+  deadline: "Deadline",
+  name: "Name A–Z",
+};
 
 function getVoterId(): string {
   if (typeof window === "undefined") return "";
@@ -116,7 +114,8 @@ function applyFilters(
   q: string,
   category: string,
   region: string,
-  status: "open" | "all"
+  status: "open" | "all",
+  sort: SortOption
 ): Opportunity[] {
   let list = all;
   if (status === "open") list = list.filter(isOpen);
@@ -132,7 +131,22 @@ function applyFilters(
   }
   if (category !== "all") list = list.filter((o) => o.category === category);
   if (region !== "all") list = list.filter((o) => o.region === region);
-  return [...list].sort((a, b) => (b.votes ?? 0) - (a.votes ?? 0));
+
+  return [...list].sort((a, b) => {
+    switch (sort) {
+      case "votes":
+        return (b.votes ?? 0) - (a.votes ?? 0);
+      case "deadline": {
+        const aDate = a.closeDate && a.closeDate !== "closed" ? new Date(a.closeDate).getTime() : Infinity;
+        const bDate = b.closeDate && b.closeDate !== "closed" ? new Date(b.closeDate).getTime() : Infinity;
+        return aDate - bDate;
+      }
+      case "name":
+        return a.name.localeCompare(b.name);
+      default:
+        return (b.votes ?? 0) - (a.votes ?? 0);
+    }
+  });
 }
 
 let allCache: Opportunity[] | null = null;
@@ -186,11 +200,7 @@ export default function BrowsePage() {
   const [category, setCategory] = useState("all");
   const [region, setRegion] = useState("all");
   const [status, setStatus] = useState<"open" | "all">("open");
-
-  const [url, setUrl] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [submitMsg, setSubmitMsg] = useState("");
-  const [submitOpen, setSubmitOpen] = useState(false);
+  const [sort, setSort] = useState<SortOption>("votes");
 
   const queryClient = useQueryClient();
   const [voterId, setVoterId] = useState("");
@@ -233,11 +243,11 @@ export default function BrowsePage() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["opportunities", voterId, q, category, region, status],
+    queryKey: ["opportunities", voterId, q, category, region, status, sort],
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
       const all = await fetchAll(voterId);
-      const filtered = applyFilters(all, q, category, region, status);
+      const filtered = applyFilters(all, q, category, region, status, sort);
       const start = (pageParam as number) * PAGE_SIZE;
       const items = filtered.slice(start, start + PAGE_SIZE);
       const nextPage =
@@ -265,149 +275,45 @@ export default function BrowsePage() {
     return () => obs.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!url.trim()) return;
-    try {
-      new URL(url);
-    } catch {
-      setSubmitMsg("invalid url");
-      return;
-    }
-    setSubmitting(true);
-    setSubmitMsg("");
-    try {
-      const res = await fetch("/api/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "url", url: url.trim() }),
-      });
-      if (!res.ok) throw new Error();
-      setSubmitMsg("submitted. thanks!");
-      setUrl("");
-    } catch {
-      setSubmitMsg("error submitting");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   const isDark = mounted && (resolvedTheme === "dark" || theme === "dark");
-  const submitBtnClass =
-    "h-10 border border-border hover:bg-accent flex items-center text-sm transition-colors shrink-0";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* ── Browse header ─────────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/85 border-b border-border">
-        <Dialog open={submitOpen} onOpenChange={setSubmitOpen}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-5 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <Link href="/" className="shrink-0">
-                <span className="font-semibold text-[17px] wordmark">
-                  Foundery.Space
-                </span>
-              </Link>
-              <span className="text-sm text-muted-foreground hidden md:inline shrink-0">
-                Explore
-              </span>
-              <div className="ml-auto flex items-center gap-2 sm:hidden shrink-0">
-                <DialogTrigger asChild>
-                  <button type="button" className={`${submitBtnClass} px-3.5`}>
-                    Submit
-                  </button>
-                </DialogTrigger>
-                <button
-                  type="button"
-                  onClick={() => setTheme(isDark ? "light" : "dark")}
-                  aria-label="toggle theme"
-                  className="w-10 h-10 border border-border hover:bg-accent flex items-center justify-center transition-colors"
-                >
-                  {mounted && isDark ? (
-                    <Sun className="w-4 h-4" />
-                  ) : (
-                    <Moon className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+          <Link href="/" className="shrink-0">
+            <span className="font-semibold text-[17px] wordmark">Foundery.Space</span>
+          </Link>
+          <span className="text-sm text-muted-foreground hidden sm:inline shrink-0">/ Browse</span>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto sm:shrink-0">
-              <div className="relative flex-1 sm:flex-none sm:w-full sm:max-w-[240px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="search\u2026"
-                  className="w-full pl-9 pr-3 h-10 border border-border bg-card text-[15px] focus:outline-none focus:ring-2 focus:ring-offset-0"
-                  style={{
-                    "--tw-ring-color": ACCENT,
-                  } as React.CSSProperties}
-                />
-              </div>
-
-              <div className="hidden sm:flex items-center gap-2 shrink-0">
-                <DialogTrigger asChild>
-                  <button type="button" className={`${submitBtnClass} px-3`}>
-                    Submit
-                  </button>
-                </DialogTrigger>
-                <button
-                  type="button"
-                  onClick={() => setTheme(isDark ? "light" : "dark")}
-                  aria-label="toggle theme"
-                  className="w-10 h-10 border border-border hover:bg-accent flex items-center justify-center transition-colors shrink-0"
-                >
-                  {mounted && isDark ? (
-                    <Sun className="w-4 h-4" />
-                  ) : (
-                    <Moon className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Submit an opportunity</DialogTitle>
-              <DialogDescription>
-                Paste a URL \u2014 we&apos;ll review and add it.
-              </DialogDescription>
-            </DialogHeader>
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col sm:flex-row gap-2 mt-2"
-            >
+          <div className="ml-auto flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <input
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://example.com/opportunity"
-                className="flex-1 px-3 h-10 border border-border bg-background text-[15px] focus:outline-none focus:ring-2"
-                style={{ "--tw-ring-color": ACCENT } as React.CSSProperties}
-                disabled={submitting}
-                autoFocus
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search…"
+                aria-label="Search opportunities"
+                className="pl-9 pr-3 h-9 w-[180px] sm:w-[240px] border border-border bg-card text-[14px] focus:outline-none focus:ring-1 focus:ring-[var(--brand)] transition-all"
               />
-              <button
-                type="submit"
-                disabled={submitting || !url.trim()}
-                className="h-10 px-5 text-white text-[15px] font-medium disabled:opacity-50 transition-opacity"
-                style={{ background: ACCENT }}
-              >
-                {submitting ? "Submitting\u2026" : "Submit"}
-              </button>
-            </form>
-            {submitMsg && (
-              <p className="text-[13px] text-muted-foreground mt-2">
-                {submitMsg}
-              </p>
-            )}
-          </DialogContent>
-        </Dialog>
+            </div>
+            <button
+              type="button"
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              aria-label="Toggle theme"
+              className="w-9 h-9 border border-border hover:bg-accent flex items-center justify-center transition-colors shrink-0"
+            >
+              {mounted && isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-5 pt-3 sm:pt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-        {/* Category pills for quick filtering */}
-        <div className="flex gap-1.5 overflow-x-auto pb-1 sm:hidden scrollbar-none">
+      {/* ── Filter bar ────────────────────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-2">
+        {/* Mobile: scrollable category pills */}
+        <div className="flex gap-1.5 overflow-x-auto pb-2 sm:hidden scrollbar-none">
           {CATEGORIES.map((c) => (
             <button
               key={c}
@@ -423,9 +329,11 @@ export default function BrowsePage() {
             </button>
           ))}
         </div>
-        <div className="hidden sm:flex gap-2 flex-wrap">
+
+        {/* Desktop: dropdowns */}
+        <div className="hidden sm:flex items-center gap-2 flex-wrap">
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="h-10 sm:h-9 w-full sm:w-[170px] bg-card text-sm">
+            <SelectTrigger className="h-9 w-[170px] bg-card text-sm">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -436,8 +344,9 @@ export default function BrowsePage() {
               ))}
             </SelectContent>
           </Select>
+
           <Select value={region} onValueChange={setRegion}>
-            <SelectTrigger className="h-10 sm:h-9 w-full sm:w-[130px] bg-card text-sm">
+            <SelectTrigger className="h-9 w-[130px] bg-card text-sm">
               <SelectValue placeholder="Region" />
             </SelectTrigger>
             <SelectContent>
@@ -448,11 +357,9 @@ export default function BrowsePage() {
               ))}
             </SelectContent>
           </Select>
-          <Select
-            value={status}
-            onValueChange={(v) => setStatus(v as "open" | "all")}
-          >
-            <SelectTrigger className="h-10 sm:h-9 w-full sm:w-[110px] bg-card text-sm">
+
+          <Select value={status} onValueChange={(v) => setStatus(v as "open" | "all")}>
+            <SelectTrigger className="h-9 w-[110px] bg-card text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -460,9 +367,24 @@ export default function BrowsePage() {
               <SelectItem value="all">All</SelectItem>
             </SelectContent>
           </Select>
+
+          <div className="ml-auto flex items-center gap-1.5">
+            <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
+            <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
+              <SelectTrigger className="h-9 w-[120px] bg-card text-sm border-0 shadow-none focus:ring-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(SORT_LABELS) as SortOption[]).map((s) => (
+                  <SelectItem key={s} value={s}>{SORT_LABELS[s]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        {/* Mobile region + status */}
-        <div className="flex gap-2 sm:hidden">
+
+        {/* Mobile: region + status + sort */}
+        <div className="flex gap-2 sm:hidden mt-1.5">
           <Select value={region} onValueChange={setRegion}>
             <SelectTrigger className="h-9 flex-1 bg-card text-sm">
               <SelectValue placeholder="Region" />
@@ -475,27 +397,35 @@ export default function BrowsePage() {
               ))}
             </SelectContent>
           </Select>
-          <Select
-            value={status}
-            onValueChange={(v) => setStatus(v as "open" | "all")}
-          >
+          <Select value={status} onValueChange={(v) => setStatus(v as "open" | "all")}>
+            <SelectTrigger className="h-9 w-[90px] bg-card text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="open">Open</SelectItem>
+              <SelectItem value="all">All</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
             <SelectTrigger className="h-9 w-[100px] bg-card text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="open">Open only</SelectItem>
-              <SelectItem value="all">All</SelectItem>
+              {(Object.keys(SORT_LABELS) as SortOption[]).map((s) => (
+                <SelectItem key={s} value={s}>{SORT_LABELS[s]}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-5 py-4 sm:py-6">
-        {/* Results count */}
+      {/* ── Results ───────────────────────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3">
+        {/* Count + clear */}
         {!isLoading && (
           <div className="flex items-center justify-between mb-3 text-[13px] text-muted-foreground">
             <span>
-              {data?.pages[0]?.total ?? 0} opportunities
+              <span className="nums">{data?.pages[0]?.total ?? 0}</span> opportunities
               {category !== "all" && (
                 <> in <span className="text-foreground">{CATEGORY_LABELS[category]}</span></>
               )}
@@ -514,120 +444,90 @@ export default function BrowsePage() {
             )}
           </div>
         )}
+
         <ul className="divide-y divide-border border-b border-border">
-          {isLoading &&
-            Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
+          {isLoading && Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)}
 
           {!isLoading && items.length === 0 && (
-            <li className="py-10 text-center text-muted-foreground text-[15px]">
+            <li className="py-12 text-center text-muted-foreground text-[15px]">
               No opportunities match your filters.
             </li>
           )}
 
-          {!isLoading &&
-            items.map((o) => {
-              const host = hostname(o.applyLink);
-              const deadline = timeUntil(o.closeDate);
-              const count = o.votes ?? 0;
-              const isVoted = !!o.hasVoted;
-              return (
-                <li key={o.id} className="flex gap-3 sm:gap-4 py-5 sm:py-4 items-start">
-                  <button
-                    type="button"
-                    onClick={() => handleVote(o.id, count, isVoted)}
-                    aria-label={isVoted ? "remove upvote" : "upvote"}
-                    className={`shrink-0 w-10 sm:w-9 flex flex-col items-center pt-1 sm:pt-0.5 select-none transition-colors ${
-                      isVoted
-                        ? "text-[color:var(--accent-color)]"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    style={{ "--accent-color": ACCENT } as React.CSSProperties}
-                  >
-                    <ChevronUp
-                      className={`w-5 h-5 ${isVoted ? "fill-current" : ""}`}
-                      strokeWidth={isVoted ? 2.5 : 2}
-                    />
-                    <span className="text-[12px] tabular-nums nums leading-none mt-0.5">
-                      {count}
+          {!isLoading && items.map((o) => {
+            const host = hostname(o.applyLink);
+            const deadline = timeUntil(o.closeDate);
+            const count = o.votes ?? 0;
+            const isVoted = !!o.hasVoted;
+            return (
+              <li key={o.id} className="flex gap-3 sm:gap-4 py-4 items-start">
+                {/* Vote */}
+                <button
+                  type="button"
+                  onClick={() => handleVote(o.id, count, isVoted)}
+                  aria-label={isVoted ? "Remove upvote" : "Upvote"}
+                  className={`shrink-0 w-9 flex flex-col items-center pt-0.5 select-none transition-colors ${
+                    isVoted ? "text-[color:var(--accent-color)]" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  style={{ "--accent-color": ACCENT } as React.CSSProperties}
+                >
+                  <ChevronUp className={`w-5 h-5 ${isVoted ? "fill-current" : ""}`} strokeWidth={isVoted ? 2.5 : 2} />
+                  <span className="text-[12px] nums leading-none mt-0.5">{count}</span>
+                </button>
+
+                {/* Logo */}
+                {o.logoUrl ? (
+                  <img
+                    src={o.logoUrl}
+                    alt=""
+                    className="w-10 h-10 object-cover bg-muted border border-border shrink-0 mt-0.5"
+                    loading="lazy"
+                    onError={(e) => { (e.target as HTMLImageElement).style.visibility = "hidden"; }}
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-muted border border-border shrink-0 mt-0.5 flex items-center justify-center font-semibold text-sm text-muted-foreground">
+                    {o.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+
+                {/* Content */}
+                <Link href={`/opportunity/${o.id}`} className="group flex-1 min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mb-1">
+                    <span className="font-medium text-[16px] leading-snug group-hover:underline decoration-2 underline-offset-2">
+                      {o.name}
                     </span>
-                  </button>
-
-                  <Link
-                    href={`/opportunity/${o.id}`}
-                    className="group flex gap-3 sm:gap-4 items-start flex-1 min-w-0"
-                  >
-                    {o.logoUrl ? (
-                      <img
-                        src={o.logoUrl}
-                        alt=""
-                        className="w-11 h-11 sm:w-10 sm:h-10 object-cover bg-muted border border-border shrink-0"
-                        loading="lazy"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.visibility =
-                            "hidden";
-                        }}
-                      />
-                    ) : (
-                      <div className="w-11 h-11 sm:w-10 sm:h-10 bg-muted border border-border shrink-0 flex items-center justify-center font-semibold text-muted-foreground">
-                        {o.name.charAt(0).toUpperCase()}
-                      </div>
+                    {host && <span className="text-[13px] text-muted-foreground">{host}</span>}
+                    <span className={`inline-flex items-center text-[11px] uppercase tracking-wide px-1.5 py-0.5 border shrink-0 ${
+                      deadline.urgent
+                        ? "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-400"
+                        : deadline.label === "closed"
+                          ? "border-border bg-muted text-muted-foreground"
+                          : "border-border bg-card text-foreground/80"
+                    }`}>
+                      {deadline.label}
+                    </span>
+                  </div>
+                  <p className="text-[14px] text-muted-foreground leading-relaxed line-clamp-2 mb-1.5">
+                    {o.description}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-muted-foreground">
+                    <span>{CATEGORY_LABELS[o.category] ?? o.category.replace(/_/g, " ")}</span>
+                    <span aria-hidden className="text-muted-foreground/40">·</span>
+                    <span>{o.region || "—"}</span>
+                    <span aria-hidden className="text-muted-foreground/40">·</span>
+                    <span className="min-w-0 truncate">{o.organizer || "—"}</span>
+                    {o.tags.length > 0 && (
+                      <span className="text-[12px] text-muted-foreground/70 truncate max-w-[200px]">
+                        {o.tags.slice(0, 3).join(", ")}
+                      </span>
                     )}
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
 
-                    <div className="flex-1 min-w-0 space-y-2 sm:space-y-0">
-                      <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-2 sm:gap-y-0.5">
-                        <span className="font-medium text-[17px] leading-snug group-hover:underline decoration-2 underline-offset-2">
-                          {o.name}
-                        </span>
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                          {host && (
-                            <span className="text-[13px] text-muted-foreground">
-                              {host}
-                            </span>
-                          )}
-                          <span
-                            className={`inline-flex items-center text-[11px] uppercase tracking-wide px-1.5 py-0.5 border shrink-0 ${
-                              deadline.urgent
-                                ? "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-400"
-                                : deadline.label === "closed"
-                                  ? "border-border bg-muted text-muted-foreground"
-                                  : "border-border bg-card text-foreground/80"
-                            }`}
-                          >
-                            {deadline.label}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-[15px] sm:text-[14px] text-muted-foreground leading-relaxed line-clamp-2 sm:mt-1">
-                        {o.description}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 sm:gap-x-3 sm:gap-y-1 sm:mt-2 text-[13px] text-muted-foreground">
-                        <span className="capitalize">
-                          {CATEGORY_LABELS[o.category] ?? o.category.replace(/_/g, " ")}
-                        </span>
-                        <span aria-hidden className="text-muted-foreground/60">
-                          \u00b7
-                        </span>
-                        <span>{o.region || "\u2014"}</span>
-                        <span aria-hidden className="text-muted-foreground/60">
-                          \u00b7
-                        </span>
-                        <span className="min-w-0">{o.organizer || "\u2014"}</span>
-                        {o.tags.length > 0 && (
-                          <span className="basis-full sm:basis-auto sm:truncate text-[12px] sm:text-[13px] leading-snug pt-0.5 sm:pt-0">
-                            {o.tags.slice(0, 4).join(", ")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-
-          {isFetchingNextPage &&
-            Array.from({ length: 3 }).map((_, i) => (
-              <SkeletonRow key={`more-${i}`} />
-            ))}
+          {isFetchingNextPage && Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={`more-${i}`} />)}
         </ul>
 
         <div ref={sentinelRef} aria-hidden className="h-8" />

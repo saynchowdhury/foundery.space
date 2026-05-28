@@ -1,6 +1,23 @@
 import type { Opportunity } from "@/lib/data";
 import { getAnonClient } from "@/lib/supabase";
 
+function normalizeCategory(raw: unknown): Opportunity["category"] {
+  const val = String(raw || "fellowship").toLowerCase().trim();
+  const map: Record<string, Opportunity["category"]> = {
+    developer_programs: "developer_program",
+    "developer programs": "developer_program",
+    entrepreneurship: "fellowship",
+    startup: "accelerator",
+    incubation: "incubator",
+    vc: "venture_capital",
+    "venture capital": "venture_capital",
+    hackathon: "competition",
+    contest: "competition",
+    scholarship: "fellowship",
+  };
+  return (map[val] ?? val) as Opportunity["category"];
+}
+
 function normalizeDate(
   value: unknown
 ): Opportunity["closeDate"] | Opportunity["openDate"] {
@@ -21,7 +38,7 @@ function mapRowToOpportunity(row: Record<string, unknown>): Opportunity {
     openDate: normalizeDate(row.open_date),
     closeDate: normalizeDate(row.close_date),
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-    category: (row.category as Opportunity["category"]) || "fellowship",
+    category: normalizeCategory(row.category),
     region: String(row.region || ""),
     country: row.country ? String(row.country) : null,
     eligibility: String(row.eligibility || ""),

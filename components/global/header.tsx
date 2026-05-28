@@ -9,7 +9,6 @@ import {
   Menu,
   X,
   List,
-  Plus,
   Moon,
   Sun,
   Home,
@@ -48,7 +47,6 @@ export function Header() {
   const navigation = [
     { name: "Home", href: "/", icon: Home },
     { name: "Browse", href: "/browse", icon: List },
-    { name: "Submit", href: "/browse?submit=true", icon: Plus },
   ];
 
   return (

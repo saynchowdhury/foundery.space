@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { SearchInput } from "@/components/global/search-input";
 
 export function HeroSection() {
@@ -21,7 +22,21 @@ export function HeroSection() {
 
   return (
     <section className="relative overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-40 pb-16 relative">
+      {/* Hero background image */}
+      <div className="absolute inset-0 -z-20">
+        <Image
+          src="/hero-bg.jpg"
+          alt=""
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+      </div>
+      {/* Dark gradient overlay — keeps text legible */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/60 to-background" />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-14 relative">
         <div className="text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-[var(--brand)] border-opacity-30 bg-[var(--brand)] bg-opacity-[0.06]">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand-light)] animate-pulse" />

@@ -13,6 +13,25 @@ function normalizeDate(value: unknown): Opportunity["closeDate"] | Opportunity["
   return String(value);
 }
 
+// Normalise rogue category values scraped from external sources
+// back to the canonical 9-value enum
+function normalizeCategory(raw: unknown): Opportunity["category"] {
+  const val = String(raw || "fellowship").toLowerCase().trim();
+  const map: Record<string, Opportunity["category"]> = {
+    developer_programs: "developer_program",
+    "developer programs": "developer_program",
+    entrepreneurship: "fellowship",
+    startup: "accelerator",
+    incubation: "incubator",
+    vc: "venture_capital",
+    "venture capital": "venture_capital",
+    hackathon: "competition",
+    contest: "competition",
+    scholarship: "fellowship",
+  };
+  return (map[val] ?? val) as Opportunity["category"];
+}
+
 function mapRow(row: Record<string, unknown>, voterId?: string): Opportunity {
   const voterList = Array.isArray(row.voters) ? (row.voters as string[]) : [];
   return {
@@ -25,7 +44,7 @@ function mapRow(row: Record<string, unknown>, voterId?: string): Opportunity {
     openDate: normalizeDate(row.open_date),
     closeDate: normalizeDate(row.close_date),
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-    category: (row.category as Opportunity["category"]) || "fellowship",
+    category: normalizeCategory(row.category),
     region: String(row.region || ""),
     country: row.country ? String(row.country) : null,
     eligibility: String(row.eligibility || ""),

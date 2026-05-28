@@ -1,0 +1,990 @@
+[
+  {
+    "url": "/",
+    "type": "home"
+  },
+  {
+    "url": "/browse",
+    "type": "browse"
+  },
+  {
+    "url": "/fellowship",
+    "type": "category",
+    "category": "fellowship"
+  },
+  {
+    "url": "/venture_capital",
+    "type": "category",
+    "category": "venture_capital"
+  },
+  {
+    "url": "/developer_programs",
+    "type": "category",
+    "category": "developer_programs"
+  },
+  {
+    "url": "/accelerator",
+    "type": "category",
+    "category": "accelerator"
+  },
+  {
+    "url": "/grant",
+    "type": "category",
+    "category": "grant"
+  },
+  {
+    "url": "/residency",
+    "type": "category",
+    "category": "residency"
+  },
+  {
+    "url": "/incubator",
+    "type": "category",
+    "category": "incubator"
+  },
+  {
+    "url": "/research",
+    "type": "category",
+    "category": "research"
+  },
+  {
+    "url": "/entrepreneurship",
+    "type": "category",
+    "category": "entrepreneurship"
+  },
+  {
+    "url": "/competition",
+    "type": "category",
+    "category": "competition"
+  },
+  {
+    "url": "/opportunity/odf",
+    "type": "opportunity",
+    "opportunityId": "odf"
+  },
+  {
+    "url": "/opportunity/rarebreed-ventures",
+    "type": "opportunity",
+    "opportunityId": "rarebreed-ventures"
+  },
+  {
+    "url": "/opportunity/initialized-capital",
+    "type": "opportunity",
+    "opportunityId": "initialized-capital"
+  },
+  {
+    "url": "/opportunity/2048-ventures-pre-seed-fast-track",
+    "type": "opportunity",
+    "opportunityId": "2048-ventures-pre-seed-fast-track"
+  },
+  {
+    "url": "/opportunity/the-future-of-devrel-six-shifts-reshaping-developer-engageme",
+    "type": "opportunity",
+    "opportunityId": "the-future-of-devrel-six-shifts-reshaping-developer-engageme"
+  },
+  {
+    "url": "/opportunity/precursor-ventures",
+    "type": "opportunity",
+    "opportunityId": "precursor-ventures"
+  },
+  {
+    "url": "/opportunity/ai-grant-accelerator",
+    "type": "opportunity",
+    "opportunityId": "ai-grant-accelerator"
+  },
+  {
+    "url": "/opportunity/sequoia-arc",
+    "type": "opportunity",
+    "opportunityId": "sequoia-arc"
+  },
+  {
+    "url": "/opportunity/sequoia-open-source-fellowship",
+    "type": "opportunity",
+    "opportunityId": "sequoia-open-source-fellowship"
+  },
+  {
+    "url": "/opportunity/developer-champions-program-nvidia-developer",
+    "type": "opportunity",
+    "opportunityId": "developer-champions-program-nvidia-developer"
+  },
+  {
+    "url": "/opportunity/exponential-fellowship-2025",
+    "type": "opportunity",
+    "opportunityId": "exponential-fellowship-2025"
+  },
+  {
+    "url": "/opportunity/general-catalyst",
+    "type": "opportunity",
+    "opportunityId": "general-catalyst"
+  },
+  {
+    "url": "/opportunity/first-round-capital",
+    "type": "opportunity",
+    "opportunityId": "first-round-capital"
+  },
+  {
+    "url": "/opportunity/battery-ventures",
+    "type": "opportunity",
+    "opportunityId": "battery-ventures"
+  },
+  {
+    "url": "/opportunity/arm-developer-program-build-ai-at-scale-on-arm-arm-developer",
+    "type": "opportunity",
+    "opportunityId": "arm-developer-program-build-ai-at-scale-on-arm-arm-developer"
+  },
+  {
+    "url": "/opportunity/founders-fund",
+    "type": "opportunity",
+    "opportunityId": "founders-fund"
+  },
+  {
+    "url": "/opportunity/bessemer-venture-partners",
+    "type": "opportunity",
+    "opportunityId": "bessemer-venture-partners"
+  },
+  {
+    "url": "/opportunity/spark-capital",
+    "type": "opportunity",
+    "opportunityId": "spark-capital"
+  },
+  {
+    "url": "/opportunity/antler-2025",
+    "type": "opportunity",
+    "opportunityId": "antler-2025"
+  },
+  {
+    "url": "/opportunity/khosla-ventures",
+    "type": "opportunity",
+    "opportunityId": "khosla-ventures"
+  },
+  {
+    "url": "/opportunity/hummingbird-vc",
+    "type": "opportunity",
+    "opportunityId": "hummingbird-vc"
+  },
+  {
+    "url": "/opportunity/seven-seven-six",
+    "type": "opportunity",
+    "opportunityId": "seven-seven-six"
+  },
+  {
+    "url": "/opportunity/localhost-france",
+    "type": "opportunity",
+    "opportunityId": "localhost-france"
+  },
+  {
+    "url": "/opportunity/cloudflare-for-startups",
+    "type": "opportunity",
+    "opportunityId": "cloudflare-for-startups"
+  },
+  {
+    "url": "/opportunity/the-bridge",
+    "type": "opportunity",
+    "opportunityId": "the-bridge"
+  },
+  {
+    "url": "/opportunity/palantir-neurodivergent-fellowship",
+    "type": "opportunity",
+    "opportunityId": "palantir-neurodivergent-fellowship"
+  },
+  {
+    "url": "/opportunity/a16z-speedrun",
+    "type": "opportunity",
+    "opportunityId": "a16z-speedrun"
+  },
+  {
+    "url": "/opportunity/palantir-american-tech-fellowship",
+    "type": "opportunity",
+    "opportunityId": "palantir-american-tech-fellowship"
+  },
+  {
+    "url": "/opportunity/vercel-ai-accelerator",
+    "type": "opportunity",
+    "opportunityId": "vercel-ai-accelerator"
+  },
+  {
+    "url": "/opportunity/build-on-trainium-kernels-for-ml-acceleration-call-for-propo",
+    "type": "opportunity",
+    "opportunityId": "build-on-trainium-kernels-for-ml-acceleration-call-for-propo"
+  },
+  {
+    "url": "/opportunity/z-fellows",
+    "type": "opportunity",
+    "opportunityId": "z-fellows"
+  },
+  {
+    "url": "/opportunity/mongodb-for-startups",
+    "type": "opportunity",
+    "opportunityId": "mongodb-for-startups"
+  },
+  {
+    "url": "/opportunity/aws-activate-for-startups",
+    "type": "opportunity",
+    "opportunityId": "aws-activate-for-startups"
+  },
+  {
+    "url": "/opportunity/posthog-for-startups",
+    "type": "opportunity",
+    "opportunityId": "posthog-for-startups"
+  },
+  {
+    "url": "/opportunity/soma-capital-fellowship-2025",
+    "type": "opportunity",
+    "opportunityId": "soma-capital-fellowship-2025"
+  },
+  {
+    "url": "/opportunity/new-enterprise-associates",
+    "type": "opportunity",
+    "opportunityId": "new-enterprise-associates"
+  },
+  {
+    "url": "/opportunity/alliance-accelerator",
+    "type": "opportunity",
+    "opportunityId": "alliance-accelerator"
+  },
+  {
+    "url": "/opportunity/founders-inc",
+    "type": "opportunity",
+    "opportunityId": "founders-inc"
+  },
+  {
+    "url": "/opportunity/lightspeed-venture-partners",
+    "type": "opportunity",
+    "opportunityId": "lightspeed-venture-partners"
+  },
+  {
+    "url": "/opportunity/ai2-incubator-2025",
+    "type": "opportunity",
+    "opportunityId": "ai2-incubator-2025"
+  },
+  {
+    "url": "/opportunity/base-case-capital",
+    "type": "opportunity",
+    "opportunityId": "base-case-capital"
+  },
+  {
+    "url": "/opportunity/chapter-one",
+    "type": "opportunity",
+    "opportunityId": "chapter-one"
+  },
+  {
+    "url": "/opportunity/boxgroup",
+    "type": "opportunity",
+    "opportunityId": "boxgroup"
+  },
+  {
+    "url": "/opportunity/sv-angel",
+    "type": "opportunity",
+    "opportunityId": "sv-angel"
+  },
+  {
+    "url": "/opportunity/anthropic-aws-agentic-ai-accelerator",
+    "type": "opportunity",
+    "opportunityId": "anthropic-aws-agentic-ai-accelerator"
+  },
+  {
+    "url": "/opportunity/amplify-partners",
+    "type": "opportunity",
+    "opportunityId": "amplify-partners"
+  },
+  {
+    "url": "/opportunity/forum-ventures",
+    "type": "opportunity",
+    "opportunityId": "forum-ventures"
+  },
+  {
+    "url": "/opportunity/startup-wise-guys-2025",
+    "type": "opportunity",
+    "opportunityId": "startup-wise-guys-2025"
+  },
+  {
+    "url": "/opportunity/boost-vc-2025",
+    "type": "opportunity",
+    "opportunityId": "boost-vc-2025"
+  },
+  {
+    "url": "/opportunity/founder-institute-2025",
+    "type": "opportunity",
+    "opportunityId": "founder-institute-2025"
+  },
+  {
+    "url": "/opportunity/accel-atoms-2025",
+    "type": "opportunity",
+    "opportunityId": "accel-atoms-2025"
+  },
+  {
+    "url": "/opportunity/google-for-startups-2025",
+    "type": "opportunity",
+    "opportunityId": "google-for-startups-2025"
+  },
+  {
+    "url": "/opportunity/seedcamp-2025",
+    "type": "opportunity",
+    "opportunityId": "seedcamp-2025"
+  },
+  {
+    "url": "/opportunity/apx-2025",
+    "type": "opportunity",
+    "opportunityId": "apx-2025"
+  },
+  {
+    "url": "/opportunity/vercel-open-source-program",
+    "type": "opportunity",
+    "opportunityId": "vercel-open-source-program"
+  },
+  {
+    "url": "/opportunity/apply-to-yc-y-combinator",
+    "type": "opportunity",
+    "opportunityId": "apply-to-yc-y-combinator"
+  },
+  {
+    "url": "/opportunity/openai-converge-2024",
+    "type": "opportunity",
+    "opportunityId": "openai-converge-2024"
+  },
+  {
+    "url": "/opportunity/conviction-embed-2025",
+    "type": "opportunity",
+    "opportunityId": "conviction-embed-2025"
+  },
+  {
+    "url": "/opportunity/greylock-edge-2025",
+    "type": "opportunity",
+    "opportunityId": "greylock-edge-2025"
+  },
+  {
+    "url": "/opportunity/betaworks-ai-camp-2026",
+    "type": "opportunity",
+    "opportunityId": "betaworks-ai-camp-2026"
+  },
+  {
+    "url": "/opportunity/angelpad-2025",
+    "type": "opportunity",
+    "opportunityId": "angelpad-2025"
+  },
+  {
+    "url": "/opportunity/the-mint-2025",
+    "type": "opportunity",
+    "opportunityId": "the-mint-2025"
+  },
+  {
+    "url": "/opportunity/android-xr-catalyst-android-developers",
+    "type": "opportunity",
+    "opportunityId": "android-xr-catalyst-android-developers"
+  },
+  {
+    "url": "/opportunity/launch-accelerator-2025",
+    "type": "opportunity",
+    "opportunityId": "launch-accelerator-2025"
+  },
+  {
+    "url": "/opportunity/pioneer-2025",
+    "type": "opportunity",
+    "opportunityId": "pioneer-2025"
+  },
+  {
+    "url": "/opportunity/afore-grants",
+    "type": "opportunity",
+    "opportunityId": "afore-grants"
+  },
+  {
+    "url": "/opportunity/localhost-romania",
+    "type": "opportunity",
+    "opportunityId": "localhost-romania"
+  },
+  {
+    "url": "/opportunity/south-park-commons-2025",
+    "type": "opportunity",
+    "opportunityId": "south-park-commons-2025"
+  },
+  {
+    "url": "/opportunity/designed-to-make-tech-startups-investor-ready-hsg-start-acce",
+    "type": "opportunity",
+    "opportunityId": "designed-to-make-tech-startups-investor-ready-hsg-start-acce"
+  },
+  {
+    "url": "/opportunity/localhost-india",
+    "type": "opportunity",
+    "opportunityId": "localhost-india"
+  },
+  {
+    "url": "/opportunity/localhost-japan",
+    "type": "opportunity",
+    "opportunityId": "localhost-japan"
+  },
+  {
+    "url": "/opportunity/hf0-residency-2025",
+    "type": "opportunity",
+    "opportunityId": "hf0-residency-2025"
+  },
+  {
+    "url": "/opportunity/thiel-fellowship-2026",
+    "type": "opportunity",
+    "opportunityId": "thiel-fellowship-2026"
+  },
+  {
+    "url": "/opportunity/ewor-fellowship",
+    "type": "opportunity",
+    "opportunityId": "ewor-fellowship"
+  },
+  {
+    "url": "/opportunity/developer-relations-wikipedia",
+    "type": "opportunity",
+    "opportunityId": "developer-relations-wikipedia"
+  },
+  {
+    "url": "/opportunity/zfellows",
+    "type": "opportunity",
+    "opportunityId": "zfellows"
+  },
+  {
+    "url": "/opportunity/emergent-ventures",
+    "type": "opportunity",
+    "opportunityId": "emergent-ventures"
+  },
+  {
+    "url": "/opportunity/pearx-2025",
+    "type": "opportunity",
+    "opportunityId": "pearx-2025"
+  },
+  {
+    "url": "/opportunity/edge-city-shift-grants",
+    "type": "opportunity",
+    "opportunityId": "edge-city-shift-grants"
+  },
+  {
+    "url": "/opportunity/the-residency-startup",
+    "type": "opportunity",
+    "opportunityId": "the-residency-startup"
+  },
+  {
+    "url": "/opportunity/ssc-2026-summer-accelerator-ssc-venture-partners",
+    "type": "opportunity",
+    "opportunityId": "ssc-2026-summer-accelerator-ssc-venture-partners"
+  },
+  {
+    "url": "/opportunity/nullfellows-fellowship",
+    "type": "opportunity",
+    "opportunityId": "nullfellows-fellowship"
+  },
+  {
+    "url": "/opportunity/neo-accelerator-2025",
+    "type": "opportunity",
+    "opportunityId": "neo-accelerator-2025"
+  },
+  {
+    "url": "/opportunity/776-foundation-2025",
+    "type": "opportunity",
+    "opportunityId": "776-foundation-2025"
+  },
+  {
+    "url": "/opportunity/techstars-2025",
+    "type": "opportunity",
+    "opportunityId": "techstars-2025"
+  },
+  {
+    "url": "/opportunity/founders-inc-off-season",
+    "type": "opportunity",
+    "opportunityId": "founders-inc-off-season"
+  },
+  {
+    "url": "/opportunity/northern-light-maria-io",
+    "type": "opportunity",
+    "opportunityId": "northern-light-maria-io"
+  },
+  {
+    "url": "/opportunity/global-good-fund-fellowship-2026",
+    "type": "opportunity",
+    "opportunityId": "global-good-fund-fellowship-2026"
+  },
+  {
+    "url": "/opportunity/entrepreneurs-first-fall-2025",
+    "type": "opportunity",
+    "opportunityId": "entrepreneurs-first-fall-2025"
+  },
+  {
+    "url": "/opportunity/y-combinator-fall-2025",
+    "type": "opportunity",
+    "opportunityId": "y-combinator-fall-2025"
+  },
+  {
+    "url": "/opportunity/500-global-flagship-2025",
+    "type": "opportunity",
+    "opportunityId": "500-global-flagship-2025"
+  },
+  {
+    "url": "/opportunity/eu-lac-digital-accelerator-open-call-2025",
+    "type": "opportunity",
+    "opportunityId": "eu-lac-digital-accelerator-open-call-2025"
+  },
+  {
+    "url": "/opportunity/eit-jumpstarter-2026-eit",
+    "type": "opportunity",
+    "opportunityId": "eit-jumpstarter-2026-eit"
+  },
+  {
+    "url": "/opportunity/coding-it-forward-fellowship-2026",
+    "type": "opportunity",
+    "opportunityId": "coding-it-forward-fellowship-2026"
+  },
+  {
+    "url": "/opportunity/y-combinator-x2026",
+    "type": "opportunity",
+    "opportunityId": "y-combinator-x2026"
+  },
+  {
+    "url": "/opportunity/interact-fellowship",
+    "type": "opportunity",
+    "opportunityId": "interact-fellowship"
+  },
+  {
+    "url": "/opportunity/openai-residency-2026",
+    "type": "opportunity",
+    "opportunityId": "openai-residency-2026"
+  },
+  {
+    "url": "/opportunity/berkeley-engineering-youth-academy-2026",
+    "type": "opportunity",
+    "opportunityId": "berkeley-engineering-youth-academy-2026"
+  },
+  {
+    "url": "/opportunity/launchx-san-diego-in-person-entrepreneurship-progr",
+    "type": "opportunity",
+    "opportunityId": "launchx-san-diego-in-person-entrepreneurship-progr"
+  },
+  {
+    "url": "/opportunity/launchx-san-diego-in-person-exploration-program-20",
+    "type": "opportunity",
+    "opportunityId": "launchx-san-diego-in-person-exploration-program-20"
+  },
+  {
+    "url": "/opportunity/ucsb-research-mentorship-program-2026",
+    "type": "opportunity",
+    "opportunityId": "ucsb-research-mentorship-program-2026"
+  },
+  {
+    "url": "/opportunity/y-combinator-summer-fellows-grants-2026",
+    "type": "opportunity",
+    "opportunityId": "y-combinator-summer-fellows-grants-2026"
+  },
+  {
+    "url": "/opportunity/launchx-entrepreneurship-bootcamp-2026",
+    "type": "opportunity",
+    "opportunityId": "launchx-entrepreneurship-bootcamp-2026"
+  },
+  {
+    "url": "/opportunity/tks-world-innovation-program-2026",
+    "type": "opportunity",
+    "opportunityId": "tks-world-innovation-program-2026"
+  },
+  {
+    "url": "/opportunity/edge-city",
+    "type": "opportunity",
+    "opportunityId": "edge-city"
+  },
+  {
+    "url": "/opportunity/call-for-applications-fall-2026-cns-visiting-fellows-program",
+    "type": "opportunity",
+    "opportunityId": "call-for-applications-fall-2026-cns-visiting-fellows-program"
+  },
+  {
+    "url": "/opportunity/anthropic-fellows-program-for-ai-safety-research-application",
+    "type": "opportunity",
+    "opportunityId": "anthropic-fellows-program-for-ai-safety-research-application"
+  },
+  {
+    "url": "/opportunity/mats-autumn-2026",
+    "type": "opportunity",
+    "opportunityId": "mats-autumn-2026"
+  },
+  {
+    "url": "/opportunity/ehri-eric-call-for-applications-conny-kristel-fellowship-pro",
+    "type": "opportunity",
+    "opportunityId": "ehri-eric-call-for-applications-conny-kristel-fellowship-pro"
+  },
+  {
+    "url": "/opportunity/introducing-the-openai-safety-fellowship",
+    "type": "opportunity",
+    "opportunityId": "introducing-the-openai-safety-fellowship"
+  },
+  {
+    "url": "/opportunity/open-source-for-science-fund-launches-to-power-ai-driven-dis",
+    "type": "opportunity",
+    "opportunityId": "open-source-for-science-fund-launches-to-power-ai-driven-dis"
+  },
+  {
+    "url": "/opportunity/2026-fellowship-the-flaherty",
+    "type": "opportunity",
+    "opportunityId": "2026-fellowship-the-flaherty"
+  },
+  {
+    "url": "/opportunity/paradigm-fellowship-2026",
+    "type": "opportunity",
+    "opportunityId": "paradigm-fellowship-2026"
+  },
+  {
+    "url": "/opportunity/2026-2027-digital-thriving-fellowship-program-center-for-dig",
+    "type": "opportunity",
+    "opportunityId": "2026-2027-digital-thriving-fellowship-program-center-for-dig"
+  },
+  {
+    "url": "/opportunity/call-for-applications",
+    "type": "opportunity",
+    "opportunityId": "call-for-applications"
+  },
+  {
+    "url": "/opportunity/applications-open-for-2026-27-new-york-times-fellowship-the-",
+    "type": "opportunity",
+    "opportunityId": "applications-open-for-2026-27-new-york-times-fellowship-the-"
+  },
+  {
+    "url": "/opportunity/applications-for-a16z-speedrun-sr007-are-now-open-andreessen",
+    "type": "opportunity",
+    "opportunityId": "applications-for-a16z-speedrun-sr007-are-now-open-andreessen"
+  },
+  {
+    "url": "/opportunity/apply-now-for-the-google-for-startups-accelerator",
+    "type": "opportunity",
+    "opportunityId": "apply-now-for-the-google-for-startups-accelerator"
+  },
+  {
+    "url": "/opportunity/accelerator-startmate",
+    "type": "opportunity",
+    "opportunityId": "accelerator-startmate"
+  },
+  {
+    "url": "/opportunity/the-four-pillars-of-devrel-and-the-foundation-they-rest-on-c",
+    "type": "opportunity",
+    "opportunityId": "the-four-pillars-of-devrel-and-the-foundation-they-rest-on-c"
+  },
+  {
+    "url": "/opportunity/silkway-accelerator-2026",
+    "type": "opportunity",
+    "opportunityId": "silkway-accelerator-2026"
+  },
+  {
+    "url": "/opportunity/oist-innovation-accelerator-okinawa-institute-of-science-and",
+    "type": "opportunity",
+    "opportunityId": "oist-innovation-accelerator-okinawa-institute-of-science-and"
+  },
+  {
+    "url": "/opportunity/tether-launches-developer-grants-program-to-fund-local-first",
+    "type": "opportunity",
+    "opportunityId": "tether-launches-developer-grants-program-to-fund-local-first"
+  },
+  {
+    "url": "/opportunity/open-source-for-the-life-sciences-open-source-for-science-fu",
+    "type": "opportunity",
+    "opportunityId": "open-source-for-the-life-sciences-open-source-for-science-fu"
+  },
+  {
+    "url": "/opportunity/nsf-26-506-pathways-to-enable-secure-open-source-ecosystems-",
+    "type": "opportunity",
+    "opportunityId": "nsf-26-506-pathways-to-enable-secure-open-source-ecosystems-"
+  },
+  {
+    "url": "/opportunity/developer-relations-programs-the-gitlab-handbook",
+    "type": "opportunity",
+    "opportunityId": "developer-relations-programs-the-gitlab-handbook"
+  },
+  {
+    "url": "/opportunity/2026-call-for-projects-graphql",
+    "type": "opportunity",
+    "opportunityId": "2026-call-for-projects-graphql"
+  },
+  {
+    "url": "/opportunity/sdk-grant-program-interledger-grants-wiki-github",
+    "type": "opportunity",
+    "opportunityId": "sdk-grant-program-interledger-grants-wiki-github"
+  },
+  {
+    "url": "/opportunity/summer-of-open-ai-research-eleutherai",
+    "type": "opportunity",
+    "opportunityId": "summer-of-open-ai-research-eleutherai"
+  },
+  {
+    "url": "/opportunity/build-with-gemini-xprize-2-000-000-in-prizes-build-with-gemi",
+    "type": "opportunity",
+    "opportunityId": "build-with-gemini-xprize-2-000-000-in-prizes-build-with-gemi"
+  },
+  {
+    "url": "/opportunity/slack-agent-builder-challenge-whether-it-s-your-first-agent-",
+    "type": "opportunity",
+    "opportunityId": "slack-agent-builder-challenge-whether-it-s-your-first-agent-"
+  },
+  {
+    "url": "/opportunity/national-buildathon-2026-2026",
+    "type": "opportunity",
+    "opportunityId": "national-buildathon-2026-2026"
+  },
+  {
+    "url": "/opportunity/onchain-summer-buildathon-devfolio",
+    "type": "opportunity",
+    "opportunityId": "onchain-summer-buildathon-devfolio"
+  },
+  {
+    "url": "/opportunity/hermes-agent-challenge-dev-challenge-dev-community",
+    "type": "opportunity",
+    "opportunityId": "hermes-agent-challenge-dev-challenge-dev-community"
+  },
+  {
+    "url": "/opportunity/founders-of-the-future-tech-nation",
+    "type": "opportunity",
+    "opportunityId": "founders-of-the-future-tech-nation"
+  },
+  {
+    "url": "/opportunity/developer-advocate-the-complete-career-strategy-guide-for-20",
+    "type": "opportunity",
+    "opportunityId": "developer-advocate-the-complete-career-strategy-guide-for-20"
+  },
+  {
+    "url": "/opportunity/developer-relations-program-manager-the-gitlab-handbook",
+    "type": "opportunity",
+    "opportunityId": "developer-relations-program-manager-the-gitlab-handbook"
+  },
+  {
+    "url": "/opportunity/google-i-o-2026-google-community-groups",
+    "type": "opportunity",
+    "opportunityId": "google-i-o-2026-google-community-groups"
+  },
+  {
+    "url": "/opportunity/2026-startup-week-buildathon-tech-nyu-s-premier-buildathon-r",
+    "type": "opportunity",
+    "opportunityId": "2026-startup-week-buildathon-tech-nyu-s-premier-buildathon-r"
+  },
+  {
+    "url": "/opportunity/microsoft-build-ai",
+    "type": "opportunity",
+    "opportunityId": "microsoft-build-ai"
+  },
+  {
+    "url": "/opportunity/google-cloud-rapid-agent-hackathon-building-agents-for-real-",
+    "type": "opportunity",
+    "opportunityId": "google-cloud-rapid-agent-hackathon-building-agents-for-real-"
+  },
+  {
+    "url": "/opportunity/codorra-2026-global-cybersecurity-ai-hackathon",
+    "type": "opportunity",
+    "opportunityId": "codorra-2026-global-cybersecurity-ai-hackathon"
+  },
+  {
+    "url": "/opportunity/ksgc-2026-global-startup-program-in-korea",
+    "type": "opportunity",
+    "opportunityId": "ksgc-2026-global-startup-program-in-korea"
+  },
+  {
+    "url": "/opportunity/inventor-to-founder-fellowship-yspace",
+    "type": "opportunity",
+    "opportunityId": "inventor-to-founder-fellowship-yspace"
+  },
+  {
+    "url": "/opportunity/residency-2026",
+    "type": "opportunity",
+    "opportunityId": "residency-2026"
+  },
+  {
+    "url": "/opportunity/khalifa-fund-entrepreneurship-competition-khalifa-fund",
+    "type": "opportunity",
+    "opportunityId": "khalifa-fund-entrepreneurship-competition-khalifa-fund"
+  },
+  {
+    "url": "/opportunity/startup-survivor-program-the-forge-mcmaster-university",
+    "type": "opportunity",
+    "opportunityId": "startup-survivor-program-the-forge-mcmaster-university"
+  },
+  {
+    "url": "/opportunity/kpmg-tech-innovator-in-the-us",
+    "type": "opportunity",
+    "opportunityId": "kpmg-tech-innovator-in-the-us"
+  },
+  {
+    "url": "/opportunity/genesis-ai-startup-competition-superai-2026-singapore",
+    "type": "opportunity",
+    "opportunityId": "genesis-ai-startup-competition-superai-2026-singapore"
+  },
+  {
+    "url": "/opportunity/ivs2026-launchpad-japan-s-largest-pitch-contest-ivs2026",
+    "type": "opportunity",
+    "opportunityId": "ivs2026-launchpad-japan-s-largest-pitch-contest-ivs2026"
+  },
+  {
+    "url": "/opportunity/aws-agentic-ai-call-for-proposals-spring-2026-amazon-science",
+    "type": "opportunity",
+    "opportunityId": "aws-agentic-ai-call-for-proposals-spring-2026-amazon-science"
+  },
+  {
+    "url": "/opportunity/2026-epiqs-experimental-investigators-emergent-phenomena-in-",
+    "type": "opportunity",
+    "opportunityId": "2026-epiqs-experimental-investigators-emergent-phenomena-in-"
+  },
+  {
+    "url": "/opportunity/program-overview",
+    "type": "opportunity",
+    "opportunityId": "program-overview"
+  },
+  {
+    "url": "/opportunity/fy2026-call-for-proposals-now-open-crest-presto-and-act-x-ca",
+    "type": "opportunity",
+    "opportunityId": "fy2026-call-for-proposals-now-open-crest-presto-and-act-x-ca"
+  },
+  {
+    "url": "/opportunity/404",
+    "type": "opportunity",
+    "opportunityId": "404"
+  },
+  {
+    "url": "/opportunity/call-for-proposals-frb-cesab-2026-fondation-pour-la-recherch",
+    "type": "opportunity",
+    "opportunityId": "call-for-proposals-frb-cesab-2026-fondation-pour-la-recherch"
+  },
+  {
+    "url": "/opportunity/2026-interpretability-rfp-schmidt-sciences",
+    "type": "opportunity",
+    "opportunityId": "2026-interpretability-rfp-schmidt-sciences"
+  },
+  {
+    "url": "/opportunity/2026-27-mhach-call-for-proposals-applications-mad",
+    "type": "opportunity",
+    "opportunityId": "2026-27-mhach-call-for-proposals-applications-mad"
+  },
+  {
+    "url": "/opportunity/joint-call-2026-m-era-net",
+    "type": "opportunity",
+    "opportunityId": "joint-call-2026-m-era-net"
+  },
+  {
+    "url": "/opportunity/pgmo-call-for-projects",
+    "type": "opportunity",
+    "opportunityId": "pgmo-call-for-projects"
+  },
+  {
+    "url": "/opportunity/decarbon8-2026-rfa-e8-angels",
+    "type": "opportunity",
+    "opportunityId": "decarbon8-2026-rfa-e8-angels"
+  },
+  {
+    "url": "/opportunity/2026-fast-for-berkeley-students",
+    "type": "opportunity",
+    "opportunityId": "2026-fast-for-berkeley-students"
+  },
+  {
+    "url": "/opportunity/undp-timbuktoo-pan-african-incubation-programme-2026-open-fo",
+    "type": "opportunity",
+    "opportunityId": "undp-timbuktoo-pan-african-incubation-programme-2026-open-fo"
+  },
+  {
+    "url": "/opportunity/pear-s-request-for-startups-pear-vc",
+    "type": "opportunity",
+    "opportunityId": "pear-s-request-for-startups-pear-vc"
+  },
+  {
+    "url": "/opportunity/flux-capacitor-request-for-explorers-investments-for-sci-fi-",
+    "type": "opportunity",
+    "opportunityId": "flux-capacitor-request-for-explorers-investments-for-sci-fi-"
+  },
+  {
+    "url": "/opportunity/apply-to-iterative",
+    "type": "opportunity",
+    "opportunityId": "apply-to-iterative"
+  },
+  {
+    "url": "/opportunity/bgv-blog-applications-are-open-for-bgv-s-autumn-2026-program",
+    "type": "opportunity",
+    "opportunityId": "bgv-blog-applications-are-open-for-bgv-s-autumn-2026-program"
+  },
+  {
+    "url": "/opportunity/social-venture-incubator-cambridge-social-ventures-cambridge",
+    "type": "opportunity",
+    "opportunityId": "social-venture-incubator-cambridge-social-ventures-cambridge"
+  },
+  {
+    "url": "/opportunity/idea-fund-program-missouri-technology-corporation",
+    "type": "opportunity",
+    "opportunityId": "idea-fund-program-missouri-technology-corporation"
+  },
+  {
+    "url": "/opportunity/request-for-startups-3f-vc",
+    "type": "opportunity",
+    "opportunityId": "request-for-startups-3f-vc"
+  },
+  {
+    "url": "/opportunity/greentown-go-make-2026-with-shell-and-technip-energies-annou",
+    "type": "opportunity",
+    "opportunityId": "greentown-go-make-2026-with-shell-and-technip-energies-annou"
+  },
+  {
+    "url": "/opportunity/apply-for-the-2026-2027-nyu-game-center-incubator-nyu-game-c",
+    "type": "opportunity",
+    "opportunityId": "apply-for-the-2026-2027-nyu-game-center-incubator-nyu-game-c"
+  },
+  {
+    "url": "/opportunity/proveg-incubator-opens-applications-for-second-cohort-of-fas",
+    "type": "opportunity",
+    "opportunityId": "proveg-incubator-opens-applications-for-second-cohort-of-fas"
+  },
+  {
+    "url": "/opportunity/maruti-suzuki-nurture-cohort-4-is-now-open-for-startups",
+    "type": "opportunity",
+    "opportunityId": "maruti-suzuki-nurture-cohort-4-is-now-open-for-startups"
+  },
+  {
+    "url": "/opportunity/apply-to-easy-residency-s4-build-inside-bhutan-s-new-soverei",
+    "type": "opportunity",
+    "opportunityId": "apply-to-easy-residency-s4-build-inside-bhutan-s-new-soverei"
+  },
+  {
+    "url": "/opportunity/idea-hatch-ihatch-startup-incubation-programme-cohort-5-for-",
+    "type": "opportunity",
+    "opportunityId": "idea-hatch-ihatch-startup-incubation-programme-cohort-5-for-"
+  },
+  {
+    "url": "/opportunity/introducing-the-16vc-founder-fellowship-16vc",
+    "type": "opportunity",
+    "opportunityId": "introducing-the-16vc-founder-fellowship-16vc"
+  },
+  {
+    "url": "/opportunity/open-call-rauschenberg-residencies-2026-27-zkm",
+    "type": "opportunity",
+    "opportunityId": "open-call-rauschenberg-residencies-2026-27-zkm"
+  },
+  {
+    "url": "/opportunity/page-not-found-joan-mitchell-foundation",
+    "type": "opportunity",
+    "opportunityId": "page-not-found-joan-mitchell-foundation"
+  },
+  {
+    "url": "/opportunity/banff-artist-in-residence-summer-2026-banff-centre-for-arts-",
+    "type": "opportunity",
+    "opportunityId": "banff-artist-in-residence-summer-2026-banff-centre-for-arts-"
+  },
+  {
+    "url": "/opportunity/klaviyo-ai-builder-residency-builders-wanted",
+    "type": "opportunity",
+    "opportunityId": "klaviyo-ai-builder-residency-builders-wanted"
+  },
+  {
+    "url": "/opportunity/ai-tools-for-creative-expression-2026-stochastic-labs",
+    "type": "opportunity",
+    "opportunityId": "ai-tools-for-creative-expression-2026-stochastic-labs"
+  },
+  {
+    "url": "/opportunity/call-for-applications-schaufler-residency-tu-dresden-2026-sc",
+    "type": "opportunity",
+    "opportunityId": "call-for-applications-schaufler-residency-tu-dresden-2026-sc"
+  },
+  {
+    "url": "/opportunity/artist-in-residence-fellowship-program-2026-akiyoshidai-inte",
+    "type": "opportunity",
+    "opportunityId": "artist-in-residence-fellowship-program-2026-akiyoshidai-inte"
+  },
+  {
+    "url": "/opportunity/bek-nordic-baltic-residency-2026-bergen-senter-for-elektroni",
+    "type": "opportunity",
+    "opportunityId": "bek-nordic-baltic-residency-2026-bergen-senter-for-elektroni"
+  },
+  {
+    "url": "/opportunity/announcing-the-long-journey-residency-at-edge-esmeralda-2026",
+    "type": "opportunity",
+    "opportunityId": "announcing-the-long-journey-residency-at-edge-esmeralda-2026"
+  }
+]

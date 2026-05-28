@@ -5,7 +5,20 @@ import { getAnonClient } from "@/lib/supabase";
 import type { GuideConfig } from "@/lib/guide-generator";
 import type { Opportunity } from "@/lib/data";
 
-export const dynamic = "force-dynamic";
+function normalizeCategory(raw: unknown): Opportunity["category"] {
+  const val = String(raw || "fellowship").toLowerCase().trim();
+  const map: Record<string, Opportunity["category"]> = {
+    developer_programs: "developer_program",
+    "developer programs": "developer_program",
+    entrepreneurship: "fellowship",
+    startup: "accelerator",
+    incubation: "incubator",
+    vc: "venture_capital",
+    hackathon: "competition",
+    scholarship: "fellowship",
+  };
+  return (map[val] ?? val) as Opportunity["category"];
+}
 
 function mapRow(row: Record<string, unknown>): Opportunity {
   return {
@@ -18,7 +31,7 @@ function mapRow(row: Record<string, unknown>): Opportunity {
     openDate: row.open_date ? String(row.open_date) : null,
     closeDate: row.close_date ? String(row.close_date) : null,
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-    category: (row.category as Opportunity["category"]) || "fellowship",
+    category: normalizeCategory(row.category),
     region: String(row.region || ""),
     country: row.country ? String(row.country) : null,
     eligibility: String(row.eligibility || ""),
