@@ -1,5 +1,17 @@
 # Foundery.Space SEO & GEO Optimization Strategy
 
+> **Note (June 2026):** This is the original 6-month plan. The active 90-day
+> execution plan is now `VISIBILITY-GAMEPLAN.md` in this folder. Refer to:
+> - `VISIBILITY-GAMEPLAN.md` — 90-day master execution plan
+> - `AI-CITATION-PLAYBOOK.md` — Per-engine (ChatGPT, Perplexity, Claude, AI Mode, Copilot) tactics
+> - `KEYWORD-MAP.md` — Target keyword clusters + intent
+> - `CONTENT-CLUSTER-PLAN.md` — Pillar + supporting article plan
+> - `DIRECT-ANSWER-BLOCKS.md` — Page-level 40–120 word answer templates
+> - `SCHEMA-AUDIT.md` — Full structured data coverage analysis
+> - `ENTITY-SEO-PLAN.md` — Wikipedia, Crunchbase, LinkedIn entity stack
+>
+> This file is kept for historical context and the original 6-month phasing.
+
 ## Executive Summary
 Foundery.Space is a community-ranked directory of tech fellowships, grants, accelerators, and programs. This strategy outlines how to improve search visibility and AI discoverability to reach more founders, entrepreneurs, and opportunity seekers.
 
@@ -255,6 +267,23 @@ Based on our research, target these high-value keyword clusters:
 - **Data Accuracy**: Implement verification process for opportunity data
 - **Technical Issues**: Regular audits and monitoring alerts
 - **Competition**: Focus on unique value (community ranking, AI optimization)
+
+## 2026 Addendum — What Changed
+
+These updates are integrated into the active `VISIBILITY-GAMEPLAN.md` but
+captured here as a diff:
+
+| 2025 Plan | 2026 Update | Why |
+|---|---|---|
+| "Optimize for featured snippets" | "Add Direct Answer paragraph + FAQPage schema to every page" | AI Overviews are the new featured snippets |
+| "5–10 pillar guides" | "12 pillars + 38 supporting + 170 programmatic + 22 blog posts = 242 pages in 90 days" | Topic cluster density matters more than depth |
+| "Internal linking strategy" | "Topic cluster architecture: pillars ↔ supporting ↔ opportunities" | Sibling clustering drives 3–4× more citations |
+| "llms.txt monthly update" | "llms.txt under 5KB curated + llms-full.txt quarterly structured corpus" | llmstxt.org 2026 spec |
+| "Be on Wikipedia someday" | "Tiered entity stack: Crunchbase → G2 → Twitter → LinkedIn → GitHub → Product Hunt → Wikipedia" | Entity authority is the lever for AI citations |
+| "Build 5–10 backlinks" | "3-tier citation stack: Tier 1 (us) + Tier 2 (Crunchbase) + Tier 3 (Wikipedia/.gov/.edu)" | Authority triangle per 2026 GEO research |
+| "Track keyword rankings" | "Track AI referrals via GA4 (referer contains chat.openai.com, perplexity.ai, claude.ai)" | New traffic source; missed by SERP-only tracking |
+| "Optimize Core Web Vitals" | "Add LCP < 0.4s target — pages with fast LCP get 6.7 AI citations vs 2.1 for slow" | Direct correlation in 2026 GEO research |
+| "Add Article schema to blog posts" | "Add Article + dateModified + author + publisher + sameAs on every page" | Recency signal matters; 25.7% fresher = more citations |
 
 ## Conclusion
 By implementing this comprehensive SEO and GEO strategy, Foundery.Space will:

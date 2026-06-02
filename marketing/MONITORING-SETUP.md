@@ -1,5 +1,10 @@
 # Foundery.Space SEO & GEO Monitoring Setup
 
+> **Note (June 2026):** This is the original monitoring doc. The full
+> AI-citation-aware tracking flow is now integrated into
+> `VISIBILITY-GAMEPLAN.md` § "Metrics That Matter". This file remains the
+> operational reference for GA4 events, GSC alerts, and the cadence.
+
 ## Overview
 This document outlines the monitoring setup for tracking SEO and GEO performance metrics for Foundery.Space.
 
@@ -47,6 +52,57 @@ This document outlines the monitoring setup for tracking SEO and GEO performance
    - Citation frequency in public content
    - Usage in educational/research materials
    - References in news/articles
+
+### 2026 Addendum — AI-Specific Tracking
+
+Per `AI-CITATION-PLAYBOOK.md`, we now track these AI-specific signals:
+
+**4. AI Crawler Hits (Server Log Analysis)**
+Set up a log drain (Vercel Log Drains → Datadog/Axiom) to count hits from:
+- `GPTBot`, `OAI-SearchBot`, `ChatGPT-User` (OpenAI)
+- `ClaudeBot`, `Claude-User`, `Claude-SearchBot` (Anthropic)
+- `PerplexityBot`, `Perplexity-User`
+- `Google-Extended`
+- `Applebot-Extended`
+- `Bytespider`, `CCBot`, `cohere-ai`, `Diffbot`, `FacebookBot`, `YouBot`
+
+Target by Day 90: ≥ 1,000 AI crawler hits/month.
+
+**5. AI Referral Traffic (GA4)**
+Filter `Session source` containing:
+- `chat.openai.com`, `chatgpt.com`
+- `perplexity.ai`
+- `claude.ai`
+- `gemini.google.com`
+- `copilot.microsoft.com`
+- `you.com`
+- `phind.com`
+- `poe.com`
+
+Target by Day 90: ≥ 200 AI referral sessions/month.
+
+**6. Brand Mention Volume (Mention.com / Brand24 / Google Alerts)**
+Track "Foundery.Space" mentions across:
+- Reddit, Hacker News, Indie Hackers, Product Hunt
+- LinkedIn, Twitter/X
+- Substack, Medium, Dev.to
+- YouTube transcripts (podcast mentions)
+- Crunchbase, G2, Capterra
+
+Target by Day 90: ≥ 20 distinct third-party mentions.
+
+**7. Manual Citation Testing (Weekly)**
+Test these 5 prompts on 5 engines, every Monday:
+
+| Engine | Prompt |
+|---|---|
+| ChatGPT | "best grants for early-stage founders 2026" |
+| Perplexity | "fellowships for first-time founders" |
+| Claude | "how do I get into Y Combinator with no prior startup" |
+| Google AI Mode | "non-dilutive funding for SaaS founders" |
+| Copilot | "accelerator vs incubator differences" |
+
+Record: (a) is foundery.space cited, (b) which URL, (c) ranked position in cited sources.
 
 ## Implementation
 

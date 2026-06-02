@@ -102,11 +102,28 @@
 - [x] **Organization** schema — Foundery.Space entity
 - [x] **Website** schema — With SearchAction
 - [x] **ItemList** schema — For opportunity listings
-- [x] **EducationalOccupationalProgram** schema — For opportunity pages
-- [x] **FAQ** schema — 5 common questions
+- [x] **EducationalOccupationalProgram** schema — For opportunity pages (updated June 2026 with dateModified, datePublished, keywords, inLanguage, identifier, @id, sameAs)
+- [x] **FAQ** schema — 5 common questions (target: 8+)
 - [x] **BreadcrumbList** schema — On opportunity pages
+- [ ] **CollectionPage** schema — On category pages (`/{category}`)
+- [ ] **Article** schema — On guide / comparison / blog pages
+- [ ] **BlogPosting** schema — On blog posts
+- [ ] **AboutPage** schema — On /about, /methodology
+- [ ] **WebPage** schema — On /privacy, /terms, /for-founders, /for-operators
+- [ ] SameAs `Organization` schema with all Tier 1 + Tier 2 entity URLs (see ENTITY-SEO-PLAN.md)
 - [ ] Validate all schemas at: https://validator.schema.org/
 - [ ] Validate at: https://search.google.com/test/rich-results
+
+### 2026 AEO Checklist
+- [ ] **Direct Answer paragraph** at top of every pillar page (40–120 words, see DIRECT-ANSWER-BLOCKS.md)
+- [ ] **FAQPage schema** with 4–8 Q-A on every pillar/guide/comparison page
+- [ ] **dateModified** in all Article + BlogPosting + EducationalOccupationalProgram schemas
+- [ ] **Hreflang** correct on all pages (when i18n ships)
+- [ ] **llms.txt** validates against 2026 spec (under 5KB, curated, see scripts/update-llms-txt.js)
+- [ ] **llms-full.txt** includes structured corpus (JSON, schema reference, FAQ)
+- [ ] **robots.txt** explicitly allows all major AI crawlers (see app/robots.ts — done)
+- [ ] **Internal link density** ≥ 10 links per pillar page
+- [ ] **Numerical claims** every 150–200 words (counts, dates, dollar amounts)
 
 ---
 
