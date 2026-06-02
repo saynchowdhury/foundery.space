@@ -18,6 +18,15 @@
 
 **Marketing docs** (commit `9d549ba`, deployed): 2026 SEO/GEO/AI-citation strategy + launch monitoring in `marketing/`: VISIBILITY-GAMEPLAN, AI-CITATION-PLAYBOOK, ENTITY-SEO-PLAN, SCHEMA-AUDIT, DIRECT-ANSWER-BLOCKS, KEYWORD-MAP, CONTENT-CLUSTER-PLAN, SEO-GEO-STRATEGY, MONITORING-SETUP, PRE-LAUNCH-CHECKLIST.
 
+**Third batch — perf** (commit `0c3f36a`, deployed): React `cache()` on Supabase fetchers, slim card payload, ISR for category pages.
+- `React.cache()` on `fetchAllOpportunities`, `fetchOpportunityById`, `fetchRecentlyAdded` — multiple consumers in one render tree now share a single Supabase roundtrip. `/opportunity/[id]` used to fetch twice (layout metadata + page body); now it fetches once.
+- New `fetchOpportunityCardData()` selects only the 12 columns the homepage carousels and `RecentlyAddedSection` need. Homepage now uses the slim fetcher.
+- New `OpportunityCardData` = `Pick<Opportunity, 12 fields>`. Card-rendering components (`OpportunityCard`, `InfiniteCarousel`, `CarouselSection`, `RecentlyAddedSection`) now accept the slim type.
+- `mapOpportunityRow` + `CARD_COLUMNS` + `mapRowToCardData` exported from `lib/opportunities-public` for reuse. Consolidates 4 copies of `mapRow` that were duplicated across `lib/opportunities-public`, `lib/recently-added`, `app/[category]`, `app/api/opportunities`, `app/api/search`.
+- `app/[category]/page.tsx`: drops its private `fetchAll`/`normalizeCategory`/`mapRow`; uses `fetchAllOpportunities` + `revalidate = 600` (ISR 10 min, matches homepage cadence).
+- `generateAltText`: takes `OpportunityCardData` (only uses name + organizer).
+- **Measured impact**: homepage RSC payload 668 KB → 206 KB (**69% smaller**), full HTML 2.09 MB → 1.62 MB (**22% smaller**), RSC chunks 216 → 66. Build: 1688 pages, 12s compile. `/[category]` now 15.4 kB with `revalidate`.
+
 ## Architecture Overview
 
 Two-tier scraping pipeline using **Exa** (semantic discovery) + **Firecrawl** (structured extraction) → validated → ingested into Supabase (`opportunities` table).
