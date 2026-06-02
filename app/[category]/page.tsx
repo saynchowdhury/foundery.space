@@ -1,65 +1,15 @@
 import { notFound } from "next/navigation";
 import { generateGuideConfigs } from "@/lib/guide-generator";
 import { GuideContent } from "@/components/features/guide-content";
-import { getAnonClient } from "@/lib/supabase";
 import type { GuideConfig } from "@/lib/guide-generator";
 import type { Opportunity } from "@/lib/data";
-import { toCanonicalCategory } from "@/lib/categories";
+import { fetchAllOpportunities } from "@/lib/opportunities-public";
 
-function normalizeCategory(raw: unknown): Opportunity["category"] {
-  const val = String(raw || "fellowship").toLowerCase().trim();
-  const friendlyAliases: Record<string, Opportunity["category"]> = {
-    startup: "accelerator",
-    incubation: "incubator",
-    vc: "venture_capital",
-    "venture capital": "venture_capital",
-    hackathon: "competition",
-    contest: "competition",
-    scholarship: "fellowship",
-    "developer programs": "developer_program",
-  };
-  if (friendlyAliases[val]) return friendlyAliases[val];
-  const canonical = toCanonicalCategory(val);
-  if (canonical) return canonical as Opportunity["category"];
-  return "fellowship";
-}
-
-function mapRow(row: Record<string, unknown>): Opportunity {
-  return {
-    id: String(row.id || ""),
-    name: String(row.name || ""),
-    logoUrl: String(row.logo_url || ""),
-    shareImageUrl: row.share_image_url ? String(row.share_image_url) : undefined,
-    description: String(row.description || ""),
-    fullDescription: String(row.full_description || row.description || ""),
-    openDate: row.open_date ? String(row.open_date) : null,
-    closeDate: row.close_date ? String(row.close_date) : null,
-    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-    category: normalizeCategory(row.category),
-    region: String(row.region || ""),
-    country: row.country ? String(row.country) : null,
-    eligibility: String(row.eligibility || ""),
-    applyLink: String(row.apply_link || ""),
-    benefits: Array.isArray(row.benefits) ? (row.benefits as string[]) : [],
-    organizer: String(row.organizer || ""),
-    duration: row.duration as Opportunity["duration"],
-    funding: row.funding as Opportunity["funding"],
-    applicationVideo: row.application_video ? String(row.application_video) : undefined,
-  };
-}
-
-async function fetchAll(): Promise<Opportunity[]> {
-  const { data, error } = await getAnonClient()
-    .from("opportunities")
-    .select("*")
-    .order("close_date", { ascending: true });
-  if (error) return [];
-  return (data || []).map(mapRow);
-}
+export const revalidate = 600; // 10 minutes
 
 export async function generateStaticParams() {
   try {
-    const opportunities = await fetchAll();
+    const opportunities = await fetchAllOpportunities();
     const configs = generateGuideConfigs(opportunities);
     return Object.values(configs).map((config) => ({
       category: config.slug,
@@ -76,12 +26,10 @@ export async function generateMetadata({
 }) {
   const { category } = await params;
   const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://foundery.space";
-  const opportunities = await fetchAll();
+  const opportunities = await fetchAllOpportunities();
   const configs = generateGuideConfigs(opportunities);
   const config = Object.values(configs).find((c) => c.slug === category);
   if (!config) return { title: "Not Found" };
-
-  const filtered = filterByConfig(opportunities, config);
 
   return {
     title: `${config.title} — Foundery.Space`,
@@ -119,7 +67,7 @@ export default async function CategoryPage({
   params: Promise<{ category: string }>;
 }) {
   const { category } = await params;
-  const opportunities = await fetchAll();
+  const opportunities = await fetchAllOpportunities();
   const configs = generateGuideConfigs(opportunities);
   const config = Object.values(configs).find((c) => c.slug === category);
   if (!config) notFound();

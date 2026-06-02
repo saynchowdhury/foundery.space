@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { BadgeList } from "@/components/ui/badge-list";
 
 import {
-  Opportunity,
+  type OpportunityCardData,
   getDaysUntilDeadline,
   getDeadlineUrgency,
 } from "@/lib/data";
@@ -48,7 +48,7 @@ const getShortDeadlineText = (days: number | null): string => {
 };
 
 interface OpportunityCardProps {
-  opportunity: Opportunity;
+  opportunity: OpportunityCardData;
   variant?: "default" | "compact";
   className?: string;
   isCarousel?: boolean;

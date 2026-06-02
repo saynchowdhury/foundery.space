@@ -7,7 +7,7 @@ import { ViewAllOpportunitiesSection } from "@/components/landing/view-all-oppor
 import { RecentlyAddedSection } from "@/components/landing/recently-added-section";
 import { fetchHomeStats } from "@/lib/home-stats";
 import { fetchRecentlyAdded } from "@/lib/recently-added";
-import { fetchAllOpportunities } from "@/lib/opportunities-public";
+import { fetchOpportunityCardData } from "@/lib/opportunities-public";
 
 export const revalidate = 600; // 10 minutes
 
@@ -15,7 +15,7 @@ export default async function HomePage() {
   const [stats, recentResult, all] = await Promise.all([
     fetchHomeStats(),
     fetchRecentlyAdded(),
-    fetchAllOpportunities(),
+    fetchOpportunityCardData(),
   ]);
 
   const open = all.filter((o) => {

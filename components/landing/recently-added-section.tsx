@@ -4,10 +4,10 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { categoryLabel, categorySlug } from "@/lib/categories";
-import type { Opportunity } from "@/lib/data";
+import type { OpportunityCardData } from "@/lib/data";
 
 interface RecentlyAddedSectionProps {
-  recent: Opportunity[];
+  recent: OpportunityCardData[];
   hasMore: boolean;
   windowDays: number;
 }

@@ -1,11 +1,11 @@
 "use client";
 
-import { Opportunity } from "@/lib/data";
+import { type OpportunityCardData } from "@/lib/data";
 import { OpportunityCard } from "./opportunity-card";
 import { cn } from "@/lib/utils";
 
 interface InfiniteCarouselProps {
-  opportunities: Opportunity[];
+  opportunities: OpportunityCardData[];
   direction?: "left" | "right";
   speed?: "normal" | "slow" | "fast";
   className?: string;

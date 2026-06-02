@@ -1,10 +1,10 @@
 import { memo } from "react";
 import { InfiniteCarousel } from "@/components/features/infinite-carousel";
-import { type Opportunity } from "@/lib/data";
+import { type OpportunityCardData } from "@/lib/data";
 
 interface CarouselSectionProps {
-  distributedCarousel1: Opportunity[];
-  distributedCarousel2: Opportunity[];
+  distributedCarousel1: OpportunityCardData[];
+  distributedCarousel2: OpportunityCardData[];
 }
 
 export const CarouselSection = memo(function CarouselSection({

@@ -1,41 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { checkBotId } from "botid/server";
-import type { Opportunity } from "@/lib/data";
 import { getAnonClient } from "@/lib/supabase";
+import { mapOpportunityRow } from "@/lib/opportunities-public";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
-
-function normalizeDate(value: unknown): Opportunity["closeDate"] | Opportunity["openDate"] {
-  if (value === undefined || value === null) return null;
-  if (value === "closed") return "closed";
-  if (value instanceof Date) return value.toISOString();
-  return String(value);
-}
-
-function mapRow(row: Record<string, unknown>): Opportunity {
-  return {
-    id: String(row.id || ""),
-    name: String(row.name || ""),
-    logoUrl: String(row.logo_url || ""),
-    shareImageUrl: row.share_image_url ? String(row.share_image_url) : undefined,
-    description: String(row.description || ""),
-    fullDescription: String(row.full_description || row.description || ""),
-    openDate: normalizeDate(row.open_date),
-    closeDate: normalizeDate(row.close_date),
-    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-    category: (row.category as Opportunity["category"]) || "fellowship",
-    region: String(row.region || ""),
-    country: row.country ? String(row.country) : null,
-    eligibility: String(row.eligibility || ""),
-    applyLink: String(row.apply_link || ""),
-    benefits: Array.isArray(row.benefits) ? (row.benefits as string[]) : [],
-    organizer: String(row.organizer || ""),
-    duration: row.duration as Opportunity["duration"],
-    funding: row.funding as Opportunity["funding"],
-    applicationVideo: row.application_video ? String(row.application_video) : undefined,
-  };
-}
 
 export async function GET(request: NextRequest) {
   const verification = await checkBotId();
@@ -66,7 +35,7 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    const opportunities = (data || []).map(mapRow);
+    const opportunities = (data || []).map((row) => mapOpportunityRow(row));
 
     return NextResponse.json(opportunities, {
       status: 200,

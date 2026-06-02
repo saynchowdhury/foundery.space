@@ -84,6 +84,29 @@ export interface Opportunity {
   };
 }
 
+/**
+ * Lightweight subset of Opportunity containing only the fields that
+ * OpportunityCard, RecentlyAddedSection, and the homepage carousels need.
+ * Using this in card-rendering paths lets the fetch layer select fewer
+ * columns and keeps the RSC payload small (a 100-card carousel is ~5x
+ * smaller on the wire).
+ */
+export type OpportunityCardData = Pick<
+  Opportunity,
+  | "id"
+  | "name"
+  | "logoUrl"
+  | "description"
+  | "category"
+  | "region"
+  | "closeDate"
+  | "tags"
+  | "funding"
+  | "organizer"
+  | "createdAt"
+  | "applyLink"
+>;
+
 export function getDaysUntilDeadline(closeDate: string): number {
   const now = new Date();
   const deadline = new Date(closeDate);

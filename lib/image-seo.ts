@@ -1,9 +1,9 @@
-import type { Opportunity } from "./data";
+import type { OpportunityCardData } from "./data";
 
 /**
  * Generate alt text for opportunity logos/images
  */
-export function generateAltText(opportunity: Opportunity): string {
+export function generateAltText(opportunity: OpportunityCardData): string {
   if (opportunity.organizer && opportunity.organizer !== opportunity.name) {
     return `${opportunity.name} - ${opportunity.organizer} logo`;
   }

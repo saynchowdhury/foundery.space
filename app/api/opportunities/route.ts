@@ -1,65 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
-import type { Opportunity } from "@/lib/data";
 import { getAnonClient } from "@/lib/supabase";
 import { cacheHeaders } from "@/lib/api-utils";
-import { toCanonicalCategory } from "@/lib/categories";
+import { mapOpportunityRow } from "@/lib/opportunities-public";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
-
-function normalizeDate(value: unknown): Opportunity["closeDate"] | Opportunity["openDate"] {
-  if (value === undefined || value === null) return null;
-  if (value === "closed") return "closed";
-  if (value instanceof Date) return value.toISOString();
-  return String(value);
-}
-
-// Normalise rogue category values scraped from external sources
-// back to the canonical enum
-function normalizeCategory(raw: unknown): Opportunity["category"] {
-  const val = String(raw || "fellowship").toLowerCase().trim();
-  const friendlyAliases: Record<string, Opportunity["category"]> = {
-    startup: "accelerator",
-    incubation: "incubator",
-    vc: "venture_capital",
-    "venture capital": "venture_capital",
-    hackathon: "competition",
-    contest: "competition",
-    scholarship: "fellowship",
-    "developer programs": "developer_program",
-  };
-  if (friendlyAliases[val]) return friendlyAliases[val];
-  const canonical = toCanonicalCategory(val);
-  if (canonical) return canonical as Opportunity["category"];
-  return "fellowship";
-}
-
-function mapRow(row: Record<string, unknown>, voterId?: string): Opportunity {
-  const voterList = Array.isArray(row.voters) ? (row.voters as string[]) : [];
-  return {
-    id: String(row.id || ""),
-    name: String(row.name || ""),
-    logoUrl: String(row.logo_url || ""),
-    shareImageUrl: row.share_image_url ? String(row.share_image_url) : undefined,
-    description: String(row.description || ""),
-    fullDescription: String(row.full_description || row.description || ""),
-    openDate: normalizeDate(row.open_date),
-    closeDate: normalizeDate(row.close_date),
-    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-    category: normalizeCategory(row.category),
-    region: String(row.region || ""),
-    country: row.country ? String(row.country) : null,
-    eligibility: String(row.eligibility || ""),
-    applyLink: String(row.apply_link || ""),
-    benefits: Array.isArray(row.benefits) ? (row.benefits as string[]) : [],
-    organizer: String(row.organizer || ""),
-    duration: row.duration as Opportunity["duration"],
-    funding: row.funding as Opportunity["funding"],
-    applicationVideo: row.application_video ? String(row.application_video) : undefined,
-    votes: voterList.length,
-    hasVoted: voterId ? voterList.includes(voterId) : false,
-  };
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -78,7 +23,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
       }
 
-      return NextResponse.json(mapRow(data, voterId), {
+      return NextResponse.json(mapOpportunityRow(data, { voterId }), {
         status: 200,
         headers: cacheHeaders(60, 300),
       });
@@ -93,7 +38,9 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    const opportunities = (data || []).map((d) => mapRow(d, voterId));
+    const opportunities = (data || []).map((d) =>
+      mapOpportunityRow(d, { voterId })
+    );
 
     return NextResponse.json(opportunities, {
       status: 200,
