@@ -1,5 +1,9 @@
 # Opportunity Scraping Agents
 
+## Completed work
+
+First batch (commit `5dd86d6`, deployed to main): cleaned the opportunity dataset by removing 3 broken scrapes (404 / "PROGRAM OVERVIEW" / "Page Not Found") and converting 55 string-encoded `funding` values into proper `{amount, currency, fundingType}` objects, making ~93 entries usable in the UI. On the code side, added route support for `/entrepreneurship` and `/developer-programs` (both previously 404'd), added a sticky Apply bar on the opportunity detail page, surfaced an Apply button on homepage carousel cards (collapsing the prior two-click flow), and made the browse page read the initial `?q=` search term from the URL. The full audit context lives in `CODEBASE-AUDIT-REPORT.md` at the repo root.
+
 ## Architecture Overview
 
 Two-tier scraping pipeline using **Exa** (semantic discovery) + **Firecrawl** (structured extraction) → validated → ingested into Supabase (`opportunities` table).
