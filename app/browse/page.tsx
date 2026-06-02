@@ -1,10 +1,10 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Search, ChevronUp, ArrowUpDown } from "lucide-react";
+import { Sun, Moon, Search, ChevronUp, ArrowUpDown, Loader2 } from "lucide-react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Select,
@@ -192,7 +192,7 @@ function SkeletonRow() {
   );
 }
 
-export default function BrowsePage() {
+function BrowsePageContent() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -555,5 +555,19 @@ export default function BrowsePage() {
         <div ref={sentinelRef} aria-hidden className="h-8" />
       </div>
     </div>
+  );
+}
+
+export default function BrowsePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <BrowsePageContent />
+    </Suspense>
   );
 }

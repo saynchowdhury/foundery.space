@@ -5,6 +5,7 @@ import { ExternalLink, MapPin } from "lucide-react";
 import { CalendarButton } from "@/components/global/calendar-button";
 import { FeedbackButton } from "@/components/global/feedback-button";
 import { AppliedButton } from "@/components/global/applied-button";
+import { StickyApplyBar } from "@/app/opportunity/[id]/sticky-apply-bar";
 
 import { getDaysUntilDeadline, type Opportunity } from "@/lib/data";
 import { fetchOpportunityById } from "@/lib/opportunities-public";
@@ -236,7 +237,10 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
               )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto">
+            <div
+              id="opportunity-apply-anchor"
+              className="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto"
+            >
               <a
                 href={opportunity.applyLink}
                 target="_blank"
@@ -383,6 +387,15 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
             )}
           </div>
         </article>
+
+        {opportunity.applyLink && (
+          <div className="max-w-4xl mx-auto px-5">
+            <StickyApplyBar
+              applyLink={opportunity.applyLink}
+              opportunityId={opportunity.id}
+            />
+          </div>
+        )}
       </div>
 
       <FeedbackButton
