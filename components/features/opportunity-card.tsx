@@ -14,7 +14,7 @@ import {
   getDeadlineUrgency,
 } from "@/lib/data";
 import { generateAltText } from "@/lib/image-seo";
-import { cn } from "@/lib/utils";
+import { cn, cleanDisplayText, formatFunding } from "@/lib/utils";
 
 const CATEGORY_LABELS: Record<string, string> = {
   fellowship: "Fellowship",
@@ -123,7 +123,7 @@ export function OpportunityCard({
                 {opportunity.name}
               </h3>
               <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                {opportunity.description}
+                {cleanDisplayText(opportunity.description)}
               </p>
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center space-x-2">
@@ -150,8 +150,8 @@ export function OpportunityCard({
                 <div className="mt-2 pt-2 border-t border-border/50">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-medium text-green-600">
-                      {opportunity.funding.isApproximate ? "~" : ""}$
-                      {opportunity.funding.amount.toLocaleString()}
+                      {opportunity.funding.isApproximate ? "~" : ""}
+                      {formatFunding(opportunity.funding.amount)}
                     </span>
                     {opportunity.funding.equityPercentage > 0 && (
                       <span className="font-medium text-orange-600">
@@ -204,7 +204,7 @@ export function OpportunityCard({
                   {opportunity.name}
                 </h3>
                 <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
-                  {opportunity.description}
+                  {cleanDisplayText(opportunity.description)}
                 </p>
               </div>
               <div
@@ -264,10 +264,26 @@ export function OpportunityCard({
       </CardContent>
       <CardFooter className="px-4 sm:px-6 py-3 sm:py-4 bg-muted/50 flex items-center justify-between">
         {isCarousel ? (
-          <div className="w-full space-y-2">
-            <Button asChild className="w-full">
-              <Link href={getOpportunityUrl()}>View Details</Link>
+          <div className="w-full flex flex-col sm:flex-row gap-2">
+            <Button asChild size="sm" variant="outline" className="flex-1 min-w-0 px-2">
+              <Link href={getOpportunityUrl()} className="truncate">
+                View Details
+              </Link>
             </Button>
+            {opportunity.applyLink && (
+              <Button asChild size="sm" className="flex-1 min-w-0 px-2">
+                <a
+                  href={opportunity.applyLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="truncate"
+                >
+                  <span className="hidden sm:inline">Apply Now</span>
+                  <span className="sm:hidden">Apply</span>
+                  <ExternalLink className="ml-1 h-3 w-3 flex-shrink-0" />
+                </a>
+              </Button>
+            )}
           </div>
         ) : (
           <>

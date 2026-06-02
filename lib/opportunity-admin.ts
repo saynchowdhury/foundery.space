@@ -287,11 +287,13 @@ export async function searchOpportunities(
   query: string
 ): Promise<AdminOpportunity[]> {
   const client = await getClient();
+  // Sanitize query: escape commas and parentheses that could alter PostgREST filter expressions
+  const sanitized = query.replace(/[(),]/g, "");
   const { data, error } = await client
     .from("opportunities")
     .select("*")
     .or(
-      `name.ilike.%${query}%,description.ilike.%${query}%,organizer.ilike.%${query}%`
+      `name.ilike.%${sanitized}%,description.ilike.%${sanitized}%,organizer.ilike.%${sanitized}%`
     )
     .order("created_at", { ascending: false })
     .limit(50);

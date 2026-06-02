@@ -2,12 +2,17 @@ import { NextResponse } from "next/server";
 import { CATEGORIES, CATEGORY_QUERIES, PRIORITY, runCategoryScrape, type Category, type ScrapeRunResult } from "@/lib/scrape";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
   const expectedToken = process.env.CRON_SECRET;
-  if (expectedToken && authHeader !== `Bearer ${expectedToken}`) {
+
+  // Deny access when no secret is configured — prevents public triggering
+  if (!expectedToken) {
+    return NextResponse.json({ error: "Cron secret not configured" }, { status: 500 });
+  }
+  if (authHeader !== `Bearer ${expectedToken}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -27,8 +32,17 @@ export async function GET(request: Request) {
   const categoryParam = searchParams.get("category");
 
   const categories: Category[] = categoryParam
-    ? ([categoryParam] as Category[])
+    ? (CATEGORIES.includes(categoryParam as Category)
+        ? [categoryParam as Category]
+        : [])
     : (CATEGORIES as unknown as Category[]).filter((c) => PRIORITY[c] !== "low");
+
+  if (categoryParam && categories.length === 0) {
+    return NextResponse.json(
+      { error: `Invalid category: ${categoryParam}. Valid: ${CATEGORIES.join(", ")}` },
+      { status: 400 },
+    );
+  }
 
   const results: ScrapeRunResult[] = [];
   const totalStart = Date.now();

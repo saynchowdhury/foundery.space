@@ -643,6 +643,17 @@ export function generateGuideConfigs(opportunities: Opportunity[]): Record<strin
   generateRegionGuides(analysis.allRegions, configs);
   generateCombinationGuides(opportunities, analysis, configs);
 
+  // Alias: plural "developer-programs" slug mirrors the singular "developer-program".
+  // The scrape pipeline produces category "developer_programs" which the page route
+  // normalizes to "developer_program", so the dynamic generator only ever creates
+  // the singular slug. Add the plural slug explicitly to make /developer-programs resolve.
+  if (configs["developer-program"] && !configs["developer-programs"]) {
+    configs["developer-programs"] = {
+      ...configs["developer-program"],
+      slug: "developer-programs",
+    };
+  }
+
   return configs;
 }
 

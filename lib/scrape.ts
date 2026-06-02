@@ -174,7 +174,129 @@ function extractStr(val: string | string[] | undefined): string {
 }
 
 function stripHtml(text: string): string {
-  return text.replace(/<[^>]*>/g, "").trim();
+  return text
+    // Remove script and style blocks entirely (including content)
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    // Remove HTML tags
+    .replace(/<[^>]*>/g, "")
+    // Decode common HTML entities
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#x27;/g, "'")
+    .replace(/&#x2F;/g, "/")
+    .replace(/&hellip;/g, "...")
+    .replace(/&mdash;/g, "—")
+    .replace(/&ndash;/g, "–")
+    .replace(/&laquo;/g, "\u00AB")
+    .replace(/&raquo;/g, "\u00BB")
+    // Strip markdown syntax
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "")           // images
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")           // links → text only
+    .replace(/^#{1,6}\s+/gm, "")                        // headings
+    .replace(/(\*{1,3}|_{1,3})(.*?)\1/g, "$2")         // bold/italic
+    .replace(/~~(.*?)~~/g, "$1")                        // strikethrough
+    .replace(/^\s*[-*+]\s+/gm, "• ")                   // list items
+    .replace(/^\s*\d+\.\s+/gm, "")                      // ordered lists
+    .replace(/^\s*>\s+/gm, "")                          // blockquotes
+    .replace(/\|/g, " ")                                // table pipes
+    .replace(/^[-=]{3,}\s*$/gm, "")                    // horizontal rules
+    .replace(/`{1,3}[^`]*`{1,3}/g, "")                 // inline code
+    // Collapse whitespace
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/** Clean markdown to produce a human-readable plain-text summary. */
+function markdownToPlainText(md: string, maxLen = 300): string {
+  const cleaned = stripHtml(md);
+  // Take the first meaningful paragraph (skip nav, cookie banners, short lines)
+  const lines = cleaned.split("\n").filter((l) => l.trim().length > 40);
+  const text = lines.slice(0, 3).join(" ").trim();
+  if (!text) return cleaned.slice(0, maxLen).trim();
+  // Don't truncate mid-word
+  if (text.length <= maxLen) return text;
+  const truncated = text.slice(0, maxLen);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return (lastSpace > maxLen * 0.7 ? truncated.slice(0, lastSpace) : truncated) + "...";
+}
+
+/** Validate that scraped content looks like a real opportunity (not a blog, 404, or cookie page). */
+function isValidOpportunity(name: string, description: string, fullDesc: string): { valid: boolean; reason?: string } {
+  const lower = (name + " " + description + " " + fullDesc).toLowerCase();
+  // Reject 404 / error pages
+  if (/\b(404|page not found|not found|couldn'?t find|does not exist)\b/i.test(name)) {
+    return { valid: false, reason: "Entry is a 404/error page" };
+  }
+  // Reject cookie policy pages
+  if (/cookie (policy|settings|preferences|consent)/i.test(fullDesc.slice(0, 500)) && fullDesc.length < 1000) {
+    return { valid: false, reason: "Entry contains only cookie policy text" };
+  }
+  // Reject Wikipedia / generic blog posts
+  if (/wikipedia|wikimedia/i.test(name)) {
+    return { valid: false, reason: "Entry is a Wikipedia article" };
+  }
+  // Reject entries with no meaningful content
+  if (!description || description.length < 20) {
+    return { valid: false, reason: "Description too short or empty" };
+  }
+  if (name === "Unknown" || name.trim().length < 3) {
+    return { valid: false, reason: "Name is missing or too short" };
+  }
+  return { valid: true };
+}
+
+/** Clean a scraped name by stripping whitespace, newlines, and tabs. */
+function cleanName(name: string): string {
+  return name.replace(/[\n\r\t]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+/** Extract a human-readable organizer name from the page metadata, falling back to domain. */
+function extractOrganizer(meta: NonNullable<FirecrawlScrapeResponse["data"]>["metadata"], url: string): string | null {
+  // Try og:site_name or structured metadata first
+  const siteName = extractStr(meta?.title);
+  if (siteName && siteName.length > 2 && siteName.length < 60) {
+    // Extract organization from title patterns like "Program Name | Organization"
+    const pipeMatch = siteName.match(/\|\s*(.+?)$/);
+    if (pipeMatch) return pipeMatch[1].trim();
+    const dashMatch = siteName.match(/[-–—]\s*([A-Z][^-–—]+)$/);
+    if (dashMatch && dashMatch[1].trim().length > 2) return dashMatch[1].trim();
+  }
+  // Fall back to domain, but format nicely
+  try {
+    const hostname = new URL(url).hostname.replace(/^www\./, "");
+    const domainPart = hostname.split(".")[0];
+    if (!domainPart || domainPart.length < 2) return null;
+    // Convert "sscventurepartners" → "Sscventurepartners" (better than raw domain)
+    return domainPart.charAt(0).toUpperCase() + domainPart.slice(1);
+  } catch {
+    return null;
+  }
+}
+
+/** Infer country from URL domain TLD rather than page language. */
+function inferCountryFromUrl(url: string): string | null {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    const tld = hostname.split(".").pop() || "";
+    const TLD_COUNTRY_MAP: Record<string, string> = {
+      us: "United States", uk: "United Kingdom", ca: "Canada", au: "Australia",
+      de: "Germany", fr: "France", es: "Spain", it: "Italy", nl: "Netherlands",
+      se: "Sweden", no: "Norway", dk: "Denmark", fi: "Finland", ch: "Switzerland",
+      at: "Austria", be: "Belgium", ie: "Ireland", pt: "Portugal", pl: "Poland",
+      jp: "Japan", cn: "China", in: "India", kr: "South Korea", sg: "Singapore",
+      il: "Israel", ae: "UAE", br: "Brazil", ar: "Argentina", za: "South Africa",
+      ng: "Nigeria", ke: "Kenya", mx: "Mexico", nz: "New Zealand",
+    };
+    return TLD_COUNTRY_MAP[tld] || null;
+  } catch {
+    return null;
+  }
 }
 
 function findMatch(text: string, patterns: RegExp[], maxLen = 200): string | null {
@@ -199,42 +321,87 @@ const DEADLINE_PATTERNS = [
 ];
 
 const FUNDING_PATTERNS = [
-  /\$([0-9,]+(?:\.\d{2})?)\s*(?:k|K|,?000)?(?:\s*(?:in\s+)?(?:funding|grant|equity|investment|award|prize|stipend|support))?/i,
-  /(?:funding|grant|investment|equity|stipend|award|prize)[:\s]+\$?([0-9,]+(?:\.\d{2})?(?:\s*(?:k|K|,?000|million|M|billion|B))?)/i,
-  /up to \$?([0-9,]+(?:\.\d{2})?(?:\s*(?:k|K|,?000|million|M|billion|B))?)/i,
+  // $Xk / $XK / $X,000 patterns — capture number AND suffix together
+  /\$([0-9,]+(?:\.\d+)?)\s*(k|K|,?000)(?:\s*(?:in\s+)?(?:funding|grant|equity|investment|award|prize|stipend|support))?/i,
+  // $X million / $XM patterns
+  /\$([0-9,]+(?:\.\d+)?)\s*(million|M|billion|B)(?:\s*(?:in\s+)?(?:funding|grant|equity|investment|award|prize|stipend|support))?/i,
+  // Plain $X (no suffix) with optional context keyword
+  /\$([0-9,]+(?:\.\d{2})?)(?:\s*(?:in\s+)?(?:funding|grant|equity|investment|award|prize|stipend|support))?/i,
+  // Keyword-first: "funding: $X" etc.
+  /(?:funding|grant|investment|equity|stipend|award|prize)[:\s]+\$?([0-9,]+(?:\.\d+)?)\s*(k|K|million|M|billion|B|,?000)?/i,
+  // "up to $X" pattern
+  /up to \$?([0-9,]+(?:\.\d+)?)\s*(k|K|million|M|billion|B|,?000)?/i,
 ];
+
+/** Detect funding type from surrounding text context. */
+function detectFundingType(text: string): string {
+  const lower = text.toLowerCase();
+  if (/\b(equity|shares|ownership|dilut)/i.test(lower)) return "equity-based";
+  if (/\b(stipend|salary|compensation|paid)/i.test(lower)) return "stipend";
+  if (/\b(investment|vc|venture|seed round)/i.test(lower)) return "investment";
+  if (/\b(prize|award|winner|hackathon)/i.test(lower)) return "prize";
+  return "grant";
+}
+
+function parseFundingValue(text: string): { amount: number; currency: string; fundingType: string } | null {
+  for (const re of FUNDING_PATTERNS) {
+    const m = re.exec(text);
+    if (!m) continue;
+
+    const numStr = m[1].replace(/,/g, "");
+    let amount = parseFloat(numStr);
+    if (isNaN(amount) || amount <= 0) continue;
+
+    // Apply suffix multiplier from capture group 2 (if present)
+    const suffix = (m[2] || "").toLowerCase();
+    if (suffix === "k" || suffix === ",000" || suffix === "000") {
+      amount *= 1_000;
+    } else if (suffix === "million" || suffix === "m") {
+      amount *= 1_000_000;
+    } else if (suffix === "billion" || suffix === "b") {
+      amount *= 1_000_000_000;
+    }
+
+    // Sanity check: amounts under $10 are likely parsing errors (unless per-month stipend)
+    if (amount < 10 && !/month|monthly|per\s+month/i.test(text.slice(m.index, m.index + 100))) {
+      continue;
+    }
+
+    const fundingType = detectFundingType(text.slice(Math.max(0, m.index - 50), m.index + m[0].length + 50));
+    return { amount: Math.round(amount), currency: "USD", fundingType };
+  }
+  return null;
+}
 
 function parseDeadline(text: string): string | null {
   return findMatch(text, DEADLINE_PATTERNS);
 }
 
-function parseFundingValue(text: string): { amount: number; currency: string; fundingType: string } | null {
-  const raw = findMatch(text, FUNDING_PATTERNS);
-  if (!raw) return null;
-  const cleaned = raw.replace(/[,$\s]/g, "").toLowerCase();
-  let amount = parseFloat(cleaned);
-  if (isNaN(amount)) {
-    if (cleaned.endsWith("million") || cleaned.endsWith("m")) amount = parseFloat(cleaned.replace(/million|m/, "")) * 1_000_000;
-    else if (cleaned.endsWith("billion") || cleaned.endsWith("b")) amount = parseFloat(cleaned.replace(/billion|b/, "")) * 1_000_000_000;
-    else if (cleaned.endsWith("k")) amount = parseFloat(cleaned.replace(/k/, "")) * 1_000;
-    else return null;
-  }
-  if (isNaN(amount) || amount <= 0) return null;
-  return { amount: Math.round(amount), currency: "USD", fundingType: "grant" };
-}
-
 function extractTags(category: Category, text: string): string[] {
-  const tags = [category.replace("_", "-")];
-  const kw = [
-    "remote", "online", "in-person", "hybrid",
-    "ai", "climate", "biotech", "fintech", "saas", "hardware",
-    "early-stage", "pre-seed", "seed", "series-a",
-    "women", "underrepresented", "diversity",
+  const tags = [category.replace(/_/g, "-")];
+  // Use word-boundary matching to avoid false positives (e.g. "ai" matching "email", "maintain")
+  const kw: Array<{ tag: string; pattern: RegExp }> = [
+    { tag: "remote", pattern: /\bremote\b/i },
+    { tag: "online", pattern: /\bonline\b/i },
+    { tag: "in-person", pattern: /\bin[- ]person\b/i },
+    { tag: "hybrid", pattern: /\bhybrid\b/i },
+    { tag: "ai", pattern: /\bartificial intelligence\b|\bAI\b|\bmachine learning\b|\bdeep learning\b|\bLLM\b/i },
+    { tag: "climate", pattern: /\bclimate\b/i },
+    { tag: "biotech", pattern: /\bbiotech\b/i },
+    { tag: "fintech", pattern: /\bfintech\b/i },
+    { tag: "saas", pattern: /\bsaas\b/i },
+    { tag: "hardware", pattern: /\bhardware\b/i },
+    { tag: "early-stage", pattern: /\bearly[- ]stage\b/i },
+    { tag: "pre-seed", pattern: /\bpre[- ]seed\b/i },
+    { tag: "seed", pattern: /\bseed (funding|round|stage|capital)\b/i },
+    { tag: "series-a", pattern: /\bseries[- ]?a\b/i },
+    { tag: "women", pattern: /\bwomen\b/i },
+    { tag: "underrepresented", pattern: /\bunderrepresented\b/i },
+    { tag: "diversity", pattern: /\bdiversity\b/i },
   ];
-  const lower = text.toLowerCase();
-  for (const k of kw) {
-    if (lower.includes(k) && !tags.includes(k)) {
-      tags.push(k);
+  for (const { tag, pattern } of kw) {
+    if (pattern.test(text) && !tags.includes(tag)) {
+      tags.push(tag);
     }
   }
   return tags;
@@ -300,32 +467,48 @@ export function parseOpportunity(
   result: ExaResult,
   scraped: FirecrawlScrapeResponse["data"],
   category: Category,
-): ParsedOpportunity {
+): ParsedOpportunity | null {
   const meta = scraped?.metadata;
   const md = scraped?.markdown || result.text || "";
   const body = [md, result.highlights?.join(" ") || ""].join("\n");
 
-  const name = extractStr(meta?.title) || result.title || "Unknown";
-  const desc = extractStr(meta?.description) || result.highlights?.[0] || stripHtml(md.slice(0, 300));
-  const applyLink = result.url;
-  const country = extractStr(meta?.language)?.toLowerCase() === "en" ? "US" : null;
+  // Clean name: strip whitespace, tabs, newlines
+  const rawName = extractStr(meta?.title) || result.title || "Unknown";
+  const name = cleanName(rawName);
+
+  // Build a clean human-readable description
+  const metaDesc = extractStr(meta?.description);
+  const highlight = result.highlights?.[0] || "";
+  const desc = metaDesc || highlight || markdownToPlainText(md, 300);
+  const fullDesc = stripHtml(md.slice(0, 5000));
+
+  // Validate this is actually an opportunity
+  const validation = isValidOpportunity(name, desc, fullDesc);
+  if (!validation.valid) {
+    console.log(`[scrape] Skipping "${name}": ${validation.reason}`);
+    return null;
+  }
+
+  // Infer country from URL domain TLD, not page language
+  const country = inferCountryFromUrl(result.url);
+  const region = resolveRegion(country);
 
   const deadline = parseDeadline(body);
   const funding = parseFundingValue(body);
   const tags = extractTags(category, body);
   const domain = extractDomain(result.url);
   const logo = meta?.ogImage || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-  const organizer = domain ? domain.split(".")[0] || null : null;
+  const organizer = extractOrganizer(meta, result.url);
 
   return {
     name,
     description: desc,
-    full_description: stripHtml(md.slice(0, 5000)),
+    full_description: fullDesc,
     category,
-    region: resolveRegion(country),
+    region: region || "Global",
     country,
-    organizer: organizer ? organizer.charAt(0).toUpperCase() + organizer.slice(1) : null,
-    apply_link: applyLink,
+    organizer,
+    apply_link: result.url,
     close_date: deadline,
     open_date: null,
     funding,
@@ -339,6 +522,41 @@ export function parseOpportunity(
   };
 }
 
+/** Generate a consistent slug ID from a name. Single source of truth for all scripts. */
+export function generateId(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 50);
+}
+
+/** Retry a fetch with exponential backoff. */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 2,
+): Promise<Response> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (res.status === 429 || res.status >= 500) {
+        if (attempt < maxRetries) {
+          const delay = Math.pow(2, attempt) * 1000;
+          await new Promise((r) => setTimeout(r, delay));
+          continue;
+        }
+      }
+      return res;
+    } catch (err) {
+      if (attempt >= maxRetries) throw err;
+      const delay = Math.pow(2, attempt) * 1000;
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw new Error("fetchWithRetry: unreachable");
+}
+
 export async function runCategoryScrape(
   category: Category,
   exaKey: string,
@@ -347,6 +565,7 @@ export async function runCategoryScrape(
   supabaseKey: string,
 ): Promise<ScrapeRunResult> {
   const start = Date.now();
+  const MAX_DURATION_MS = 250_000; // 250s safety margin for Vercel's 300s limit
   const result: ScrapeRunResult = {
     category,
     discovered: 0,
@@ -357,26 +576,41 @@ export async function runCategoryScrape(
     durationMs: 0,
   };
 
+  const supabaseHeaders = {
+    apikey: supabaseKey,
+    Authorization: `Bearer ${supabaseKey}`,
+  };
+
   try {
     const query = CATEGORY_QUERIES[category];
     const exaResults = await searchExa(query, exaKey, 10);
     result.discovered = exaResults.length;
 
     for (const exaResult of exaResults) {
+      // Early exit if approaching time limit
+      if (Date.now() - start > MAX_DURATION_MS) {
+        result.errors.push(`Time limit reached, stopping category ${category}`);
+        break;
+      }
+
       try {
         const scraped = await scrapeWithFirecrawl(exaResult.url, firecrawlKey);
         result.scraped++;
 
         const opp = parseOpportunity(exaResult, scraped, category);
 
-        const dedupRes = await fetch(
-          `${supabaseUrl}/rest/v1/opportunities?select=id&name=eq.${encodeURIComponent(opp.name)}&limit=1`,
-          {
-            headers: {
-              apikey: supabaseKey,
-              Authorization: `Bearer ${supabaseKey}`,
-            },
-          },
+        // Skip invalid entries (404s, blogs, cookie pages, etc.)
+        if (!opp) {
+          result.errors.push(`Skipped invalid: ${exaResult.url}`);
+          continue;
+        }
+
+        const slug = generateId(opp.name);
+
+        // Deduplicate by both name AND slug ID
+        const dedupRes = await fetchWithRetry(
+          `${supabaseUrl}/rest/v1/opportunities?select=id&or=(name.eq.${encodeURIComponent(opp.name)},id.eq.${encodeURIComponent(slug)})&limit=1`,
+          { headers: supabaseHeaders },
         );
         const existing = dedupRes.ok ? await dedupRes.json() : [];
         if (existing.length > 0) {
@@ -384,17 +618,16 @@ export async function runCategoryScrape(
           continue;
         }
 
-        const insertRes = await fetch(
+        const insertRes = await fetchWithRetry(
           `${supabaseUrl}/rest/v1/opportunities`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              apikey: supabaseKey,
-              Authorization: `Bearer ${supabaseKey}`,
+              ...supabaseHeaders,
             },
             body: JSON.stringify({
-              id: opp.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60),
+              id: slug,
               name: opp.name,
               description: opp.description,
               full_description: opp.full_description,

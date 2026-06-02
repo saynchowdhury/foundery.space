@@ -8,6 +8,7 @@ import { AppliedButton } from "@/components/global/applied-button";
 
 import { getDaysUntilDeadline, type Opportunity } from "@/lib/data";
 import { fetchOpportunityById } from "@/lib/opportunities-public";
+import { cleanDisplayText, normalizeTagDisplay, formatFunding } from "@/lib/utils";
 
 const ACCENT = "var(--brand)";
 
@@ -95,7 +96,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
     "@context": "https://schema.org",
     "@type": "Scholarship",
     name: opportunity.name,
-    description: opportunity.fullDescription || opportunity.description,
+    description: cleanDisplayText(opportunity.fullDescription || opportunity.description),
     provider: {
       "@type": "Organization",
       name: opportunity.organizer,
@@ -228,7 +229,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
                       key={t}
                       className="inline-flex items-center text-[11px] uppercase tracking-wide px-2 py-0.5 border border-border bg-card text-foreground/80"
                     >
-                      {t}
+                      {normalizeTagDisplay(t)}
                     </span>
                   ))}
                 </div>
@@ -275,7 +276,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
               )}
           </div>
 
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4 py-4 border-y border-border text-[14px]">
+          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-border text-[14px]">
             <div>
               <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
                 Opens
@@ -303,6 +304,16 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
                 {CATEGORY_LABELS[opportunity.category] ?? opportunity.category.replace(/_/g, " ")}
               </div>
             </div>
+            <div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+                Funding
+              </div>
+              <div>
+                {opportunity.funding?.amount
+                  ? formatFunding(opportunity.funding.amount)
+                  : "Varies"}
+              </div>
+            </div>
           </div>
 
           <div className="mt-10 space-y-10">
@@ -311,7 +322,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
                 About
               </h2>
               <p className="text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
-                {opportunity.fullDescription || opportunity.description}
+                {cleanDisplayText(opportunity.fullDescription || opportunity.description)}
               </p>
             </section>
 
@@ -326,7 +337,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
                       <span className="text-muted-foreground select-none">
                         —
                       </span>
-                      <span>{b}</span>
+                      <span>{cleanDisplayText(b)}</span>
                     </li>
                   ))}
                 </ul>
@@ -339,7 +350,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
                   Eligibility
                 </h2>
                 <p className="text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
-                  {opportunity.eligibility}
+                  {cleanDisplayText(opportunity.eligibility)}
                 </p>
               </section>
             )}

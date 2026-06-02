@@ -10,11 +10,12 @@ function normalizeCategory(raw: unknown): Opportunity["category"] {
   const map: Record<string, Opportunity["category"]> = {
     developer_programs: "developer_program",
     "developer programs": "developer_program",
-    entrepreneurship: "fellowship",
     startup: "accelerator",
     incubation: "incubator",
     vc: "venture_capital",
+    "venture capital": "venture_capital",
     hackathon: "competition",
+    contest: "competition",
     scholarship: "fellowship",
   };
   return (map[val] ?? val) as Opportunity["category"];

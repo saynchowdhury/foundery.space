@@ -22,8 +22,23 @@ function handleAdmin(request: NextRequest): NextResponse | null {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  const token = request.nextUrl.searchParams.get("token");
+  // Support both URL query param and cookie-based auth
+  const token =
+    request.nextUrl.searchParams.get("token") ||
+    request.cookies.get("admin_token")?.value;
   if (token === adminToken) {
+    // If authenticated via query param, set a cookie for subsequent requests
+    if (request.nextUrl.searchParams.get("token")) {
+      const response = NextResponse.next();
+      response.cookies.set("admin_token", adminToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 8, // 8 hours
+        path: "/",
+      });
+      return response;
+    }
     return NextResponse.next();
   }
 

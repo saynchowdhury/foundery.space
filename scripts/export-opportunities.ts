@@ -3,8 +3,13 @@ import { mkdirSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
 // Initialize Supabase client with service role for full access (if needed) or anon for public data
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing required env vars: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  process.exit(1);
+}
 
 // Using anon client since opportunities are public (same as in API routes)
 const supabase = createClient(supabaseUrl, supabaseAnonKey)

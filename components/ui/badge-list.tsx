@@ -8,6 +8,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ChevronDown } from "lucide-react";
+import { normalizeTagDisplay } from "@/lib/utils";
 
 interface BadgeListProps {
   badges: string[];
@@ -42,7 +43,7 @@ export function BadgeList({
     <div className={`flex flex-wrap gap-2 ${className}`}>
       {visibleBadges.map((badge) => (
         <Badge key={badge} variant={variant} className={badgeClassName}>
-          {badge}
+          {normalizeTagDisplay(badge)}
         </Badge>
       ))}
 
@@ -70,7 +71,7 @@ export function BadgeList({
                     variant={variant}
                     className={badgeClassName}
                   >
-                    {badge}
+                    {normalizeTagDisplay(badge)}
                   </Badge>
                 ))}
               </div>

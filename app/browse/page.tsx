@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Sun, Moon, Search, ChevronUp, ArrowUpDown } from "lucide-react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
@@ -196,7 +197,28 @@ export default function BrowsePage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  const [q, setQ] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialQ = searchParams.get("q") || "";
+  const [q, setQ] = useState(initialQ);
+
+  useEffect(() => {
+    const fromUrl = searchParams.get("q") || "";
+    setQ((prev) => (prev === fromUrl ? prev : fromUrl));
+  }, [searchParams]);
+
+  useEffect(() => {
+    const current = searchParams.get("q") || "";
+    if (q === current) return;
+    const handle = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (q) params.set("q", q);
+      else params.delete("q");
+      const qs = params.toString();
+      router.replace(qs ? `/browse?${qs}` : "/browse", { scroll: false });
+    }, 200);
+    return () => clearTimeout(handle);
+  }, [q, router, searchParams]);
   const [category, setCategory] = useState("all");
   const [region, setRegion] = useState("all");
   const [status, setStatus] = useState<"open" | "all">("open");

@@ -8,6 +8,17 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: "1rem",    // 16px on mobile — safe edge clearance
+        sm: "1.5rem",       // 24px on small tablets
+        md: "2rem",         // 32px on tablets
+        lg: "2rem",         // 32px on desktop
+        xl: "2.5rem",       // 40px on wide desktop
+        "2xl": "3rem",      // 48px on ultra-wide
+      },
+    },
     extend: {
       fontFamily: {
         // DM Sans — humanist sans, not Inter/Geist/Roboto

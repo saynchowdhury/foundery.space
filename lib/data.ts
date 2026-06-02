@@ -17,7 +17,9 @@ export interface Opportunity {
     | "residency"
     | "competition"
     | "research"
-    | "developer_program";
+    | "developer_program"
+    | "developer_programs"
+    | "entrepreneurship";
   region: string;
   country: string | null;
   eligibility: string;
@@ -86,6 +88,7 @@ export function getDaysUntilDeadline(closeDate: string): number {
   const now = new Date();
   const deadline = new Date(closeDate);
   const diffTime = deadline.getTime() - now.getTime();
+  if (Number.isNaN(diffTime)) return NaN;
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
@@ -93,6 +96,7 @@ export function getDeadlineUrgency(
   closeDate: string
 ): "safe" | "warning" | "urgent" {
   const days = getDaysUntilDeadline(closeDate);
+  if (Number.isNaN(days)) return "safe"; // invalid dates treated as safe, not urgent
   if (days <= 7) return "urgent";
   if (days <= 30) return "warning";
   return "safe";

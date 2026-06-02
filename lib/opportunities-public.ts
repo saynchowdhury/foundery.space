@@ -4,9 +4,7 @@ import { getAnonClient } from "@/lib/supabase";
 function normalizeCategory(raw: unknown): Opportunity["category"] {
   const val = String(raw || "fellowship").toLowerCase().trim();
   const map: Record<string, Opportunity["category"]> = {
-    developer_programs: "developer_program",
-    "developer programs": "developer_program",
-    entrepreneurship: "fellowship",
+    "developer programs": "developer_programs",
     startup: "accelerator",
     incubation: "incubator",
     vc: "venture_capital",
@@ -81,8 +79,8 @@ export async function fetchOpportunityById(
 
 export function isOpportunityOpen(o: Opportunity): boolean {
   if (o.closeDate === "closed") return false;
-  if (!o.closeDate) return true;
+  if (!o.closeDate) return true; // rolling deadline — always open
   const t = new Date(o.closeDate).getTime();
-  if (Number.isNaN(t)) return true;
+  if (Number.isNaN(t)) return false; // invalid date — treat as closed, not perpetually open
   return t >= Date.now();
 }
