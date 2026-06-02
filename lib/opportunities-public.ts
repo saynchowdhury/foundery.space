@@ -1,10 +1,10 @@
 import type { Opportunity } from "@/lib/data";
 import { getAnonClient } from "@/lib/supabase";
+import { toCanonicalCategory } from "@/lib/categories";
 
-function normalizeCategory(raw: unknown): Opportunity["category"] {
+export function normalizeCategory(raw: unknown): Opportunity["category"] {
   const val = String(raw || "fellowship").toLowerCase().trim();
-  const map: Record<string, Opportunity["category"]> = {
-    "developer programs": "developer_programs",
+  const friendlyAliases: Record<string, Opportunity["category"]> = {
     startup: "accelerator",
     incubation: "incubator",
     vc: "venture_capital",
@@ -12,8 +12,12 @@ function normalizeCategory(raw: unknown): Opportunity["category"] {
     hackathon: "competition",
     contest: "competition",
     scholarship: "fellowship",
+    "developer programs": "developer_program",
   };
-  return (map[val] ?? val) as Opportunity["category"];
+  if (friendlyAliases[val]) return friendlyAliases[val];
+  const canonical = toCanonicalCategory(val);
+  if (canonical) return canonical as Opportunity["category"];
+  return "fellowship";
 }
 
 function normalizeDate(
@@ -46,6 +50,7 @@ function mapRowToOpportunity(row: Record<string, unknown>): Opportunity {
     duration: row.duration as Opportunity["duration"],
     funding: row.funding as Opportunity["funding"],
     applicationVideo: row.application_video ? String(row.application_video) : undefined,
+    createdAt: row.created_at ? String(row.created_at) : undefined,
     votes: typeof row.votes === "number" ? row.votes : 0,
   };
 }

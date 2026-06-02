@@ -14,21 +14,8 @@ import {
   getDeadlineUrgency,
 } from "@/lib/data";
 import { generateAltText } from "@/lib/image-seo";
+import { categoryLabel, categoryLabelSingular } from "@/lib/categories";
 import { cn, cleanDisplayText, formatFunding } from "@/lib/utils";
-
-const CATEGORY_LABELS: Record<string, string> = {
-  fellowship: "Fellowship",
-  accelerator: "Accelerator",
-  incubator: "Incubator",
-  venture_capital: "Venture Capital",
-  grant: "Grant",
-  residency: "Residency",
-  competition: "Competition",
-  research: "Research Program",
-  developer_program: "Developer Program",
-  developer_programs: "Developer Programs",
-  entrepreneurship: "Entrepreneurship",
-};
 
 const getDeadlineText = (days: number | null): string => {
   if (days === null) return "Apply anytime";
@@ -128,7 +115,7 @@ export function OpportunityCard({
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center space-x-2">
                   <Badge variant="secondary" className="text-xs rounded-lg">
-                    {CATEGORY_LABELS[opportunity.category] ?? opportunity.category.replace(/_/g, " ")}
+                    {categoryLabelSingular(opportunity.category)}
                   </Badge>
                   <BadgeList
                     badges={opportunity.tags}
@@ -247,7 +234,7 @@ export function OpportunityCard({
             <div className="mt-auto">
               <div className="flex flex-wrap gap-1 sm:gap-2">
                 <Badge variant="outline" className="rounded-lg text-xs">
-                  {CATEGORY_LABELS[opportunity.category] ?? opportunity.category.replace(/_/g, " ")}
+                  {categoryLabelSingular(opportunity.category)}
                 </Badge>
                 <BadgeList
                   badges={opportunity.tags}

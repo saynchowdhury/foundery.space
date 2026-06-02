@@ -75,42 +75,74 @@ export function generateItemListSchema(
 
 /**
  * Generate Opportunity schema for individual opportunity pages
+ *
+ * 2026 SEO best practices applied:
+ *  - dateModified signals freshness (AI citations correlate 25.7% with recency)
+ *  - keywords gives crawlers explicit topical signal
+ *  - inLanguage + availableLanguage broadens international discovery
+ *  - identifier gives a stable cross-network ID for entity resolution
  */
 export function generateOpportunitySchema(
   opportunity: Opportunity
 ): Record<string, unknown> {
+  const now = new Date().toISOString();
   return {
     "@context": "https://schema.org",
     "@type": "EducationalOccupationalProgram",
+    "@id": `https://foundery.space/opportunity/${opportunity.id}#program`,
+    identifier: `foundery-space:${opportunity.id}`,
     name: opportunity.name,
     description: opportunity.description,
     url: `https://foundery.space/opportunity/${opportunity.id}`,
+    sameAs: [`https://foundery.space/opportunity/${opportunity.id}.md`],
+    keywords: [
+      opportunity.category,
+      ...(opportunity.tags || []),
+      opportunity.region,
+    ]
+      .filter(Boolean)
+      .join(", "),
+    inLanguage: "en",
+    dateModified: now,
+    datePublished:
+      opportunity.openDate && opportunity.openDate !== "rolling"
+        ? new Date(opportunity.openDate).toISOString()
+        : now,
     provider: {
       "@type": "Organization",
       name: opportunity.organizer,
+      url: opportunity.applyLink || undefined,
     },
-    educationalProgramMode: opportunity.tags.includes("online")
+    educationalProgramMode: opportunity.tags?.includes("online")
       ? "distance learning"
       : "classroom and/or distance learning",
     applicationDeadline:
       opportunity.closeDate !== "closed" && opportunity.closeDate
         ? new Date(opportunity.closeDate).toISOString().split("T")[0]
         : undefined,
-    programDuration: "P1Y", // Default to 1 year, could be made more specific
+    applicationStartDate:
+      opportunity.openDate && opportunity.openDate !== "rolling"
+        ? new Date(opportunity.openDate).toISOString().split("T")[0]
+        : undefined,
+    programDuration: "P1Y",
     offers: {
       "@type": "Offer",
-      price: opportunity.description.includes("$")
-        // Try to extract price from description
+      price: opportunity.description?.includes("$")
         ? parseInt(
             opportunity.description.match(/\$([0-9,]+(?:\.[0-9]+)?)/)?.[1] ||
               "0"
           ) * 1000
-        : undefined,
+        : 0,
       priceCurrency: "USD",
       availability:
         opportunity.closeDate === "closed"
           ? "https://schema.org/ItemAvailabilityOutOfStock"
           : "https://schema.org/ItemAvailabilityInStock",
+      validThrough:
+        opportunity.closeDate !== "closed" && opportunity.closeDate
+          ? new Date(opportunity.closeDate).toISOString()
+          : undefined,
+      url: opportunity.applyLink || undefined,
     },
   };
 }

@@ -37,6 +37,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 import type { Opportunity } from "@/lib/data";
+import { PRIMARY, CATEGORY_LABELS, toCanonicalCategory } from "@/lib/categories";
 import { cn } from "@/lib/utils";
 
 const EXAMPLE_OPPORTUNITY_JSON = JSON.stringify(
@@ -96,17 +97,7 @@ type FormState = {
   benefits: string;
 };
 
-const categories: Opportunity["category"][] = [
-  "fellowship",
-  "accelerator",
-  "incubator",
-  "venture_capital",
-  "grant",
-  "residency",
-  "competition",
-  "research",
-  "developer_program",
-];
+const categories: Opportunity["category"][] = [...PRIMARY];
 
 const emptyForm: FormState = {
   name: "",
@@ -257,18 +248,7 @@ function AdminNewContent() {
 
       const normalizeCategory = (value: unknown): Opportunity["category"] | "" => {
         if (typeof value === "string") {
-          const validCategories: Opportunity["category"][] = [
-            "fellowship",
-            "accelerator",
-            "incubator",
-            "venture_capital",
-            "grant",
-            "residency",
-            "competition",
-            "research",
-            "developer_program",
-          ];
-          if (validCategories.includes(value as Opportunity["category"])) {
+          if (PRIMARY.includes(value as Opportunity["category"])) {
             return value as Opportunity["category"];
           }
         }
@@ -650,7 +630,7 @@ function AdminNewContent() {
                   <SelectContent>
                     {categories.map((category) => (
                       <SelectItem key={category} value={category}>
-                        {category}
+                        {CATEGORY_LABELS[category].singular}
                       </SelectItem>
                     ))}
                   </SelectContent>

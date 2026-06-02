@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Opportunity } from "@/lib/data";
 import { getAnonClient } from "@/lib/supabase";
 import { cacheHeaders } from "@/lib/api-utils";
+import { toCanonicalCategory } from "@/lib/categories";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
@@ -14,13 +15,10 @@ function normalizeDate(value: unknown): Opportunity["closeDate"] | Opportunity["
 }
 
 // Normalise rogue category values scraped from external sources
-// back to the canonical 9-value enum
+// back to the canonical enum
 function normalizeCategory(raw: unknown): Opportunity["category"] {
   const val = String(raw || "fellowship").toLowerCase().trim();
-  const map: Record<string, Opportunity["category"]> = {
-    developer_programs: "developer_program",
-    "developer programs": "developer_program",
-    entrepreneurship: "fellowship",
+  const friendlyAliases: Record<string, Opportunity["category"]> = {
     startup: "accelerator",
     incubation: "incubator",
     vc: "venture_capital",
@@ -28,8 +26,12 @@ function normalizeCategory(raw: unknown): Opportunity["category"] {
     hackathon: "competition",
     contest: "competition",
     scholarship: "fellowship",
+    "developer programs": "developer_program",
   };
-  return (map[val] ?? val) as Opportunity["category"];
+  if (friendlyAliases[val]) return friendlyAliases[val];
+  const canonical = toCanonicalCategory(val);
+  if (canonical) return canonical as Opportunity["category"];
+  return "fellowship";
 }
 
 function mapRow(row: Record<string, unknown>, voterId?: string): Opportunity {

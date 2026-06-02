@@ -1,26 +1,24 @@
-"use client";
-
 import { Header } from "@/components/global/header";
 import { Footer } from "@/components/global/footer";
 import { HeroSection } from "@/components/landing/hero-section";
 import { CarouselSection } from "@/components/landing/carousel-section";
 import { WhatYouGetSection } from "@/components/landing/what-you-get";
 import { ViewAllOpportunitiesSection } from "@/components/landing/view-all-opportunities-section";
-import { useQuery } from "@tanstack/react-query";
-import type { Opportunity } from "@/lib/data";
+import { RecentlyAddedSection } from "@/components/landing/recently-added-section";
+import { fetchHomeStats } from "@/lib/home-stats";
+import { fetchRecentlyAdded } from "@/lib/recently-added";
+import { fetchAllOpportunities } from "@/lib/opportunities-public";
 
-export default function HomePage() {
-  const { data: all = [] } = useQuery<Opportunity[]>({
-    queryKey: ["opportunities"],
-    queryFn: async () => {
-      const res = await fetch("/api/opportunities");
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
-    },
-    select: (data) => data ?? [],
-  });
+export const revalidate = 600; // 10 minutes
 
-  const open = all.filter((o: Opportunity) => {
+export default async function HomePage() {
+  const [stats, recentResult, all] = await Promise.all([
+    fetchHomeStats(),
+    fetchRecentlyAdded(),
+    fetchAllOpportunities(),
+  ]);
+
+  const open = all.filter((o) => {
     if (!o.closeDate || o.closeDate === "closed") return true;
     const t = new Date(o.closeDate).getTime();
     return Number.isNaN(t) || t >= Date.now();
@@ -32,10 +30,15 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <HeroSection />
+      <HeroSection stats={stats} />
       <CarouselSection
         distributedCarousel1={carousel1}
         distributedCarousel2={carousel2}
+      />
+      <RecentlyAddedSection
+        recent={recentResult.recent}
+        hasMore={recentResult.hasMore}
+        windowDays={recentResult.windowDays}
       />
       <WhatYouGetSection />
       <ViewAllOpportunitiesSection />

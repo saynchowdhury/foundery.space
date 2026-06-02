@@ -1,7 +1,7 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import Script from "next/script";
-import { ExternalLink, MapPin } from "lucide-react";
+import { ExternalLink, MapPin, Clock, Globe, Tag, Building2, DollarSign, Users } from "lucide-react";
 import { CalendarButton } from "@/components/global/calendar-button";
 import { FeedbackButton } from "@/components/global/feedback-button";
 import { AppliedButton } from "@/components/global/applied-button";
@@ -9,23 +9,10 @@ import { StickyApplyBar } from "@/app/opportunity/[id]/sticky-apply-bar";
 
 import { getDaysUntilDeadline, type Opportunity } from "@/lib/data";
 import { fetchOpportunityById } from "@/lib/opportunities-public";
+import { categoryLabel, categoryLabelSingular, categorySlug } from "@/lib/categories";
 import { cleanDisplayText, normalizeTagDisplay, formatFunding } from "@/lib/utils";
 
 const ACCENT = "var(--brand)";
-
-const CATEGORY_LABELS: Record<string, string> = {
-  fellowship: "Fellowship",
-  accelerator: "Accelerator",
-  incubator: "Incubator",
-  venture_capital: "Venture Capital",
-  grant: "Grant",
-  residency: "Residency",
-  competition: "Competition",
-  research: "Research Program",
-  developer_program: "Developer Program",
-  developer_programs: "Developer Programs",
-  entrepreneurship: "Entrepreneurship",
-};
 
 function getSiteUrl() {
   return process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_BASE_URL || "https://foundery.space";
@@ -162,6 +149,8 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
     ],
   };
 
+  const catSlug = categorySlug(opportunity.category);
+
   return (
     <>
       <Script
@@ -182,16 +171,20 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
 
       <div className="min-h-screen bg-background text-foreground">
         <header className="sticky top-0 z-30 backdrop-blur-md bg-background/85 border-b border-border">
-          <div className="max-w-4xl mx-auto px-5 py-3 flex items-center gap-3">
+          <div className="max-w-6xl mx-auto px-4 sm:px-5 py-3 flex items-center gap-3">
             <Link href="/" className="shrink-0">
               <span className="font-semibold text-[17px] wordmark">
                 Foundery.Space
               </span>
             </Link>
+            <span className="text-sm text-muted-foreground hidden sm:inline shrink-0">
+              / {categoryLabelSingular(opportunity.category)}
+            </span>
           </div>
         </header>
 
-        <article className="max-w-4xl mx-auto px-5 py-8">
+        <article className="max-w-6xl mx-auto px-4 sm:px-5 py-8">
+          {/* Hero block */}
           <div className="flex flex-col sm:flex-row gap-5 items-start">
             {opportunity.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -214,9 +207,12 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
                 {opportunity.organizer}
               </p>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-[13px] text-muted-foreground">
-                <span>
-                  {CATEGORY_LABELS[opportunity.category] ?? opportunity.category.replace(/_/g, " ")}
-                </span>
+                <Link
+                  href={`/${catSlug}`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {categoryLabelSingular(opportunity.category)}
+                </Link>
                 <span aria-hidden>·</span>
                 <span className="inline-flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5" />
@@ -255,6 +251,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
             </div>
           </div>
 
+          {/* Deadline banner */}
           <div
             className={`mt-8 border ${deadlineTone} px-5 py-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2`}
           >
@@ -280,116 +277,178 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
               )}
           </div>
 
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-border text-[14px]">
-            <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                Opens
-              </div>
-              <div>
-                {opportunity.openDate
-                  ? new Date(opportunity.openDate).toLocaleDateString()
-                  : "—"}
-              </div>
-            </div>
-            <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                Region
-              </div>
-              <div className="inline-flex items-center gap-1.5">
-                <MapPin className="w-4 h-4" />
-                {opportunity.region || "—"}
-              </div>
-            </div>
-            <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                Category
-              </div>
-              <div>
-                {CATEGORY_LABELS[opportunity.category] ?? opportunity.category.replace(/_/g, " ")}
-              </div>
-            </div>
-            <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                Funding
-              </div>
-              <div>
-                {opportunity.funding?.amount
-                  ? formatFunding(opportunity.funding.amount)
-                  : "Varies"}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 space-y-10">
-            <section>
-              <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                About
-              </h2>
-              <p className="text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
-                {cleanDisplayText(opportunity.fullDescription || opportunity.description)}
-              </p>
-            </section>
-
-            {opportunity.benefits.length > 0 && (
+          {/* Main content + sidebar */}
+          <div className="mt-10 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 lg:gap-10">
+            {/* Main content */}
+            <div className="min-w-0 space-y-10">
               <section>
                 <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                  What you&apos;ll get
-                </h2>
-                <ul className="space-y-1.5 text-[15px]">
-                  {opportunity.benefits.map((b, i) => (
-                    <li key={i} className="flex gap-2">
-                      <span className="text-muted-foreground select-none">
-                        —
-                      </span>
-                      <span>{cleanDisplayText(b)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {opportunity.eligibility && (
-              <section>
-                <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                  Eligibility
+                  About
                 </h2>
                 <p className="text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
-                  {cleanDisplayText(opportunity.eligibility)}
+                  {cleanDisplayText(opportunity.fullDescription || opportunity.description)}
                 </p>
               </section>
-            )}
 
-            {opportunity.applicationVideo && (
-              <section>
-                <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                  Application tips
-                </h2>
-                <div className="relative aspect-video border border-border overflow-hidden max-w-2xl">
-                  <iframe
-                    src={opportunity.applicationVideo}
-                    title="Application video"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                    className="absolute inset-0 w-full h-full"
-                  />
+              {opportunity.benefits.length > 0 && (
+                <section>
+                  <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                    What you&apos;ll get
+                  </h2>
+                  <ul className="space-y-1.5 text-[15px]">
+                    {opportunity.benefits.map((b, i) => (
+                      <li key={i} className="flex gap-2">
+                        <span className="text-muted-foreground select-none">
+                          —
+                        </span>
+                        <span>{cleanDisplayText(b)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {opportunity.eligibility && (
+                <section>
+                  <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                    Eligibility
+                  </h2>
+                  <p className="text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
+                    {cleanDisplayText(opportunity.eligibility)}
+                  </p>
+                </section>
+              )}
+
+              {opportunity.applicationVideo && (
+                <section>
+                  <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                    Application tips
+                  </h2>
+                  <div className="relative aspect-video border border-border overflow-hidden max-w-2xl">
+                    <iframe
+                      src={opportunity.applicationVideo}
+                      title="Application video"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                      className="absolute inset-0 w-full h-full"
+                    />
+                  </div>
+                </section>
+              )}
+
+              {opportunity.closeDate && opportunity.closeDate !== "closed" && (
+                <section>
+                  <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                    Add to calendar
+                  </h2>
+                  <CalendarButton opportunity={opportunity} />
+                </section>
+              )}
+            </div>
+
+            {/* Sidebar */}
+            <aside className="space-y-5 lg:sticky lg:top-20 lg:self-start">
+              <div className="border border-border bg-card p-5 space-y-4">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                    <Building2 className="w-3.5 h-3.5" />
+                    Organizer
+                  </div>
+                  <div className="text-sm font-medium">
+                    {opportunity.organizer || "—"}
+                  </div>
                 </div>
-              </section>
-            )}
 
-            {opportunity.closeDate && opportunity.closeDate !== "closed" && (
-              <section>
-                <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                  Add to calendar
-                </h2>
-                <CalendarButton opportunity={opportunity} />
-              </section>
-            )}
+                {opportunity.funding && (
+                  <div>
+                    <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                      <DollarSign className="w-3.5 h-3.5" />
+                      Funding
+                    </div>
+                    <div className="text-sm font-medium nums">
+                      {formatFunding(opportunity.funding.amount)}
+                    </div>
+                    {opportunity.funding.fundingType && (
+                      <div className="text-xs text-muted-foreground mt-0.5 capitalize">
+                        {opportunity.funding.fundingType.replace(/-/g, " ")}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {opportunity.region && (
+                  <div>
+                    <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                      <Globe className="w-3.5 h-3.5" />
+                      Region
+                    </div>
+                    <div className="text-sm">{opportunity.region}</div>
+                  </div>
+                )}
+
+                {opportunity.openDate && (
+                  <div>
+                    <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                      <Clock className="w-3.5 h-3.5" />
+                      Opens
+                    </div>
+                    <div className="text-sm">
+                      {new Date(opportunity.openDate).toLocaleDateString()}
+                    </div>
+                  </div>
+                )}
+
+                {opportunity.duration && (
+                  <div>
+                    <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                      <Users className="w-3.5 h-3.5" />
+                      Duration
+                    </div>
+                    <div className="text-sm capitalize">
+                      {opportunity.duration.value} {opportunity.duration.unit}
+                    </div>
+                  </div>
+                )}
+
+                {opportunity.tags.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                      <Tag className="w-3.5 h-3.5" />
+                      Tags
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {opportunity.tags.map((t) => (
+                        <span
+                          key={t}
+                          className="inline-flex items-center text-[10px] uppercase tracking-wide px-1.5 py-0.5 border border-border bg-muted text-foreground/80"
+                        >
+                          {normalizeTagDisplay(t)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="border border-border bg-card p-5">
+                <h3 className="text-sm font-medium mb-2">More like this</h3>
+                <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                  See other {categoryLabel(opportunity.category).toLowerCase()}.
+                </p>
+                <Link
+                  href={`/${catSlug}`}
+                  className="text-sm text-[var(--brand-light)] hover:opacity-80 transition-opacity"
+                >
+                  Browse all {categoryLabel(opportunity.category).toLowerCase()} →
+                </Link>
+              </div>
+            </aside>
           </div>
         </article>
 
         {opportunity.applyLink && (
-          <div className="max-w-4xl mx-auto px-5">
+          <div className="max-w-6xl mx-auto px-5">
             <StickyApplyBar
               applyLink={opportunity.applyLink}
               opportunityId={opportunity.id}

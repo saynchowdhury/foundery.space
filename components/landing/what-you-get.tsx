@@ -1,513 +1,102 @@
 "use client";
-/* eslint-disable @next/next/no-img-element */
-import { useRef, useEffect } from "react";
-import { useTheme } from "next-themes";
+
 import {
   Search,
   Filter,
   Bell,
   Users,
   Clock,
+  Calendar,
+  TrendingUp,
 } from "lucide-react";
 
 const cards = [
   {
     icon: Search,
-    title: "Opportunity Aggregation",
-    subtitle: "Browse fellowships, grants, accelerators, incubators, developer programs, competitions, residencies, and research programs — all in one ranked directory.",
-    category: "Discovery",
-    span: "col-span-2 row-span-2",
-    image: "https://res.cloudinary.com/disamtech/image/upload/v1766317468/fellows/mockups/yviwphvmvcem7ewrkrpf.png",
+    eyebrow: "Discovery",
+    title: "One directory, every program",
+    body: "Fellowships, grants, accelerators, residencies, and developer programs — in one ranked list. No more 12 open tabs.",
+    span: "md:col-span-2 md:row-span-2",
+    emphasis: true,
   },
   {
     icon: Filter,
-    title: "Advanced Search & Filters",
-    subtitle: "Filter by category, region, deadline status, funding range, and tags. Find exactly what matches your profile — from equity-free grants to developer programs.",
-    category: "Filtering",
-    span: "col-span-2 row-span-2",
-    image: "https://res.cloudinary.com/disamtech/image/upload/v1766319991/fellows/mockups/n58tm0uiflksugnbevgs.png",
+    eyebrow: "Filtering",
+    title: "Filter to what you can actually apply to",
+    body: "Open vs. rolling, region, funding range, equity-free, deadline urgency — find programs that match your profile in seconds.",
+    span: "md:col-span-2 md:row-span-2",
+    emphasis: true,
   },
   {
-    icon: Clock,
-    title: "Community Driven",
-    subtitle: "Submit new opportunities and vote on the ones that matter. The community surfaces the best programs so you don't have to dig.",
-    category: "Community",
-    span: "col-span-2 row-span-1",
+    icon: TrendingUp,
+    eyebrow: "Ranking",
+    title: "Community voted",
+    body: "Programs move up as founders upvote the ones that matter.",
+    span: "md:col-span-2 md:row-span-1",
   },
   {
     icon: Bell,
-    title: "Deadline Reminders",
-    subtitle: "Export any deadline directly to Google Calendar, Outlook, Apple Calendar, or Yahoo. Never miss an application window.",
-    category: "Reminders",
-    span: "col-span-1 row-span-1",
+    eyebrow: "Reminders",
+    title: "Add deadlines to your calendar",
+    body: "One click to push to Google, Outlook, or Apple. Never miss a window.",
+    span: "md:col-span-1 md:row-span-1",
   },
   {
-    icon: Users,
-    title: "Personal Tracking",
-    subtitle: "Track which programs you've applied to, bookmark favorites, and build your opportunity pipeline.",
-    category: "Dashboard",
-    badge: "Soon",
-    span: "col-span-1 row-span-1",
-    hideOnMobile: true,
+    icon: Clock,
+    eyebrow: "Refreshed weekly",
+    title: "New every Monday",
+    body: "New opportunities from across the web, automated every week.",
+    span: "md:col-span-1 md:row-span-1",
   },
 ];
 
-const cardStyles = `
-  #cards-container {
-    --bg-color: rgb(250, 250, 250);
-    --card-color: rgb(255, 255, 255);
-  }
-
-  .dark #cards-container {
-    --bg-color: rgb(20, 20, 20);
-    --card-color: rgb(23, 23, 23);
-  }
-
-  #cards-container #cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 200px;
-    gap: 12px;
-    max-width: 1120px;
-    width: 100%;
-  }
-
-  #cards-container #cards:hover > .card::after {
-    opacity: 1;
-  }
-
-  #cards-container .card {
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .dark #cards-container .card {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  /* Bento grid spans */
-  #cards-container .card.col-span-2 {
-    grid-column: span 2 !important;
-  }
-
-  #cards-container .card.row-span-2 {
-    grid-row: span 2 !important;
-  }
-
-  #cards-container .card.col-span-1 {
-    grid-column: span 1;
-  }
-
-  #cards-container .card.row-span-1 {
-    grid-row: span 1;
-  }
-
-  #cards-container .card:hover::before {
-    opacity: 1;
-  }
-
-  #cards-container .card::before,
-  #cards-container .card::after {
-    border-radius: inherit;
-    content: "";
-    height: 100%;
-    left: 0px;
-    opacity: 0;
-    position: absolute;
-    top: 0px;
-    transition: opacity 500ms;
-    width: 100%;
-  }
-
-  #cards-container .card::before {
-    background: radial-gradient(
-      800px circle at var(--mouse-x) var(--mouse-y),
-      rgba(0, 0, 0, 0.06),
-      transparent 40%
-    );
-    z-index: 3;
-  }
-
-  .dark #cards-container .card::before {
-    background: radial-gradient(
-      800px circle at var(--mouse-x) var(--mouse-y),
-      rgba(255, 255, 255, 0.06),
-      transparent 40%
-    );
-  }
-
-  #cards-container .card::after {
-    background: radial-gradient(
-      600px circle at var(--mouse-x) var(--mouse-y),
-      rgba(0, 0, 0, 0.1),
-      transparent 40%
-    );
-    z-index: 1;
-  }
-
-  .dark #cards-container .card::after {
-    background: radial-gradient(
-      600px circle at var(--mouse-x) var(--mouse-y),
-      rgba(255, 255, 255, 0.4),
-      transparent 40%
-    );
-  }
-
-  #cards-container .card > .card-content {
-    background-color: var(--card-color);
-    border-radius: inherit;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    inset: 1px;
-    padding: 32px;
-    padding-top: 32px;
-    position: absolute;
-    z-index: 2;
-    justify-content: flex-start;
-    align-items: stretch;
-    overflow: hidden;
-    border: 0.5px solid rgba(0, 0, 0, 0.08);
-  }
-
-  .dark #cards-container .card > .card-content {
-    border: 0.5px solid rgba(255, 255, 255, 0.1);
-  }
-
-  #cards-container .card-info-wrapper {
-    align-items: flex-start;
-    display: flex;
-    flex-grow: 1;
-    justify-content: flex-start;
-    flex-direction: column;
-    width: 100%;
-  }
-
-  #cards-container .card-info {
-    width: 100%;
-  }
-
-  #cards-container .card-info-title {
-    flex: 1;
-    width: 100%;
-  }
-
-  #cards-container .card-info-title .category-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  #cards-container .card-info-title .category-label > svg {
-    width: 20px;
-    height: 20px;
-    color: hsl(var(--primary));
-    flex-shrink: 0;
-  }
-
-  #cards-container .card-info-title .category-label > span:first-of-type {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: hsl(var(--primary));
-  }
-
-  #cards-container .card-info-title .category-label .ml-auto {
-    margin-left: auto;
-  }
-
-  #cards-container .card-info-title > h3 {
-    font-size: 1.25rem;
-    line-height: 1.3;
-    color: rgb(15, 15, 15);
-    font-family: "Rubik", sans-serif;
-    font-weight: 400;
-    margin: 0px;
-    margin-bottom: 8px;
-  }
-
-  .dark #cards-container .card-info-title > h3 {
-    color: rgb(240, 240, 240);
-  }
-
-  #cards-container .card-info-title > h4 {
-    color: rgba(0, 0, 0, 0.6);
-    font-size: 0.75rem;
-    margin-top: 0px;
-    font-family: "Rubik", sans-serif;
-    font-weight: 400;
-    line-height: 1.5;
-  }
-
-  .dark #cards-container .card-info-title > h4 {
-    color: rgba(255, 255, 255, 0.5);
-  }
-
-  #cards-container .card-image {
-    width: 100%;
-    height: auto;
-    margin-top: 16px;
-    border-radius: 8px;
-    object-fit: cover;
-    max-height: 400px;
-    transform: scale(1.6) translateY(40px) translateX(-10px);
-    transform-origin: center center;
-    object-position: center;
-  }
-
-  #cards-container .card-image-search {
-    transform: scale(1.1) translateY(-10px) translateX(-10px);
-  }
-
-  /* Tablet and smaller desktop */
-  @media (max-width: 1024px) {
-    #cards-container #cards {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    #cards-container .card.col-span-2 {
-      grid-column: span 2;
-    }
-
-    #cards-container .card.row-span-2 {
-      grid-row: span 2;
-    }
-  }
-
-  /* Mobile landscape and small tablets */
-  @media (max-width: 768px) {
-    #cards-container #cards {
-      grid-template-columns: repeat(2, 1fr);
-      grid-auto-rows: 220px;
-      gap: 8px;
-    }
-
-    #cards-container .card.col-span-2 {
-      grid-column: span 2;
-    }
-
-    #cards-container .card.row-span-2 {
-      grid-row: span 1;
-    }
-
-    #cards-container .card.hide-mobile {
-      display: none;
-    }
-
-    #cards-container .card > .card-content {
-      padding: 20px;
-    }
-
-    #cards-container .card-info-title > h3 {
-      font-size: 1.2rem;
-    }
-
-    #cards-container .card-info-title > h4 {
-      font-size: 0.7rem;
-    }
-
-    #cards-container .card-image {
-      margin-top: 12px;
-      max-height: 250px;
-      transform: scale(1.05);
-    }
-
-    #cards-container .card-image-search {
-      transform: scale(1.0) translateY(-5px);
-    }
-  }
-
-  /* Mobile portrait */
-  @media (max-width: 640px) {
-    #cards-container #cards {
-      grid-template-columns: 1fr;
-      grid-auto-rows: auto;
-      gap: 8px;
-    }
-
-    #cards-container .card {
-      min-height: 200px;
-    }
-
-    #cards-container .card.col-span-2 {
-      grid-column: span 1;
-    }
-
-    #cards-container .card.row-span-2 {
-      grid-row: span 1;
-    }
-
-    #cards-container .card.hide-mobile {
-      display: none;
-    }
-
-    #cards-container .card > .card-content {
-      padding: 16px;
-    }
-
-    #cards-container .card-info-title .category-label {
-      margin-bottom: 8px;
-    }
-
-    #cards-container .card-info-title .category-label > svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    #cards-container .card-info-title .category-label > span:first-of-type {
-      font-size: 0.8rem;
-    }
-
-    #cards-container .card-info-title > h3 {
-      font-size: 1.15rem;
-      margin-bottom: 6px;
-    }
-
-    #cards-container .card-info-title > h4 {
-      font-size: 0.7rem;
-      line-height: 1.4;
-    }
-
-    #cards-container .card-image {
-      margin-top: 12px;
-      max-height: 220px;
-      transform: scale(1.05);
-    }
-  }
-
-  /* Small mobile */
-  @media (max-width: 480px) {
-    #cards-container #cards {
-      gap: 6px;
-    }
-
-    #cards-container .card {
-      min-height: 190px;
-    }
-
-    #cards-container .card.hide-mobile {
-      display: none;
-    }
-
-    #cards-container .card > .card-content {
-      padding: 12px;
-    }
-
-    #cards-container .card-info-title .category-label > svg {
-      width: 16px;
-      height: 16px;
-    }
-
-    #cards-container .card-info-title > h3 {
-      font-size: 1.1rem;
-    }
-
-    #cards-container .card-info-title > h4 {
-      font-size: 0.65rem;
-    }
-
-    #cards-container .card-image {
-      margin-top: 10px;
-      max-height: 180px;
-      transform: scale(1.03);
-    }
-  }
-`;
-
 export function WhatYouGetSection() {
-  const cardsRef = useRef<HTMLDivElement>(null);
-  const { theme } = useTheme();
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!cardsRef.current) return;
-
-      const cardElements = Array.from(
-        cardsRef.current.getElementsByClassName("card")
-      );
-      for (const card of cardElements) {
-        const rect = (card as HTMLElement).getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        (card as HTMLElement).style.setProperty("--mouse-x", `${x}px`);
-        (card as HTMLElement).style.setProperty("--mouse-y", `${y}px`);
-      }
-    };
-
-    const cardsElement = cardsRef.current;
-    if (cardsElement) {
-      cardsElement.addEventListener("mousemove", handleMouseMove);
-      return () => {
-        cardsElement.removeEventListener("mousemove", handleMouseMove);
-      };
-    }
-  }, []);
-
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: cardStyles }} />
-      <section id="cards-container" className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
-        <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-medium mb-2 sm:mb-3 md:mb-4 px-4">Everything You Need to Win</h2>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-            Built for ambitious founders, researchers, and builders who don&apos;t miss opportunities
-          </p>
-        </div>
+    <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20">
+      <div className="text-center mb-8 sm:mb-12">
+        <span className="eyebrow text-[var(--brand-light)]">
+          Why Foundery.Space
+        </span>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium mt-2 mb-3">
+          Built for builders who don&apos;t miss opportunities
+        </h2>
+        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+          A focused, ranked directory — not a content farm. Every feature earns
+          its place.
+        </p>
+      </div>
 
-        <div className="flex justify-center">
-          <div id="cards" ref={cardsRef}>
-            {cards.map((card, index) => {
-              const Icon = card.icon;
-              let imageUrl = card.image;
-              if (theme === "light") {
-                if (index === 0) {
-                  imageUrl = "https://res.cloudinary.com/disamtech/image/upload/v1769241889/fellows/mockups/j2a8githcazr18k3yojk.png";
-                } else if (index === 1) {
-                  imageUrl = "https://res.cloudinary.com/disamtech/image/upload/v1769242128/fellows/mockups/o8nopbp7ufy0rsv7isns.png";
-                }
-              }
-              return (
-                <div key={index} className={`card ${card.span} ${card.hideOnMobile ? 'hide-mobile' : ''}`}>
-                  <div className="card-content">
-                    <div className="card-info-wrapper">
-                      <div className="card-info">
-                        <div className="card-info-title">
-                          <div className="category-label">
-                            <Icon />
-                            <span>{card.category}</span>
-                            {card.badge && (
-                              <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded ml-auto">
-                                {card.badge}
-                              </span>
-                            )}
-                          </div>
-                          <h3>{card.title}</h3>
-                          <h4>{card.subtitle}</h4>
-                        </div>
-                      </div>
-                    </div>
-                    {imageUrl && (
-                      <img 
-                        src={imageUrl} 
-                        alt={card.title}
-                        className={`card-image ${card.title === "Advanced Search" ? "card-image-search" : ""}`}
-                      />
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-    </>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto">
+        {cards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={card.title}
+              className={`group relative border border-border bg-card p-5 sm:p-6 transition-colors hover:border-[var(--brand)] ${card.span}`}
+            >
+              <div className="flex items-center gap-2 mb-3 text-[var(--brand-light)]">
+                <Icon className="w-4 h-4" />
+                <span className="eyebrow">{card.eyebrow}</span>
+              </div>
+              <h3 className="text-base sm:text-lg font-medium leading-snug mb-1.5">
+                {card.title}
+              </h3>
+              <p
+                className={`text-muted-foreground leading-relaxed ${
+                  card.emphasis
+                    ? "text-[14px] sm:text-[15px]"
+                    : "text-[13px] sm:text-[14px]"
+                }`}
+              >
+                {card.body}
+              </p>
+              {card.emphasis && (
+                <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[var(--brand)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
-

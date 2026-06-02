@@ -17,34 +17,15 @@ import { generateGuideContent } from "@/lib/guide-content-generator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { GuideConfig } from "@/lib/guide-generator";
 import type { Opportunity } from "@/lib/data";
+import { categoryLabel, categorySlug, CATEGORY_LABELS } from "@/lib/categories";
 
-const CATEGORY_LABELS: Record<string, string> = {
-  fellowship: "Fellowships",
-  accelerator: "Accelerators",
-  incubator: "Incubators",
-  venture_capital: "Venture Capital",
-  grant: "Grants",
-  residency: "Residencies",
-  competition: "Competitions",
-  research: "Research Programs",
-  developer_program: "Developer Programs",
-  developer_programs: "Developer Programs",
-  entrepreneurship: "Entrepreneurship",
-};
+const CATEGORY_GUIDE_LABELS: Record<string, string> = Object.fromEntries(
+  Object.entries(CATEGORY_LABELS).map(([k, v]) => [k, v.plural]),
+);
 
-const CATEGORY_SLUGS: Record<string, string> = {
-  fellowship: "fellowship",
-  accelerator: "accelerator",
-  incubator: "incubator",
-  venture_capital: "venture-capital",
-  grant: "grant",
-  residency: "residency",
-  competition: "competition",
-  research: "research",
-  developer_program: "developer-program",
-  developer_programs: "developer-programs",
-  entrepreneurship: "entrepreneurship",
-};
+const CATEGORY_SLUGS: Record<string, string> = Object.fromEntries(
+  Object.entries(CATEGORY_LABELS).map(([k, v]) => [k, v.slug]),
+);
 
 interface GuideContentProps {
   config: GuideConfig;
@@ -240,7 +221,7 @@ export function GuideContent({ config, opportunities, allOpportunities = [] }: G
                   href={`/${CATEGORY_SLUGS[cat] ?? cat}`}
                   className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-[var(--brand)] transition-colors"
                 >
-                  {CATEGORY_LABELS[cat] ?? cat}
+                  {CATEGORY_GUIDE_LABELS[cat] ?? cat}
                 </Link>
               ))}
               <Link

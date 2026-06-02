@@ -4,12 +4,11 @@ import { GuideContent } from "@/components/features/guide-content";
 import { getAnonClient } from "@/lib/supabase";
 import type { GuideConfig } from "@/lib/guide-generator";
 import type { Opportunity } from "@/lib/data";
+import { toCanonicalCategory } from "@/lib/categories";
 
 function normalizeCategory(raw: unknown): Opportunity["category"] {
   const val = String(raw || "fellowship").toLowerCase().trim();
-  const map: Record<string, Opportunity["category"]> = {
-    developer_programs: "developer_program",
-    "developer programs": "developer_program",
+  const friendlyAliases: Record<string, Opportunity["category"]> = {
     startup: "accelerator",
     incubation: "incubator",
     vc: "venture_capital",
@@ -17,8 +16,12 @@ function normalizeCategory(raw: unknown): Opportunity["category"] {
     hackathon: "competition",
     contest: "competition",
     scholarship: "fellowship",
+    "developer programs": "developer_program",
   };
-  return (map[val] ?? val) as Opportunity["category"];
+  if (friendlyAliases[val]) return friendlyAliases[val];
+  const canonical = toCanonicalCategory(val);
+  if (canonical) return canonical as Opportunity["category"];
+  return "fellowship";
 }
 
 function mapRow(row: Record<string, unknown>): Opportunity {

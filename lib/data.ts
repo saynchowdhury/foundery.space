@@ -18,7 +18,6 @@ export interface Opportunity {
     | "competition"
     | "research"
     | "developer_program"
-    | "developer_programs"
     | "entrepreneurship";
   region: string;
   country: string | null;
@@ -40,6 +39,7 @@ export interface Opportunity {
     additionalFunding?: string;
   };
   applicationVideo?: string;
+  createdAt?: string;
   votes?: number;
   hasVoted?: boolean;
   // Extracted comparison data fields

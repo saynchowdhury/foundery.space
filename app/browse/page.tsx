@@ -14,37 +14,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Opportunity } from "@/lib/data";
+import { CATEGORIES, CATEGORY_LABELS, categoryLabel, type CategoryFilter } from "@/lib/categories";
+import { MoreFiltersSheet, EMPTY_FILTERS, type BrowseFilterState } from "@/components/features/more-filters-sheet";
 
 const ACCENT = "var(--brand)";
 const PAGE_SIZE = 20;
 
-// Canonical 9 categories only — rogue values (developer_programs, entrepreneurship)
-// are normalised in the API mapRow; we don't expose them as filter options
-const CATEGORIES = [
-  "all",
-  "fellowship",
-  "accelerator",
-  "incubator",
-  "venture_capital",
-  "grant",
-  "residency",
-  "competition",
-  "research",
-  "developer_program",
-];
-
-const CATEGORY_LABELS: Record<string, string> = {
+const CATEGORY_FILTER_LABELS: Record<CategoryFilter, string> = {
   all: "All categories",
-  fellowship: "Fellowships",
-  accelerator: "Accelerators",
-  incubator: "Incubators",
-  venture_capital: "Venture Capital",
-  grant: "Grants",
-  residency: "Residencies",
-  competition: "Competitions",
-  research: "Research Programs",
-  developer_program: "Developer Programs",
-};
+  ...Object.fromEntries(
+    CATEGORIES.filter((c): c is Exclude<CategoryFilter, "all"> => c !== "all").map((c) => [
+      c,
+      CATEGORY_LABELS[c].plural,
+    ]),
+  ),
+} as Record<CategoryFilter, string>;
 
 const REGIONS = [
   "all",
@@ -116,7 +100,8 @@ function applyFilters(
   category: string,
   region: string,
   status: "open" | "all",
-  sort: SortOption
+  sort: SortOption,
+  more: BrowseFilterState = EMPTY_FILTERS
 ): Opportunity[] {
   let list = all;
   if (status === "open") list = list.filter(isOpen);
@@ -132,6 +117,47 @@ function applyFilters(
   }
   if (category !== "all") list = list.filter((o) => o.category === category);
   if (region !== "all") list = list.filter((o) => o.region === region);
+
+  if (more.categories.length > 0) {
+    list = list.filter((o) => more.categories.includes(o.category as never));
+  }
+  if (more.regions.length > 0) {
+    list = list.filter((o) => more.regions.includes(o.region));
+  }
+  if (more.tags.length > 0) {
+    list = list.filter((o) => more.tags.every((t) => o.tags.includes(t)));
+  }
+  if (more.fundingAmount.min > 0 || more.fundingAmount.max < 2000000) {
+    list = list.filter((o) => {
+      if (!o.funding) return false;
+      return (
+        o.funding.amount >= more.fundingAmount.min &&
+        o.funding.amount <= more.fundingAmount.max
+      );
+    });
+  }
+  if (more.equityPercentage.min > 0 || more.equityPercentage.max < 20) {
+    list = list.filter((o) => {
+      if (!o.funding) return false;
+      return (
+        o.funding.equityPercentage >= more.equityPercentage.min &&
+        o.funding.equityPercentage <= more.equityPercentage.max
+      );
+    });
+  }
+  if (more.duration.min > 0 || more.duration.max < 52) {
+    list = list.filter((o) => {
+      if (!o.duration) return false;
+      let v = o.duration.value;
+      if (o.duration.unit === "weeks" && more.duration.unit === "months") v = v / 4.33;
+      else if (o.duration.unit === "weeks" && more.duration.unit === "years") v = v / 52;
+      else if (o.duration.unit === "months" && more.duration.unit === "weeks") v = v * 4.33;
+      else if (o.duration.unit === "months" && more.duration.unit === "years") v = v / 12;
+      else if (o.duration.unit === "years" && more.duration.unit === "weeks") v = v * 52;
+      else if (o.duration.unit === "years" && more.duration.unit === "months") v = v * 12;
+      return v >= more.duration.min && v <= more.duration.max;
+    });
+  }
 
   return [...list].sort((a, b) => {
     switch (sort) {
@@ -219,10 +245,11 @@ function BrowsePageContent() {
     }, 200);
     return () => clearTimeout(handle);
   }, [q, router, searchParams]);
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState<CategoryFilter>("all");
   const [region, setRegion] = useState("all");
   const [status, setStatus] = useState<"open" | "all">("open");
   const [sort, setSort] = useState<SortOption>("votes");
+  const [moreFilters, setMoreFilters] = useState<BrowseFilterState>(EMPTY_FILTERS);
 
   const queryClient = useQueryClient();
   const [voterId, setVoterId] = useState("");
@@ -269,7 +296,7 @@ function BrowsePageContent() {
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
       const all = await fetchAll(voterId);
-      const filtered = applyFilters(all, q, category, region, status, sort);
+      const filtered = applyFilters(all, q, category, region, status, sort, moreFilters);
       const start = (pageParam as number) * PAGE_SIZE;
       const items = filtered.slice(start, start + PAGE_SIZE);
       const nextPage =
@@ -347,21 +374,21 @@ function BrowsePageContent() {
                   : "border-border text-muted-foreground hover:text-foreground"
               }`}
             >
-              {c === "all" ? "All" : CATEGORY_LABELS[c]?.split(" ")[0] ?? c}
+              {c === "all" ? "All" : CATEGORY_FILTER_LABELS[c]?.split(" ")[0] ?? c}
             </button>
           ))}
         </div>
 
         {/* Desktop: dropdowns */}
         <div className="hidden sm:flex items-center gap-2 flex-wrap">
-          <Select value={category} onValueChange={setCategory}>
+          <Select value={category} onValueChange={(v) => setCategory(v as CategoryFilter)}>
             <SelectTrigger className="h-9 w-[170px] bg-card text-sm">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
               {CATEGORIES.map((c) => (
                 <SelectItem key={c} value={c}>
-                  {CATEGORY_LABELS[c] ?? c.replace(/_/g, " ")}
+                  {CATEGORY_FILTER_LABELS[c] ?? c.replace(/_/g, " ")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -402,6 +429,7 @@ function BrowsePageContent() {
                 ))}
               </SelectContent>
             </Select>
+            <MoreFiltersSheet state={moreFilters} onChange={setMoreFilters} />
           </div>
         </div>
 
@@ -438,6 +466,7 @@ function BrowsePageContent() {
               ))}
             </SelectContent>
           </Select>
+          <MoreFiltersSheet state={moreFilters} onChange={setMoreFilters} />
         </div>
       </div>
 
@@ -449,7 +478,7 @@ function BrowsePageContent() {
             <span>
               <span className="nums">{data?.pages[0]?.total ?? 0}</span> opportunities
               {category !== "all" && (
-                <> in <span className="text-foreground">{CATEGORY_LABELS[category]}</span></>
+                <> in <span className="text-foreground">{CATEGORY_FILTER_LABELS[category]}</span></>
               )}
               {region !== "all" && (
                 <> · <span className="text-foreground">{region}</span></>
@@ -533,7 +562,7 @@ function BrowsePageContent() {
                     {o.description}
                   </p>
                   <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-muted-foreground">
-                    <span>{CATEGORY_LABELS[o.category] ?? o.category.replace(/_/g, " ")}</span>
+                    <span>{categoryLabel(o.category)}</span>
                     <span aria-hidden className="text-muted-foreground/40">·</span>
                     <span>{o.region || "—"}</span>
                     <span aria-hidden className="text-muted-foreground/40">·</span>

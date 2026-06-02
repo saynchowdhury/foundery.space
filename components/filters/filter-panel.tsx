@@ -9,9 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
+import { PRIMARY, CATEGORY_LABELS, type Category } from "@/lib/categories";
 
 export interface FilterOptions {
-  categories: string[];
+  categories: Category[];
   regions: string[];
   tags: string[];
   fundingAmount: {
@@ -36,19 +37,7 @@ interface FilterPanelProps {
   onToggle: () => void;
 }
 
-const categoryOptions = [
-  "accelerator",
-  "fellowship",
-  "incubator",
-  "venture_capital",
-  "grant",
-  "residency",
-  "competition",
-  "research",
-  "developer_program",
-  "developer_programs",
-  "entrepreneurship",
-];
+const categoryOptions: Category[] = [...PRIMARY];
 
 const tagGroups = {
   programType: {
@@ -141,7 +130,7 @@ export function FilterPanel({
     );
   };
 
-  const handleCategoryChange = (category: string, checked: boolean) => {
+  const handleCategoryChange = (category: Category, checked: boolean) => {
     const newCategories = checked
       ? [...filters.categories, category]
       : filters.categories.filter((c) => c !== category);
@@ -384,13 +373,7 @@ export function FilterPanel({
                       htmlFor={`category-${category}`}
                       className="text-sm cursor-pointer"
                     >
-                      {category
-                        .split("_")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ")}
+                      {CATEGORY_LABELS[category].plural}
                     </Label>
                   </div>
                 ))}
