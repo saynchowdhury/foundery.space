@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { categoryLabel } from "@/lib/categories";
@@ -13,33 +14,43 @@ export function HeroSection({ stats }: HeroSectionProps) {
   const openLabel = stats.open.toLocaleString();
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden bg-sky-50 dark:bg-slate-950">
       <div className="absolute inset-0 -z-20">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/hero-bg.jpg"
+        <Image
+          src="/hero/hero-background.jpg"
           alt=""
-          className="object-cover object-center w-full h-full"
+          fill
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+          quality={85}
+          className="object-cover object-[center_28%]"
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/60 to-background" />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-14 relative">
+      <div
+        className="absolute inset-0 -z-10 bg-gradient-to-b from-black/30 via-black/10 to-background dark:from-black/60 dark:via-black/30"
+        aria-hidden
+      />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28 pb-12 sm:pb-16 relative">
         <div className="text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-[var(--brand)] border-opacity-30 bg-[var(--brand)] bg-opacity-[0.06]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-[var(--brand)] border-opacity-30 bg-white/70 dark:bg-black/40 backdrop-blur-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand-light)] animate-pulse" />
             <span className="eyebrow text-[var(--brand-light)]">
               {openLabel} open right now
             </span>
           </div>
 
-          <h1 className="text-fluid-hero font-semibold mb-6">
+          <h1 className="text-fluid-hero font-semibold mb-6 text-foreground drop-shadow-[0_2px_8px_rgba(255,255,255,0.5)] dark:drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
             The directory for{" "}
             <span className="wordmark">ambitious builders</span>
           </h1>
 
-          <h2 className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
-            <span className="nums text-foreground font-medium">{totalLabel}</span>{" "}
+          <h2 className="text-lg md:text-xl text-muted-foreground dark:text-white/80 mb-8 leading-relaxed max-w-2xl mx-auto drop-shadow-[0_1px_3px_rgba(255,255,255,0.6)] dark:drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
+            <span className="nums text-foreground dark:text-white font-medium">
+              {totalLabel}
+            </span>{" "}
             fellowships, grants, accelerators, and residencies — ranked by
             community, tracked by deadline, and refreshed every Monday.
             {top.length > 0 && (
@@ -72,7 +83,7 @@ export function HeroSection({ stats }: HeroSectionProps) {
                   name="q"
                   type="search"
                   placeholder="Search fellowships, grants, accelerators..."
-                  className="pl-9 pr-3 h-11 w-full border border-border bg-card text-[14px] focus:outline-none focus:ring-1 focus:ring-[var(--brand)] transition-all"
+                  className="pl-9 pr-3 h-11 w-full border border-border bg-white/95 dark:bg-black/60 backdrop-blur-sm text-[14px] focus:outline-none focus:ring-1 focus:ring-[var(--brand)] transition-all"
                 />
               </div>
             </div>
@@ -81,7 +92,7 @@ export function HeroSection({ stats }: HeroSectionProps) {
           <div className="flex flex-wrap justify-center gap-2 mt-6">
             <Link
               href="/browse"
-              className="px-3 py-1 text-xs border border-[var(--brand)] text-[var(--brand-light)] hover:bg-[var(--brand)] hover:text-white transition-colors"
+              className="px-3 py-1 text-xs border border-[var(--brand)] text-[var(--brand-light)] hover:bg-[var(--brand)] hover:text-white transition-colors bg-white/70 dark:bg-black/40 backdrop-blur-sm"
             >
               Browse all
             </Link>
@@ -91,7 +102,7 @@ export function HeroSection({ stats }: HeroSectionProps) {
                 <Link
                   key={category}
                   href={`/${slug}`}
-                  className="px-3 py-1 text-xs border border-border text-muted-foreground hover:text-foreground hover:border-[var(--brand)] transition-colors"
+                  className="px-3 py-1 text-xs border border-border text-foreground dark:text-white/90 hover:text-foreground hover:border-[var(--brand)] transition-colors bg-white/70 dark:bg-black/40 backdrop-blur-sm"
                 >
                   {categoryLabel(category)}{" "}
                   <span className="opacity-50 nums">({count})</span>
