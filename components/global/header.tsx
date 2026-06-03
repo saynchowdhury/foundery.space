@@ -18,6 +18,7 @@ export function Header() {
     { name: "accelerators", href: "/accelerator" },
     { name: "competitions", href: "/competition" },
     { name: "residencies", href: "/residency" },
+    { name: "blog", href: "/blog" },
     { name: "startups", href: "/startup-program" },
   ];
 
@@ -38,7 +39,7 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
+        <nav className="hidden lg:flex items-center gap-2.5 xl:gap-5 2xl:gap-7">
           {navigation.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -50,7 +51,7 @@ export function Header() {
                 key={item.name}
                 href={item.href}
                 prefetch={true}
-                className={`font-mono-technical text-[10px] tracking-[0.2em] uppercase transition-all duration-200 py-1 whitespace-nowrap hover:text-white ${
+                className={`font-mono-technical text-[10px] tracking-[0.12em] xl:tracking-[0.2em] uppercase transition-all duration-200 py-1 whitespace-nowrap hover:text-white ${
                   isActive ? "text-brand" : "text-white/40"
                 }`}
               >

@@ -54,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  // Category pages — all 9 canonical categories
+  // Category pages — all canonical categories
   const categoryRoutes: MetadataRoute.Sitemap = [
     "accelerator",
     "fellowship",
@@ -65,6 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "competition",
     "research",
     "developer-program",
+    "startup-program",
   ].map((category) => ({
     url: `${baseUrl}/${category}`,
     lastModified: new Date(currentDate),

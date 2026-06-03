@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
 
       if (fallback.error) throw fallback.error;
 
-      const results = (fallback.data || []).map(mapOpportunityRow);
+      const results = (fallback.data || []).map((row) => mapOpportunityRow(row));
       return NextResponse.json(results, {
         status: 200,
         headers: {

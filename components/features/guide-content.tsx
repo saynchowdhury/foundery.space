@@ -106,7 +106,7 @@ export function GuideContent({ config, opportunities, allOpportunities = [] }: G
             <div className="h-px flex-1 bg-white/5" />
             <span className="font-mono-technical text-[10px] text-white/20 uppercase tracking-widest">{opportunities.length}_PROGRAMS</span>
           </div>
-          <AsciiHeading text={config.title.split(" ")[0].toUpperCase()} className="text-6xl md:text-8xl tracking-tighter mb-4" />
+          <AsciiHeading text={config.title.split(" ")[0].toUpperCase()} as="h2" className="text-6xl md:text-8xl tracking-tighter mb-4" />
           <h2 className="text-xl md:text-2xl font-light text-foreground/60 mb-8 max-w-3xl leading-tight">
             {config.description}
           </h2>

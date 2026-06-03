@@ -249,7 +249,7 @@ function BrowsePageContent() {
             <div className="h-px flex-1 bg-white/5" />
             <span className="font-mono-technical text-[10px] text-white/20 uppercase tracking-widest">{totalItems}_NODES_FOUND</span>
           </div>
-          <AsciiHeading text="BROWSE" className="text-7xl md:text-8xl tracking-tighter mb-8" />
+          <AsciiHeading text="BROWSE" as="h2" className="text-7xl md:text-8xl tracking-tighter mb-8" />
         </div>
 
         {/* Command Center */}

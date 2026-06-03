@@ -4,10 +4,10 @@
   "private": true,
   "packageManager": "pnpm@10.9.0",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
+    "dev": "node_modules/.bin/next dev",
+    "build": "node_modules/.bin/next build",
+    "start": "node_modules/.bin/next start",
+    "lint": "node_modules/.bin/next lint",
     "upload-fellows": "tsx scripts/upload-fellows.ts",
     "setup:text-index": "tsx scripts/setup-text-index.ts",
     "seed:new": "tsx scripts/seed-16-new-programs.ts"

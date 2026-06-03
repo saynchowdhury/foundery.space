@@ -49,17 +49,21 @@ export function CTASection() {
   // Direct DOM manipulation for glow parallax — avoids re-renders
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (rafRef.current !== null) return;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
     rafRef.current = requestAnimationFrame(() => {
       if (sectionRef.current) {
-        const rect = sectionRef.current.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 100;
-        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 100;
-        if (glow1Ref.current) {
-          glow1Ref.current.style.transform = `translate(${x * 0.05}px, ${y * 0.05}px)`;
-        }
-        if (glow2Ref.current) {
-          glow2Ref.current.style.transform = `translate(${x * -0.03}px, ${y * -0.03}px)`;
-        }
+        try {
+          const rect = sectionRef.current.getBoundingClientRect();
+          const x = ((clientX - rect.left) / rect.width - 0.5) * 100;
+          const y = ((clientY - rect.top) / rect.height - 0.5) * 100;
+          if (glow1Ref.current) {
+            glow1Ref.current.style.transform = `translate(${x * 0.05}px, ${y * 0.05}px)`;
+          }
+          if (glow2Ref.current) {
+            glow2Ref.current.style.transform = `translate(${x * -0.03}px, ${y * -0.03}px)`;
+          }
+        } catch { /* element unmounted */ }
       }
       rafRef.current = null;
     });
