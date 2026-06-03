@@ -1,0 +1,29 @@
+{
+  "name": "Foundery.Space - Fellowships, Grants & Startup Opportunities",
+  "short_name": "Foundery",
+  "description": "Discover 100+ tech fellowships, grants, accelerators, and competitions for ambitious builders",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#F05A24",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "business", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}

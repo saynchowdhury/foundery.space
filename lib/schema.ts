@@ -7,6 +7,7 @@ import type { Opportunity } from "./data";
 
 /**
  * Generate Website schema for the homepage
+ * Links to Organization entity via publisher @id reference.
  */
 export function generateWebsiteSchema(): Record<string, unknown> {
   return {
@@ -16,6 +17,10 @@ export function generateWebsiteSchema(): Record<string, unknown> {
     url: "https://foundery.space/",
     description:
       "The community-ranked directory for ambitious founders, researchers, and builders. Discover fellowships, grants, accelerators, incubators, competitions, residencies, and developer programs.",
+    publisher: {
+      "@id": ORGANIZATION_ID,
+    },
+    inLanguage: "en",
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -28,18 +33,54 @@ export function generateWebsiteSchema(): Record<string, unknown> {
 }
 
 /**
- * Generate Organization schema
+ * Organization entity ID — used for cross-page @id linking so that every
+ * schema node (WebSite, Article, ItemList, etc.) can reference the same
+ * canonical Organization entity. This is a core Entity-SEO signal that
+ * helps Google Knowledge Graph consolidate brand signals.
+ */
+export const ORGANIZATION_ID = "https://foundery.space/#organization";
+
+/**
+ * Generate Organization schema with entity-linking signals.
+ *
+ * Entity-SEO best practices applied:
+ *  - Stable `@id` lets other schemas (Article publisher, WebSite provider)
+ *    reference this entity, forming a connected graph instead of isolated nodes.
+ *  - `knowsAbout` declares topical expertise, reinforcing E-E-A-T signals.
+ *  - `foundingDate` + `alternateName` disambiguate the brand entity.
+ *  - `areaServed` signals geographic scope.
  */
 export function generateOrganizationSchema(): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": ORGANIZATION_ID,
     name: "Foundery.Space",
+    alternateName: "Foundery",
     url: "https://foundery.space",
-    logo: "https://foundery.space/logos/foundery-logo-32.webp",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://foundery.space/logos/foundery-logo-32.webp",
+    },
     description:
       "Community-ranked directory of fellowships, grants, accelerators, incubators, competitions, residencies, research programs, and developer programs for ambitious founders and builders.",
-    sameAs: [],
+    foundingDate: "2024",
+    knowsAbout: [
+      "Tech fellowships",
+      "Startup grants",
+      "Accelerator programs",
+      "Incubator programs",
+      "Startup competitions",
+      "Research residencies",
+      "Developer programs",
+      "Founder funding",
+      "Venture capital",
+      "Entrepreneurship",
+    ],
+    areaServed: {
+      "@type": "Place",
+      name: "Global",
+    },
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",

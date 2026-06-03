@@ -1,51 +1,18 @@
 "use client";
 
+import React, { useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, MapPin, ExternalLink } from "lucide-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { BadgeList } from "@/components/ui/badge-list";
-
+import { motion } from "framer-motion";
+import { Calendar, MapPin, ExternalLink, ShieldCheck } from "lucide-react";
 import {
   type OpportunityCardData,
   getDaysUntilDeadline,
   getDeadlineUrgency,
 } from "@/lib/data";
 import { generateAltText } from "@/lib/image-seo";
-import { categoryLabel, categoryLabelSingular } from "@/lib/categories";
-import { cn, cleanDisplayText, formatFunding } from "@/lib/utils";
-
-const getDeadlineText = (days: number | null): string => {
-  if (days === null) return "Apply anytime";
-  if (days > 1) return `${days} days left`;
-  if (days === 1) return "1 day left";
-  if (days === 0) return "Closed today";
-
-  const daysAgo = Math.abs(days);
-  if (daysAgo === 1) return "Closed yesterday";
-  if (daysAgo < 7) return `Closed ${daysAgo} days ago`;
-
-  const weeksAgo = Math.floor(daysAgo / 7);
-  if (weeksAgo === 1) return "Closed 1 week ago";
-  if (weeksAgo < 5) return `Closed ${weeksAgo} weeks ago`;
-
-  const monthsAgo = Math.floor(daysAgo / 30.44);
-  if (monthsAgo === 1) return `Closed 1 month ago`;
-  if (monthsAgo < 12) return `Closed ${monthsAgo} months ago`;
-
-  const yearsAgo = Math.floor(daysAgo / 365.25);
-  if (yearsAgo === 1) return `Closed 1 year ago`;
-  return `Closed ${yearsAgo} years ago`;
-};
-
-const getShortDeadlineText = (days: number | null): string => {
-  if (days === null) return "Rolling";
-  if (days > 1) return `${days}d left`;
-  if (days === 1) return `1d left`;
-  return "Closed";
-};
+import { categoryLabelSingular } from "@/lib/categories";
+import { cn, cleanDisplayText } from "@/lib/utils";
 
 interface OpportunityCardProps {
   opportunity: OpportunityCardData;
@@ -56,7 +23,7 @@ interface OpportunityCardProps {
   priority?: boolean;
 }
 
-export function OpportunityCard({
+function OpportunityCardInner({
   opportunity,
   variant = "default",
   className,
@@ -64,6 +31,9 @@ export function OpportunityCard({
   from,
   priority = false,
 }: OpportunityCardProps) {
+  const glowRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  
   const daysUntil = opportunity.closeDate
     ? getDaysUntilDeadline(opportunity.closeDate)
     : null;
@@ -72,228 +42,168 @@ export function OpportunityCard({
     : "safe";
   const altText = generateAltText(opportunity);
 
-  const urgencyStyles = {
-    safe: "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300",
-    warning:
-      "border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
-    urgent:
-      "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300",
-  };
+  // Direct DOM manipulation — avoids React re-renders on every mouse pixel
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (rafRef.current !== null) return;
+    // Guard: currentTarget can be null if event is pooled/replayed
+    if (!e.currentTarget) return;
+    // Capture values synchronously before the async RAF callback
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    let rect: DOMRect;
+    try {
+      rect = e.currentTarget.getBoundingClientRect();
+    } catch {
+      return;
+    }
+    rafRef.current = requestAnimationFrame(() => {
+      if (glowRef.current) {
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        glowRef.current.style.background = `radial-gradient(500px circle at ${x}px ${y}px, var(--brand-dim), transparent 45%)`;
+      }
+      rafRef.current = null;
+    });
+  }, []);
 
   const getOpportunityUrl = () => {
     const baseUrl = `/opportunity/${opportunity.id}`;
     return from ? `${baseUrl}?from=${from}` : baseUrl;
   };
 
-  if (variant === "compact") {
-    return (
-      <Card
-        className={cn(
-          "hover:shadow-md transition-all duration-200 hover:-translate-y-1 flex flex-col",
-          className
-        )}
-      >
-        <CardContent className="p-4 flex-grow">
-          <div className="flex items-start space-x-3">
-            <Image
-              src={opportunity.logoUrl}
-              alt={altText}
-              width={40}
-              height={40}
-              className="rounded-lg object-cover"
-              loading={isCarousel && !priority ? "lazy" : priority ? "eager" : "lazy"}
-              priority={priority}
-              sizes="40px"
-            />
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm truncate">
-                {opportunity.name}
-              </h3>
-              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                {cleanDisplayText(opportunity.description)}
-              </p>
-              <div className="flex items-center justify-between mt-3">
-                <div className="flex items-center space-x-2">
-                  <Badge variant="secondary" className="text-xs rounded-lg">
-                    {categoryLabelSingular(opportunity.category)}
-                  </Badge>
-                  <BadgeList
-                    badges={opportunity.tags}
-                    variant="secondary"
-                    maxVisible={2}
-                    className="text-xs"
-                    badgeClassName="text-xs rounded-lg h-6 px-2.5 py-0.5"
-                    simple={true}
-                  />
-                </div>
-                <div
-                  className={`px-2 py-1 rounded-none text-xs font-medium border ${urgencyStyles[urgency]}`}
-                >
-                  {getDeadlineText(daysUntil)}
-                </div>
-              </div>
-
-              {opportunity.funding && !isCarousel && (
-                <div className="mt-2 pt-2 border-t border-border/50">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-green-600">
-                      {opportunity.funding.isApproximate ? "~" : ""}
-                      {formatFunding(opportunity.funding.amount)}
-                    </span>
-                    {opportunity.funding.equityPercentage > 0 && (
-                      <span className="font-medium text-orange-600">
-                        {opportunity.funding.isApproximate &&
-                        opportunity.funding.equityPercentage % 1 !== 0
-                          ? "~"
-                          : ""}
-                        {opportunity.funding.equityPercentage}% equity
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter className="p-4 pt-0 space-y-2">
-          <Button asChild size="sm" className="w-full">
-            <Link href={getOpportunityUrl()}>View Details</Link>
-          </Button>
-        </CardFooter>
-      </Card>
-    );
-  }
-
   return (
-    <Card
+    <motion.div
+      onMouseMove={handleMouseMove}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
       className={cn(
-        "hover:shadow-lg transition-all duration-200 hover:-translate-y-1 flex flex-col",
-        isCarousel ? "h-[280px] sm:h-[320px]" : "",
+        "group relative overflow-hidden bg-[#0a0a0a] border border-white/5 p-5 md:p-6 transition-all duration-700 hover:border-brand/40 shadow-2xl",
+        isCarousel ? "h-[340px]" : "h-full",
         className
       )}
     >
-      <CardContent className="p-4 sm:p-6 flex-grow flex flex-col">
-        <div className="flex items-start space-x-3 sm:space-x-4 flex-grow">
-          <Image
-            src={opportunity.logoUrl}
-            alt={altText}
-            width={50}
-            height={50}
-            className="w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] rounded-lg object-cover flex-shrink-0"
-            loading={isCarousel && !priority ? "lazy" : priority ? "eager" : "lazy"}
-            priority={priority}
-            sizes="(max-width: 640px) 50px, 60px"
-          />
-          <div className="flex-1 min-w-0 flex flex-col h-full">
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-base sm:text-lg mb-1 line-clamp-1">
-                  {opportunity.name}
-                </h3>
-                <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
-                  {cleanDisplayText(opportunity.description)}
-                </p>
+      {/* Dynamic Background Glow — ref-based, zero re-renders */}
+      <div
+        ref={glowRef}
+        className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-0"
+      />
+
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Header Section */}
+        <div className="flex items-start gap-5 mb-5">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden bg-black border border-white/10 group-hover:border-brand/30 transition-colors duration-500">
+            {opportunity.logoUrl ? (
+              <Image
+                src={opportunity.logoUrl}
+                alt={altText}
+                fill
+                className="object-cover p-1.5 transition-all duration-700 group-hover:scale-110 group-hover:rotate-2 group-hover:brightness-110"
+                priority={priority}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center font-ascii text-2xl text-white/10 uppercase">
+                {opportunity.name.charAt(0)}
               </div>
-              <div
-                className={`px-2 sm:px-3 py-1 rounded-none text-xs sm:text-sm font-medium border whitespace-nowrap ml-2 flex-shrink-0 ${urgencyStyles[urgency]}`}
-              >
-                <span className="hidden sm:inline">
-                  {getDeadlineText(daysUntil)}
-                </span>
-                <span className="sm:hidden">
-                  {getShortDeadlineText(daysUntil)}
-                </span>
+            )}
+            <div className="absolute inset-0 scanlines opacity-30 pointer-events-none" />
+            <motion.div 
+              animate={{ y: ["0%", "100%", "0%"] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-x-0 h-[2px] bg-brand/30 z-10 pointer-events-none"
+            />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-1.5">
+              <span className="font-mono-technical text-[8px] text-brand/60 tracking-[0.25em] uppercase">
+                NODE_INTEL::{opportunity.id.slice(0, 8)}
+              </span>
+              <div className="h-[1px] flex-1 bg-white/5" />
+              <div className={cn(
+                "flex items-center gap-1 font-mono-technical text-[7px] px-2 py-0.5 border tracking-[0.2em] transition-all duration-500",
+                urgency === "urgent" ? "border-brand/40 text-brand bg-brand/10 shadow-[0_0_8px_rgba(240,90,36,0.2)]" : "border-white/10 text-white/30"
+              )}>
+                <ShieldCheck size={8} className={urgency === "urgent" ? "text-brand" : "text-white/20"} />
+                {urgency === "urgent" ? "PRIORITY_OMEGA" : "SYSTEM_STABLE"}
               </div>
             </div>
+            <Link href={getOpportunityUrl()} prefetch={true}>
+              <h3 className="font-ascii text-2xl text-foreground group-hover:text-brand transition-all duration-500 leading-none tracking-tight uppercase">
+                {opportunity.name}
+              </h3>
+            </Link>
+          </div>
+        </div>
 
-            <div className="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm text-muted-foreground mb-3">
-              <div className="flex items-center space-x-1">
-                <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">
-                  {opportunity.closeDate
-                    ? `Closes ${new Date(
-                        opportunity.closeDate
-                      ).toLocaleDateString()}`
-                    : "Rolling deadline"}
-                </span>
-                <span className="sm:hidden">
-                  {opportunity.closeDate
-                    ? new Date(opportunity.closeDate).toLocaleDateString(
-                        "en-US",
-                        { month: "short", day: "numeric" }
-                      )
-                    : "Rolling"}
-                </span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="truncate">{opportunity.region}</span>
-              </div>
+        {/* Content */}
+        <div className="relative flex-grow">
+          <p className="text-muted-foreground/80 text-[13px] leading-relaxed line-clamp-3 mb-6 font-light group-hover:text-foreground transition-colors duration-500">
+            {cleanDisplayText(opportunity.description)}
+          </p>
+        </div>
+
+        {/* Data Grid */}
+        <div className="grid grid-cols-2 gap-4 py-4 border-y border-white/5 bg-white/[0.01]">
+          <div className="flex flex-col gap-1">
+            <span className="font-mono-technical text-[7px] text-white/20 uppercase tracking-[0.2em]">PROTOCOL_REGION</span>
+            <div className="flex items-center gap-2 text-foreground/70 text-[11px]">
+              <MapPin size={11} className="text-brand/50" />
+              <span className="truncate uppercase">{opportunity.region}</span>
             </div>
-
-            <div className="mt-auto">
-              <div className="flex flex-wrap gap-1 sm:gap-2">
-                <Badge variant="outline" className="rounded-lg text-xs">
-                  {categoryLabelSingular(opportunity.category)}
-                </Badge>
-                <BadgeList
-                  badges={opportunity.tags}
-                  variant="secondary"
-                  maxVisible={isCarousel ? 1 : 2}
-                  className="text-xs"
-                  badgeClassName="text-xs rounded-lg h-6 px-2.5 py-0.5"
-                  simple={true}
-                />
-              </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="font-mono-technical text-[7px] text-white/20 uppercase tracking-[0.2em]">EXPIRY_SEQUENCE</span>
+            <div className="flex items-center gap-2 text-foreground/70 text-[11px]">
+              <Calendar size={11} className="text-brand/50" />
+              <span className="font-mono-technical uppercase">
+                {daysUntil === null ? "ROLLING_CYCLE" : daysUntil <= 0 ? "STALE_NODE" : `${daysUntil}D_UNTIL_LOCK`}
+              </span>
             </div>
           </div>
         </div>
-      </CardContent>
-      <CardFooter className="px-4 sm:px-6 py-3 sm:py-4 bg-muted/50 flex items-center justify-between">
-        {isCarousel ? (
-          <div className="w-full flex flex-col sm:flex-row gap-2">
-            <Button asChild size="sm" variant="outline" className="flex-1 min-w-0 px-2">
-              <Link href={getOpportunityUrl()} className="truncate">
-                View Details
-              </Link>
-            </Button>
-            {opportunity.applyLink && (
-              <Button asChild size="sm" className="flex-1 min-w-0 px-2">
-                <a
-                  href={opportunity.applyLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="truncate"
-                >
-                  <span className="hidden sm:inline">Apply Now</span>
-                  <span className="sm:hidden">Apply</span>
-                  <ExternalLink className="ml-1 h-3 w-3 flex-shrink-0" />
-                </a>
-              </Button>
-            )}
+
+        {/* Footer */}
+        <div className="mt-6 flex items-center justify-between">
+          <div className="flex gap-2">
+            <span className="font-mono-technical text-[9px] text-brand/70 bg-brand/5 border border-brand/10 px-2.5 py-1 uppercase tracking-wider">
+              {categoryLabelSingular(opportunity.category)}
+            </span>
           </div>
-        ) : (
-          <>
-            <Button asChild variant="outline" size="sm">
-              <Link href={getOpportunityUrl()}>
-                <span className="hidden sm:inline">View Details</span>
-                <span className="sm:hidden">Details</span>
-              </Link>
-            </Button>
-            <Button asChild>
-              <a
-                href={opportunity.applyLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span className="hidden sm:inline">Apply Now</span>
-                <span className="sm:hidden">Apply</span>
-                <ExternalLink className="ml-2 h-4 w-4" />
-              </a>
-            </Button>
-          </>
-        )}
-      </CardFooter>
-    </Card>
+          
+          <Link 
+            href={getOpportunityUrl()}
+            prefetch={true}
+            className="group/link font-mono-technical text-[10px] text-foreground hover:text-brand transition-all flex items-center gap-2 tracking-widest uppercase px-3 py-1.5 border border-white/10 hover:border-brand/50 hover:bg-brand/5"
+          >
+            VIEW_DETAILS <ExternalLink size={11} className="group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Futuristic Accents */}
+      <div className="absolute top-0 right-0 w-10 h-[1px] bg-brand/40 group-hover:w-full transition-all duration-700" />
+      <div className="absolute top-0 right-0 w-[1px] h-10 bg-brand/40 group-hover:h-full transition-all duration-700" />
+      <div className="absolute bottom-0 left-0 w-3 h-[1px] bg-white/10" />
+      <div className="absolute bottom-0 left-0 w-[1px] h-3 bg-white/10" />
+      
+      {/* Corner Brackets */}
+      <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-white/20" />
+      <div className="absolute bottom-2 right-2 w-1.5 h-1.5 border-b border-r border-white/20" />
+    </motion.div>
   );
 }
+
+// Memoized to skip re-renders when parent updates with identical card data
+export const OpportunityCard = React.memo(OpportunityCardInner, (prev, next) => {
+  // Fast-path: skip render if the opportunity id and variant props are identical
+  return (
+    prev.opportunity.id === next.opportunity.id &&
+    prev.variant === next.variant &&
+    prev.isCarousel === next.isCarousel &&
+    prev.from === next.from &&
+    prev.priority === next.priority &&
+    prev.className === next.className
+  );
+});
+OpportunityCard.displayName = "OpportunityCard";

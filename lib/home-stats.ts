@@ -17,6 +17,7 @@ const KNOWN_CATEGORIES = [
   "venture_capital",
   "residency",
   "competition",
+  "startup_program",
 ];
 
 /**

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ArrowUpDown, SearchX } from "lucide-react";
+import { ArrowUpDown, SearchX, ExternalLink, ShieldCheck } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -12,12 +12,14 @@ import {
 } from "@/components/ui/select";
 import { OpportunityCard } from "@/components/features/opportunity-card";
 import { InfiniteCarousel } from "@/components/features/infinite-carousel";
-import { GuideHeader } from "./guide-header";
 import { generateGuideContent } from "@/lib/guide-content-generator";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { GuideConfig } from "@/lib/guide-generator";
 import type { Opportunity } from "@/lib/data";
-import { categoryLabel, categorySlug, CATEGORY_LABELS } from "@/lib/categories";
+import { CATEGORY_LABELS } from "@/lib/categories";
+import { AsciiHeading } from "@/components/ui/ascii-heading";
+import { SiteShell } from "@/components/global/site-shell";
+import { PageBreadcrumb } from "@/components/global/page-breadcrumb";
+import { cn } from "@/lib/utils";
 
 const CATEGORY_GUIDE_LABELS: Record<string, string> = Object.fromEntries(
   Object.entries(CATEGORY_LABELS).map(([k, v]) => [k, v.plural]),
@@ -63,7 +65,6 @@ export function GuideContent({ config, opportunities, allOpportunities = [] }: G
     return sorted;
   }, [opportunities, sortBy]);
 
-  // Carousel: open opportunities only, shuffled
   const carouselOpportunities = useMemo(() => {
     const open = opportunities.filter((o) => {
       if (!o.closeDate || o.closeDate === "closed") return !o.closeDate;
@@ -72,11 +73,9 @@ export function GuideContent({ config, opportunities, allOpportunities = [] }: G
     return [...open].sort(() => Math.random() - 0.5).slice(0, 12);
   }, [opportunities]);
 
-  // Related categories: find other categories present in the filtered set
   const relatedCategories = useMemo(() => {
     if (!config.filters.categories?.length) return [];
     const primaryCat = config.filters.categories[0];
-    // Find programs in allOpportunities that share tags with this category's programs
     const thisCatTags = new Set(opportunities.flatMap((o) => o.tags));
     const related = new Set<string>();
     for (const opp of allOpportunities) {
@@ -89,152 +88,144 @@ export function GuideContent({ config, opportunities, allOpportunities = [] }: G
   }, [opportunities, allOpportunities, config.filters.categories]);
 
   return (
-    <>
-      <GuideHeader config={config} overview={guideContent.overview} />
+    <SiteShell>
+      <div className="pt-32 pb-24">
+      <div className="max-w-7xl mx-auto px-6">
+        <PageBreadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Browse", href: "/browse" },
+            { label: config.title },
+          ]}
+        />
 
-      {/* Carousel */}
-      {carouselOpportunities.length > 0 && (
-        <div className="py-6 border-b border-border">
-          <InfiniteCarousel
-            opportunities={carouselOpportunities}
-            direction="right"
-            speed="slow"
-            from="guide"
-          />
-        </div>
-      )}
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* SEO content cards */}
-        {(guideContent.whatYoullFind.length > 0 ||
-          guideContent.benefits.length > 0 ||
-          guideContent.tips.length > 0) && (
-          <div className="mb-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {guideContent.whatYoullFind.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">What You&apos;ll Find</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-1.5 text-sm text-muted-foreground list-disc list-inside">
-                      {guideContent.whatYoullFind.map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {guideContent.benefits.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Benefits</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-1.5 text-sm text-muted-foreground list-disc list-inside">
-                      {guideContent.benefits.map((b, i) => (
-                        <li key={i}>{b}</li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {guideContent.tips.length > 0 && (
-                <Card className={
-                  guideContent.whatYoullFind.length > 0 && guideContent.benefits.length > 0
-                    ? "md:col-span-2"
-                    : ""
-                }>
-                  <CardHeader>
-                    <CardTitle className="text-base">Application Tips</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-1.5 text-sm text-muted-foreground list-disc list-inside">
-                      {guideContent.tips.map((tip, i) => (
-                        <li key={i}>{tip}</li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
+        {/* Futuristic Category Header */}
+        <div className="mb-16">
+          <div className="flex items-center gap-4 mb-4">
+            <span className="font-mono-technical text-[10px] text-brand tracking-[0.3em] uppercase">{config.title}_DIRECTORY</span>
+            <div className="h-px flex-1 bg-white/5" />
+            <span className="font-mono-technical text-[10px] text-white/20 uppercase tracking-widest">{opportunities.length}_PROGRAMS</span>
+          </div>
+          <AsciiHeading text={config.title.split(" ")[0].toUpperCase()} className="text-6xl md:text-8xl tracking-tighter mb-4" />
+          <h2 className="text-xl md:text-2xl font-light text-foreground/60 mb-8 max-w-3xl leading-tight">
+            {config.description}
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-white/5">
+            <div className="flex flex-col gap-2">
+              <span className="font-mono-technical text-[9px] text-brand tracking-[0.2em] uppercase">SYSTEM_OVERVIEW</span>
+              <p className="text-xs text-muted-foreground leading-relaxed font-light">{guideContent.overview}</p>
             </div>
+            {guideContent.benefits.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <span className="font-mono-technical text-[9px] text-brand tracking-[0.2em] uppercase">CORE_BENEFITS</span>
+                <ul className="space-y-1">
+                  {guideContent.benefits.slice(0, 3).map((b, i) => (
+                    <li key={i} className="text-[10px] text-muted-foreground flex items-center gap-2 font-light">
+                      <div className="h-1 w-1 bg-brand" /> {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="flex flex-col gap-2">
+              <span className="font-mono-technical text-[9px] text-brand tracking-[0.2em] uppercase">ACCESS_STATUS</span>
+              <div className="flex items-center gap-3">
+                <div className="px-3 py-1 border border-brand/20 bg-brand/5 rounded-sm flex items-center gap-2">
+                  <ShieldCheck size={10} className="text-brand" />
+                  <span className="font-mono-technical text-[10px] text-brand uppercase tracking-widest">PUBLIC_RECORDS_OPEN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Carousel (Holographic Ticker) */}
+        {carouselOpportunities.length > 0 && (
+          <div className="mb-24 py-12 border-y border-white/5 bg-white/[0.01] overflow-hidden">
+            <div className="max-w-7xl mx-auto px-6 mb-6">
+              <span className="font-mono-technical text-[8px] text-white/20 uppercase tracking-[0.4em]">LIVE_NODE_TRANSMISSION</span>
+            </div>
+            <InfiniteCarousel
+              opportunities={carouselOpportunities}
+              direction="right"
+              speed="slow"
+              from="guide"
+            />
           </div>
         )}
 
+        {/* Listing Controls */}
+        <div className="flex items-center justify-between mb-12 py-4 border-b border-white/5">
+          <div className="font-mono-technical text-[10px] text-white/40 uppercase tracking-widest">
+            NODES_IDENTIFIED: <span className="text-brand">{opportunities.length}</span>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <span className="font-mono-technical text-[9px] text-white/20 uppercase tracking-widest">FILTER_RANK:</span>
+            <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
+              <SelectTrigger className="w-44 h-8 bg-transparent border-none font-mono-technical text-[10px] tracking-widest uppercase focus:ring-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-black border-white/10">
+                <SelectItem value="deadline" className="font-mono-technical text-[10px] uppercase">By Deadline</SelectItem>
+                <SelectItem value="votes" className="font-mono-technical text-[10px] uppercase">By Votes</SelectItem>
+                <SelectItem value="name" className="font-mono-technical text-[10px] uppercase">By Name</SelectItem>
+                <SelectItem value="category" className="font-mono-technical text-[10px] uppercase">By Category</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Grid */}
         {opportunities.length === 0 ? (
-          <div className="text-center py-16">
-            <SearchX className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No opportunities found</h3>
-            <p className="text-muted-foreground mb-6">
-              No opportunities match the filters for this guide.
-            </p>
+          <div className="text-center py-32 border border-dashed border-white/10">
+            <SearchX className="h-12 w-12 text-white/10 mx-auto mb-4" />
+            <h3 className="font-ascii text-3xl mb-2">No programs here yet</h3>
             <Link
               href="/browse"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-border text-sm hover:bg-muted hover:border-[var(--brand)] transition-colors"
+              className="font-mono-technical text-[10px] text-brand hover:underline uppercase tracking-widest"
             >
-              Browse all opportunities
+              Browse full directory
             </Link>
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* Sort + count */}
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                {sortedOpportunities.length}{" "}
-                {sortedOpportunities.length === 1 ? "opportunity" : "opportunities"}
-              </div>
-              <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
-                <SelectTrigger className="w-44">
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="deadline">By Deadline</SelectItem>
-                  <SelectItem value="votes">By Votes</SelectItem>
-                  <SelectItem value="name">By Name</SelectItem>
-                  <SelectItem value="category">By Category</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {sortedOpportunities.map((opp) => (
-                <OpportunityCard key={opp.id} opportunity={opp} from="guide" />
-              ))}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sortedOpportunities.map((opp) => (
+              <OpportunityCard key={opp.id} opportunity={opp} from="guide" />
+            ))}
           </div>
         )}
 
-        {/* Related categories — cross-discovery for multi-category programs */}
+        {/* Related Categories (Sub-Protocol Discovery) */}
         {relatedCategories.length > 0 && (
-          <div className="mt-14 pt-10 border-t border-border">
-            <h2 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">
-              Related categories
+          <div className="mt-32 pt-16 border-t border-white/5">
+            <h2 className="font-mono-technical text-[10px] tracking-[0.3em] text-brand mb-8 uppercase">
+              CROSS_PROTOCOL_DISCOVERY
             </h2>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {relatedCategories.map((cat) => (
                 <Link
                   key={cat}
                   href={`/${CATEGORY_SLUGS[cat] ?? cat}`}
-                  className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-[var(--brand)] transition-colors"
+                  className="group relative px-6 py-8 border border-white/5 bg-white/[0.02] hover:border-brand/40 transition-all duration-500 overflow-hidden"
                 >
-                  {CATEGORY_GUIDE_LABELS[cat] ?? cat}
+                  <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-white/10 group-hover:border-brand/40 transition-colors" />
+                  <span className="font-mono-technical text-[8px] text-white/20 block mb-2 lowercase">ID_{cat.slice(0, 6)}</span>
+                  <span className="font-ascii text-xl text-foreground group-hover:text-brand transition-colors block uppercase">
+                    {CATEGORY_GUIDE_LABELS[cat] ?? cat}
+                  </span>
+                  <div className="mt-4 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <span className="font-mono-technical text-[8px] text-brand tracking-widest uppercase">INITIALIZE_LINK</span>
+                    <ExternalLink size={8} className="text-brand" />
+                  </div>
                 </Link>
               ))}
-              <Link
-                href="/browse"
-                className="px-4 py-2 text-sm border border-border text-muted-foreground hover:text-foreground hover:border-[var(--brand)] transition-colors"
-              >
-                Browse all →
-              </Link>
             </div>
           </div>
         )}
       </div>
-    </>
+      </div>
+    </SiteShell>
   );
 }
-

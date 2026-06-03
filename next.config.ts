@@ -2,9 +2,48 @@ import { NextConfig } from "next";
 import { withBotId } from "botid/next/config";
 
 const nextConfig: NextConfig = {
-  images: {
-    unoptimized: true,
+  transpilePackages: ["three", "@react-three/fiber", "@react-three/drei"],
+  
+  // ── Performance Optimizations ────────────────────────────────────────
+  compress: true,
+  
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production" ? {
+      exclude: ["error", "warn"],
+    } : false,
   },
+
+  // ── Experimental Features for Performance ────────────────────────────
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "framer-motion",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-alert-dialog",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-select",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-tooltip",
+    ],
+    ppr: false, // Can enable Partial Prerendering when stable
+  },
+  
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "**" },
+      { protocol: "http", hostname: "**" },
+    ],
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 31536000, // 1 year for external images
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+  
   poweredByHeader: false,
 
   async headers() {
@@ -56,9 +95,31 @@ const nextConfig: NextConfig = {
         ],
       },
 
-      // ── Static asset caching ─────────────────────────────────────────────
+      // ── Static asset caching with preload hints ──────────────────────────
       {
-        source: "/:path*\\.(jpg|jpeg|png|gif|webp|avif|svg|ico|woff2|woff)",
+        source: "/:path*\\.(jpg|jpeg|png|gif|webp|avif|svg|ico)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/:path*\\.(woff2|woff)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "*",
+          },
+        ],
+      },
+      {
+        source: "/:path*\\.(js|css)",
         headers: [
           {
             key: "Cache-Control",
@@ -83,6 +144,26 @@ const nextConfig: NextConfig = {
       {
         source: "/api/admin/(.*)",
         headers: [{ key: "Cache-Control", value: "no-store" }],
+      },
+      
+      // ── API read routes — short cache ────────────────────────────────────
+      {
+        source: "/api/opportunities",
+        headers: [
+          { 
+            key: "Cache-Control", 
+            value: "public, s-maxage=3600, stale-while-revalidate=7200" 
+          }
+        ],
+      },
+      {
+        source: "/api/search",
+        headers: [
+          { 
+            key: "Cache-Control", 
+            value: "public, s-maxage=1800, stale-while-revalidate=3600" 
+          }
+        ],
       },
     ];
   },

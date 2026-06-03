@@ -59,6 +59,7 @@ const CATEGORY_NAMES: Record<string, string> = {
   developer_program: "Developer Programs",
   developer_programs: "Developer Programs",
   entrepreneurship: "Entrepreneurship",
+  startup_program: "Startup Programs",
 };
 
 const TAG_GUIDES: Record<string, { title: string; description: string }> = {

@@ -7,6 +7,9 @@ import { MetadataRoute } from "next";
  * PerplexityBot, Google-Extended, etc.) so it is unambiguous to operators
  * and to the crawlers themselves. The wildcard `*` already permits them,
  * but listing them is recommended for clarity and forward-compat.
+ *
+ * AI discoverability: /llms.txt is served as a route handler for
+ * AI systems following the llmstxt.org convention.
  */
 export default function robots(): MetadataRoute.Robots {
   return {

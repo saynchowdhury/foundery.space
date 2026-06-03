@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-const ACCENT = "#5b6cff";
-
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -30,8 +28,7 @@ export default function NotFound() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 h-10 px-4 text-white text-[14px] font-medium"
-            style={{ background: ACCENT }}
+            className="inline-flex items-center gap-1.5 h-10 px-4 text-white text-[14px] font-medium bg-brand hover:bg-brand-light transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to home

@@ -7,7 +7,6 @@ const CATEGORY_LINKS = [
   { href: "/accelerator", label: "Accelerators" },
   { href: "/grant", label: "Grants" },
   { href: "/developer-program", label: "Developer Programs" },
-  { href: "/developer-programs", label: "Developer Programs" },
   { href: "/incubator", label: "Incubators" },
   { href: "/competition", label: "Competitions" },
   { href: "/residency", label: "Residencies" },

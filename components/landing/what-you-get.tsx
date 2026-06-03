@@ -13,7 +13,7 @@ import {
 const cards = [
   {
     icon: Search,
-    eyebrow: "Discovery",
+    eyebrow: "DISCOVERY_PROTOCOL",
     title: "One directory, every program",
     body: "Fellowships, grants, accelerators, residencies, and developer programs — in one ranked list. No more 12 open tabs.",
     span: "md:col-span-2 md:row-span-2",
@@ -21,7 +21,7 @@ const cards = [
   },
   {
     icon: Filter,
-    eyebrow: "Filtering",
+    eyebrow: "FILTER_SYSTEM",
     title: "Filter to what you can actually apply to",
     body: "Open vs. rolling, region, funding range, equity-free, deadline urgency — find programs that match your profile in seconds.",
     span: "md:col-span-2 md:row-span-2",
@@ -29,21 +29,21 @@ const cards = [
   },
   {
     icon: TrendingUp,
-    eyebrow: "Ranking",
+    eyebrow: "RANK_ALGORITHM",
     title: "Community voted",
     body: "Programs move up as founders upvote the ones that matter.",
     span: "md:col-span-2 md:row-span-1",
   },
   {
     icon: Bell,
-    eyebrow: "Reminders",
+    eyebrow: "ALERT_MODULE",
     title: "Add deadlines to your calendar",
     body: "One click to push to Google, Outlook, or Apple. Never miss a window.",
     span: "md:col-span-1 md:row-span-1",
   },
   {
     icon: Clock,
-    eyebrow: "Refreshed weekly",
+    eyebrow: "AUTO_REFRESH",
     title: "New every Monday",
     body: "New opportunities from across the web, automated every week.",
     span: "md:col-span-1 md:row-span-1",
@@ -52,15 +52,18 @@ const cards = [
 
 export function WhatYouGetSection() {
   return (
-    <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20">
+    <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 bg-[#050505]">
       <div className="text-center mb-8 sm:mb-12">
-        <span className="eyebrow text-[var(--brand-light)]">
-          Why Foundery.Space
-        </span>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium mt-2 mb-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 border border-brand/30 bg-brand/5">
+          <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
+          <span className="font-mono-technical text-[9px] text-brand tracking-[0.3em] uppercase">
+            SYSTEM_CAPABILITIES
+          </span>
+        </div>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-ascii text-foreground uppercase tracking-tight mt-2 mb-3">
           Built for builders who don&apos;t miss opportunities
         </h2>
-        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto font-light">
           A focused, ranked directory — not a content farm. Every feature earns
           its place.
         </p>
@@ -72,17 +75,18 @@ export function WhatYouGetSection() {
           return (
             <div
               key={card.title}
-              className={`group relative border border-border bg-card p-5 sm:p-6 transition-colors hover:border-[var(--brand)] ${card.span}`}
+              className={`group relative border border-white/5 bg-[#0a0a0a] p-5 sm:p-6 transition-all duration-500 hover:border-brand/40 ${card.span}`}
             >
-              <div className="flex items-center gap-2 mb-3 text-[var(--brand-light)]">
+              <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-white/10 group-hover:border-brand/40 transition-colors" />
+              <div className="flex items-center gap-2 mb-3 text-brand/70">
                 <Icon className="w-4 h-4" />
-                <span className="eyebrow">{card.eyebrow}</span>
+                <span className="font-mono-technical text-[8px] tracking-[0.2em] uppercase">{card.eyebrow}</span>
               </div>
-              <h3 className="text-base sm:text-lg font-medium leading-snug mb-1.5">
+              <h3 className="text-base sm:text-lg font-medium leading-snug mb-1.5 text-foreground">
                 {card.title}
               </h3>
               <p
-                className={`text-muted-foreground leading-relaxed ${
+                className={`text-muted-foreground/80 leading-relaxed font-light ${
                   card.emphasis
                     ? "text-[14px] sm:text-[15px]"
                     : "text-[13px] sm:text-[14px]"
@@ -91,7 +95,10 @@ export function WhatYouGetSection() {
                 {card.body}
               </p>
               {card.emphasis && (
-                <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[var(--brand)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <>
+                  <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/20" />
+                </>
               )}
             </div>
           );

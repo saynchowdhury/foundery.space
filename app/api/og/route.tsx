@@ -2,6 +2,7 @@
 import { ImageResponse } from "@vercel/og";
 import { NextRequest } from "next/server";
 import type { Opportunity } from "@/lib/data";
+import { fetchOpportunityById } from "@/lib/opportunities-public";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
@@ -10,7 +11,7 @@ export const fetchCache = "force-no-store";
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams, origin } = new URL(req.url);
+    const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
@@ -41,17 +42,8 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    let opportunity: Opportunity | undefined;
-
-    try {
-      const response = await fetch(`${origin}/api/opportunities?id=${id}`, { cache: "no-store" });
-
-      if (response.ok) {
-        opportunity = (await response.json()) as Opportunity | undefined;
-      }
-    } catch (error) {
-      console.error("Error fetching opportunity for OG", error);
-    }
+    // Fetch directly from Supabase — avoids /api/opportunities round-trip + botid middleware
+    const opportunity = await fetchOpportunityById(id);
 
     if (!opportunity) {
       return new ImageResponse(

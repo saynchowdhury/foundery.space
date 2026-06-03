@@ -25,7 +25,7 @@ export function getAnonClient(): SupabaseClient {
       global: {
         fetch: (input, init) => {
           const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 5000);
+          const timeout = setTimeout(() => controller.abort(), 10000);
           return fetch(input, { ...init, signal: controller.signal }).finally(
             () => clearTimeout(timeout)
           );

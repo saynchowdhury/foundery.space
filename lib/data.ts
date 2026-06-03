@@ -18,7 +18,8 @@ export interface Opportunity {
     | "competition"
     | "research"
     | "developer_program"
-    | "entrepreneurship";
+    | "entrepreneurship"
+    | "startup_program";
   region: string;
   country: string | null;
   eligibility: string;

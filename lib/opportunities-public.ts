@@ -6,7 +6,9 @@ import { toCanonicalCategory } from "@/lib/categories";
 export function normalizeCategory(raw: unknown): Opportunity["category"] {
   const val = String(raw || "fellowship").toLowerCase().trim();
   const friendlyAliases: Record<string, Opportunity["category"]> = {
-    startup: "accelerator",
+    startup: "startup_program",
+    "startup program": "startup_program",
+    "startup programs": "startup_program",
     incubation: "incubator",
     vc: "venture_capital",
     "venture capital": "venture_capital",

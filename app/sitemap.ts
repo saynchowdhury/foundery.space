@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
 import type { Opportunity } from "@/lib/data";
+import { fetchAllOpportunities } from "@/lib/opportunities-public";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // regenerate hourly, not on every request
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || "https://foundery.space";
@@ -34,20 +35,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Fetch directly from Supabase — avoids API route round-trip + botid middleware
   let activeOpportunities: Opportunity[] = [];
-
   try {
-    const apiUrl = new URL(
-      "/api/opportunities",
-      baseUrl
-    );
-    const response = await fetch(apiUrl, { cache: "no-store" });
-
-    if (response.ok) {
-      activeOpportunities = ((await response.json()) as Opportunity[]).filter(
-        (opportunity) => opportunity.closeDate !== "closed"
-      );
-    }
+    const all = await fetchAllOpportunities();
+    activeOpportunities = all.filter((o) => o.closeDate !== "closed");
   } catch (error) {
     console.error("Error fetching opportunities for sitemap", error);
   }
@@ -112,11 +104,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Error generating comparison routes for sitemap", error);
   }
 
+  // Blog routes
+  let blogRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const { getAllBlogPosts } = await import("@/lib/blog-posts");
+    const posts = getAllBlogPosts();
+    blogRoutes = [
+      {
+        url: `${baseUrl}/blog`,
+        lastModified: new Date(currentDate),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      },
+      ...posts.map((post) => ({
+        url: `${baseUrl}/blog/${post.slug}`,
+        lastModified: new Date(post.updatedDate || post.date),
+        changeFrequency: "monthly" as const,
+        priority: 0.75,
+      })),
+    ];
+  } catch (error) {
+    console.error("Error generating blog routes for sitemap", error);
+  }
+
   return [
     ...staticRoutes,
     ...opportunityRoutes,
     ...categoryRoutes,
     ...guideRoutes,
     ...comparisonRoutes,
+    ...blogRoutes,
   ];
 }

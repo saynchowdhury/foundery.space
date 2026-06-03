@@ -5,168 +5,105 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Menu,
-  X,
-  List,
-  Moon,
-  Sun,
-  Home,
-} from "lucide-react";
-import { useTheme } from "next-themes";
+import { Menu, X } from "lucide-react";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  React.useEffect(() => {
-    if (isMenuOpen) {
-      const mainElement = document.querySelector("main");
-      const footerElement = document.querySelector("footer");
-      if (mainElement) mainElement.style.filter = "blur(8px)";
-      if (footerElement) footerElement.style.filter = "blur(8px)";
-      document.body.style.overflow = "hidden";
-    } else {
-      const mainElement = document.querySelector("main");
-      const footerElement = document.querySelector("footer");
-      if (mainElement) mainElement.style.filter = "";
-      if (footerElement) footerElement.style.filter = "";
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      const mainElement = document.querySelector("main");
-      const footerElement = document.querySelector("footer");
-      if (mainElement) mainElement.style.filter = "";
-      if (footerElement) footerElement.style.filter = "";
-      document.body.style.overflow = "";
-    };
-  }, [isMenuOpen]);
-  const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
   const navigation = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "Browse", href: "/browse", icon: List },
+    { name: "browse", href: "/browse" },
+    { name: "fellowships", href: "/fellowship" },
+    { name: "grants", href: "/grant" },
+    { name: "accelerators", href: "/accelerator" },
+    { name: "competitions", href: "/competition" },
+    { name: "residencies", href: "/residency" },
+    { name: "startups", href: "/startup-program" },
   ];
 
   return (
-    <>
-      <header className="sticky top-0 z-50 border-b bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center">
-            <div className="flex-1">
-              <Link
-                href="/"
-                className="flex items-center space-x-3 group w-fit"
-              >
-                <div className="relative h-8 w-8 flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-lg opacity-20 group-hover:opacity-100 transition-opacity duration-300 bg-foreground/10" />
-                  <Image
-                    src="/logos/foundery-logo-32.webp"
-                    alt="Foundery.Space"
-                    width={20}
-                    height={20}
-                    className="transform group-hover:scale-110 transition-transform duration-300"
-                  />
-                </div>
-                <span className="text-xl font-semibold wordmark">
-                  Foundery.Space
-                </span>
-              </Link>
-            </div>
-
-            <nav className="hidden md:flex items-center space-x-8 flex-1 justify-center">
-              {navigation.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`flex items-center space-x-1 text-sm font-medium transition-colors hover:text-foreground ${
-                      isActive ? "text-foreground" : "text-muted-foreground"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.name}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <div className="hidden md:flex items-center space-x-4 flex-1 justify-end">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            </div>
-
-            <div className="flex items-center space-x-2 md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {isMenuOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <Menu className="h-5 w-5" aria-label="Menu" />
-                )}
-              </Button>
-            </div>
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#050505]/50 backdrop-blur-xl">
+      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+        <Link href="/" className="flex items-center space-x-3 group">
+          <div className="relative h-10 w-10 overflow-hidden rounded-sm border border-brand/20">
+            <Image
+              src="/logo.png"
+              alt="Foundery"
+              fill
+              className="object-cover p-1.5 transform group-hover:scale-110 transition-transform duration-500"
+            />
           </div>
+          <span className="text-lg font-ascii tracking-tight text-foreground uppercase group-hover:text-brand transition-colors">
+            Foundery
+          </span>
+        </Link>
 
-          {isMenuOpen && (
-            <div className="fixed inset-0 top-16 z-50 bg-background border-t md:hidden">
-              <div className="flex flex-col h-full">
-                <div className="flex-1 px-6 py-8">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">
-                      Navigation
-                    </p>
-                    {navigation.map((item) => {
-                      const Icon = item.icon;
-                      const isActive = pathname === item.href;
-                      return (
-                        <Link
-                          key={item.name}
-                          href={item.href}
-                          className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
-                            isActive
-                              ? "bg-primary/10 text-primary border border-primary/20"
-                              : "text-foreground hover:bg-muted hover:text-foreground"
-                          }`}
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <Icon className="h-5 w-5 flex-shrink-0" />
-                          <span>{item.name}</span>
-                          {isActive && (
-                            <div className="ml-auto w-2 h-2 bg-primary rounded-none"></div>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                  </div>
-              </div>
-            </div>
-          )}
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
+          {navigation.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href === "/browse" &&
+                (pathname.startsWith("/browse") ||
+                  pathname.startsWith("/opportunity/")));
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                prefetch={true}
+                className={`font-mono-technical text-[10px] tracking-[0.2em] uppercase transition-all duration-200 py-1 whitespace-nowrap hover:text-white ${
+                  isActive ? "text-brand" : "text-white/40"
+                }`}
+              >
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="flex items-center space-x-6">
+          <Link
+            href="/browse"
+            prefetch={true}
+            className="hidden lg:flex font-mono-technical text-[10px] tracking-widest uppercase h-9 px-5 bg-brand text-black hover:bg-brand/90 transition-all rounded-sm items-center shrink-0"
+          >
+            explore_all
+          </Link>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden text-foreground hover:text-brand"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </Button>
         </div>
-      </header>
-    </>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 top-20 z-40 bg-[#050505]/95 backdrop-blur-2xl md:hidden">
+          <nav className="flex flex-col items-center justify-center h-full space-y-12">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="font-mono-technical text-2xl tracking-[0.2em] uppercase text-foreground hover:text-brand"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+            <Link
+              href="/browse"
+              className="font-mono-technical text-xs tracking-widest uppercase bg-brand text-black h-12 px-8 flex items-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              explore_all
+            </Link>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 }

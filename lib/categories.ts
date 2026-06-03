@@ -25,6 +25,7 @@ export const PRIMARY = [
   "research",
   "developer_program",
   "entrepreneurship",
+  "startup_program",
 ] as const satisfies readonly Opportunity["category"][];
 
 export type Category = (typeof PRIMARY)[number];
@@ -63,6 +64,7 @@ export const CATEGORY_LABELS: Record<Category, { singular: string; plural: strin
   research: { singular: "Research Program", plural: "Research Programs", slug: "research" },
   developer_program: { singular: "Developer Program", plural: "Developer Programs", slug: "developer-program" },
   entrepreneurship: { singular: "Entrepreneurship", plural: "Entrepreneurship", slug: "entrepreneurship" },
+  startup_program: { singular: "Startup Program", plural: "Startup Programs", slug: "startup-program" },
 };
 
 /**
@@ -114,4 +116,5 @@ export const CATEGORY_ORDER: Record<Category, number> = {
   research: 7,
   developer_program: 8,
   entrepreneurship: 9,
+  startup_program: 10,
 };

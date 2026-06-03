@@ -11,35 +11,20 @@ const config: Config = {
     container: {
       center: true,
       padding: {
-        DEFAULT: "1rem",    // 16px on mobile — safe edge clearance
-        sm: "1.5rem",       // 24px on small tablets
-        md: "2rem",         // 32px on tablets
-        lg: "2rem",         // 32px on desktop
-        xl: "2.5rem",       // 40px on wide desktop
-        "2xl": "3rem",      // 48px on ultra-wide
+        DEFAULT: "1rem",
+        sm: "1.5rem",
+        md: "2rem",
+        lg: "2rem",
+        xl: "2.5rem",
+        "2xl": "3rem",
       },
     },
     extend: {
       fontFamily: {
-        // DM Sans — humanist sans, not Inter/Geist/Roboto
         sans: ["var(--font-dm-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        ascii: ["var(--font-vt323)", "monospace"],
+        mono: ["var(--font-dm-mono)", "monospace"],
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
-      borderRadius: {
-        none: "0",
-        DEFAULT: "var(--radius)",
-        sm: "max(0px, calc(var(--radius) - 4px))",
-        md: "max(0px, calc(var(--radius) - 2px))",
-        lg: "var(--radius)",
-        xl: "var(--radius)",
-        "2xl": "var(--radius)",
-        "3xl": "var(--radius)",
-      },
-      // Shadcn color tokens — use var() directly so OKLCH values pass through
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
@@ -74,19 +59,18 @@ const config: Config = {
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
-        // Brand accent — direct OKLCH
         brand: {
           DEFAULT: "var(--brand)",
           light: "var(--brand-light)",
           dim: "var(--brand-dim)",
         },
-        chart: {
-          "1": "var(--chart-1)",
-          "2": "var(--chart-2)",
-          "3": "var(--chart-3)",
-          "4": "var(--chart-4)",
-          "5": "var(--chart-5)",
-        },
+      },
+      borderRadius: {
+        none: "0",
+        DEFAULT: "var(--radius)",
+        sm: "max(0px, calc(var(--radius) - 1px))",
+        md: "var(--radius)",
+        lg: "calc(var(--radius) + 2px)",
       },
       keyframes: {
         "accordion-down": {
@@ -97,15 +81,25 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
         scroll: {
-          to: { transform: "translateX(-50%)" },
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "scroll-reverse": {
+          "0%": { transform: "translateX(-50%)" },
+          "100%": { transform: "translateX(0)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s ease-out",
         scroll: "scroll 40s linear infinite",
-        "scroll-reverse": "scroll 40s linear infinite reverse",
+        "scroll-reverse": "scroll-reverse 40s linear infinite",
       },
     },
   },

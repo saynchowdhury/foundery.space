@@ -3,6 +3,7 @@
 import { type OpportunityCardData } from "@/lib/data";
 import { OpportunityCard } from "./opportunity-card";
 import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 
 interface InfiniteCarouselProps {
   opportunities: OpportunityCardData[];
@@ -19,10 +20,13 @@ export function InfiniteCarousel({
   className,
   from,
 }: InfiniteCarouselProps) {
-  const openOpportunities = opportunities.filter((opp) => {
-    if (!opp.closeDate) return true;
-    return new Date(opp.closeDate) > new Date();
-  });
+  // Memoize filtered opportunities to prevent unnecessary recalculations
+  const openOpportunities = useMemo(() => {
+    return opportunities.filter((opp) => {
+      if (!opp.closeDate) return true;
+      return new Date(opp.closeDate) > new Date();
+    });
+  }, [opportunities]);
 
   return (
     <div
@@ -30,6 +34,7 @@ export function InfiniteCarousel({
         "w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)] sm:[mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
         className
       )}
+      style={{ contentVisibility: "auto" }}
     >
       <div
         className={cn(
@@ -37,13 +42,15 @@ export function InfiniteCarousel({
           direction === "left" ? "animate-scroll" : "animate-scroll-reverse",
           speed === "slow" && "animation-duration-slow",
           speed === "fast" && "animation-duration-fast",
-          "hover:[animation-play-state:paused]"
+          "hover:[animation-play-state:paused]",
+          "will-change-transform" // GPU acceleration hint
         )}
         style={{
           animationDuration:
-            speed === "normal" ? "40s" : speed === "slow" ? "80s" : "20s",
+            speed === "normal" ? "30s" : speed === "slow" ? "40s" : "20s",
         }}
       >
+        {/* Real cards */}
         {openOpportunities.map((opportunity, idx) => (
           <div
             key={`${opportunity.id}-${idx}`}
@@ -58,10 +65,12 @@ export function InfiniteCarousel({
             />
           </div>
         ))}
+        {/* Clones — aria-hidden for a11y, no priority loading */}
         {openOpportunities.map((opportunity, idx) => (
           <div
             key={`${opportunity.id}-${idx}-clone`}
             className="w-[280px] sm:w-[320px] lg:w-[350px] shrink-0"
+            aria-hidden="true"
           >
             <OpportunityCard
               opportunity={opportunity}
