@@ -18,7 +18,8 @@ export function ShareButton({ opportunity, className }: ShareButtonProps) {
       url: window.location.href,
     };
 
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+    const canShare = navigator.canShare ? navigator.canShare(shareData) : !!navigator.share;
+    if (canShare) {
       try {
         await navigator.share(shareData);
         return;
@@ -37,12 +38,10 @@ export function ShareButton({ opportunity, className }: ShareButtonProps) {
       toast.success("Link copied to clipboard!");
     } catch (err) {
       console.error("Failed to copy:", err);
-      // Last resort fallback: open Twitter intent as before
-      const tweetText = `Excited to share that I'm applying to ${opportunity.name}! This could be the start of an incredible new chapter.
-
-Working toward my goals and grateful for the amazing community that keeps me motivated. Will definitely share updates as the journey unfolds!`;
+      // Last resort fallback: open Twitter intent
+      const shareText = `Check out this opportunity: ${opportunity.name} on Foundery.Space`;
       const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        tweetText
+        shareText
       )}&url=${encodeURIComponent(window.location.href)}`;
       window.open(twitterIntentUrl, "_blank");
     }
