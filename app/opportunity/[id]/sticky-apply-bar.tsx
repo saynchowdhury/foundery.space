@@ -3,20 +3,21 @@
 import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { AppliedButton } from "@/components/global/applied-button";
+import { ShareButton } from "@/components/global/share-button";
+import { type Opportunity } from "@/lib/data";
 
 const ACCENT = "var(--brand)";
 
 interface StickyApplyBarProps {
-  applyLink: string;
-  opportunityId: string;
+  opportunity: Opportunity;
   anchorId?: string;
 }
 
 export function StickyApplyBar({
-  applyLink,
-  opportunityId,
+  opportunity,
   anchorId = "opportunity-apply-anchor",
 }: StickyApplyBarProps) {
+  const { applyLink, id: opportunityId } = opportunity;
   const [showBar, setShowBar] = useState(false);
 
   useEffect(() => {
@@ -71,7 +72,7 @@ export function StickyApplyBar({
           showBar ? "translate-y-0" : "translate-y-full pointer-events-none"
         }`}
       >
-        <div className="max-w-4xl mx-auto px-4 sm:px-5 py-3 flex items-center gap-2 sm:gap-3 pr-24 sm:pr-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-5 py-3 flex items-center gap-2 sm:gap-3 pr-4 sm:pr-4">
           <a
             href={applyLink}
             target="_blank"
@@ -83,6 +84,7 @@ export function StickyApplyBar({
             <ExternalLink className="w-4 h-4" />
           </a>
           <AppliedButton opportunityId={opportunityId} />
+          <ShareButton opportunity={opportunity} className="hidden sm:inline-flex" />
         </div>
       </div>
     </>
