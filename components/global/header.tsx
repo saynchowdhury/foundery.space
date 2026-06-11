@@ -75,6 +75,7 @@ export function Header() {
             size="sm"
             className="md:hidden text-foreground hover:text-brand"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </Button>
