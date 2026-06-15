@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { checkBotId } from "botid/server";
 import OpenAI from "openai";
 import Groq from "groq-sdk";
 import type { Opportunity } from "@/lib/data";
@@ -33,6 +34,13 @@ function createTimeoutPromise(timeoutMs: number): Promise<never> {
 }
 
 export async function POST(request: NextRequest) {
+  // Prevent automated exploitation of AI search endpoints.
+  // Using AI models is costly; this check mitigates bot-driven resource exhaustion.
+  const verification = await checkBotId();
+  if (verification.isBot) {
+    return NextResponse.json({ error: "Access denied" }, { status: 403 });
+  }
+
   try {
     if (!hasLLMConfig) {
       return NextResponse.json(
