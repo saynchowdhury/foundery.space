@@ -57,6 +57,7 @@ export function SearchInput({
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         className={`pl-10 pr-28 ${size === "lg" ? "h-12 text-base" : ""}`}
+        aria-label="Search opportunities"
       />
       <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
         {!value && showAiBadge && (
@@ -74,6 +75,7 @@ export function SearchInput({
             size="sm"
             className="h-6 px-2 gap-1.5"
             onClick={onSubmit}
+            aria-label="Submit search"
           >
             <span className="text-xs">Send</span>
             <ArrowRight className="h-3 w-3" />
@@ -85,6 +87,7 @@ export function SearchInput({
             size="sm"
             className="h-6 w-6 p-0"
             onClick={() => onChange("")}
+            aria-label="Clear search"
           >
             <X className="h-3 w-3" />
           </Button>
