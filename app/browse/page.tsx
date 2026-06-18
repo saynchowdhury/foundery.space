@@ -155,6 +155,15 @@ function BrowsePageContent() {
   const [status, setStatus] = useState<"open" | "all">("open");
   const [sort, setSort] = useState<SortOption>("votes");
   const [moreFilters, setMoreFilters] = useState<BrowseFilterState>(EMPTY_FILTERS);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const current = searchParams.get("q") || "";
@@ -256,7 +265,10 @@ function BrowsePageContent() {
         <div className="mb-12 space-y-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1 group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-white/20 group-focus-within:text-brand transition-colors">
+              <div
+                className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-white/20 group-focus-within:text-brand transition-colors"
+                aria-hidden="true"
+              >
                 <span className="font-mono-technical text-xs">[</span>
                 <Search size={14} />
                 <span className="font-mono-technical text-xs">]</span>
@@ -265,6 +277,7 @@ function BrowsePageContent() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="EXECUTE_SEARCH_QUERY..."
+                aria-label="Search opportunities"
                 className="w-full bg-white/[0.02] border border-white/5 h-12 pl-16 pr-4 font-mono-technical text-xs tracking-wider focus:outline-none focus:border-brand/40 focus:bg-white/[0.04] transition-all uppercase"
               />
               <div className="absolute bottom-0 left-0 h-0.5 bg-brand/40 w-0 group-focus-within:w-full transition-all duration-500" />
@@ -369,6 +382,18 @@ function BrowsePageContent() {
         </div>
       </div>
       </div>
+
+      {/* Back to Top Button */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className={cn(
+          "fixed bottom-8 right-8 z-50 p-4 bg-brand text-black rounded-none shadow-2xl transition-all duration-300 hover:bg-brand/90 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2",
+          showBackToTop ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0 pointer-events-none"
+        )}
+        aria-label="Back to top"
+      >
+        <ChevronUp size={20} />
+      </button>
     </SiteShell>
   );
 }

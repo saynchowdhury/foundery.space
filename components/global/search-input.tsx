@@ -31,7 +31,7 @@ export function SearchInput({
 
   return (
     <div className="relative">
-      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4">
+      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" aria-hidden="true">
         <div
           className="h-full w-full"
           style={{
@@ -74,9 +74,10 @@ export function SearchInput({
             size="sm"
             className="h-6 px-2 gap-1.5"
             onClick={onSubmit}
+            aria-label="Submit search"
           >
             <span className="text-xs">Send</span>
-            <ArrowRight className="h-3 w-3" />
+            <ArrowRight className="h-3 w-3" aria-hidden="true" />
           </Button>
         )}
         {value && !onSubmit && (
@@ -85,8 +86,9 @@ export function SearchInput({
             size="sm"
             className="h-6 w-6 p-0"
             onClick={() => onChange("")}
+            aria-label="Clear search"
           >
-            <X className="h-3 w-3" />
+            <X className="h-3 w-3" aria-hidden="true" />
           </Button>
         )}
       </div>
