@@ -1,0 +1,4 @@
+## 2025-05-15 - XSS Prevention in JSON-LD Structured Data
+**Vulnerability:** Cross-Site Scripting (XSS) via `dangerouslySetInnerHTML` in JSON-LD script tags.
+**Learning:** Using `JSON.stringify` inside a `<script type="application/ld+json">` tag with `dangerouslySetInnerHTML` is vulnerable to XSS if any of the fields in the data object contain `</script>` or other malicious HTML tags. The browser's HTML parser will see the `</script>` tag and terminate the script block prematurely, allowing the subsequent content to be executed as HTML/JavaScript.
+**Prevention:** Always use a helper function like `safeJsonLd` that stringifies the data and then escapes `<` and `>` characters (e.g., replacing them with `\u003c` and `\u003e`). This ensures that the browser's HTML parser does not misinterpret the JSON content as HTML tags.
