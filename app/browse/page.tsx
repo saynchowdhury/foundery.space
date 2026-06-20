@@ -155,6 +155,13 @@ function BrowsePageContent() {
   const [status, setStatus] = useState<"open" | "all">("open");
   const [sort, setSort] = useState<SortOption>("votes");
   const [moreFilters, setMoreFilters] = useState<BrowseFilterState>(EMPTY_FILTERS);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setShowBackToTop(window.scrollY > 400);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const current = searchParams.get("q") || "";
@@ -230,6 +237,8 @@ function BrowsePageContent() {
     setMoreFilters(EMPTY_FILTERS);
     router.replace("/browse", { scroll: false });
   };
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
     <SiteShell>
@@ -369,6 +378,16 @@ function BrowsePageContent() {
         </div>
       </div>
       </div>
+
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          aria-label="Back to top"
+          className="fixed bottom-24 right-6 z-50 p-3 bg-black border border-brand/30 text-brand hover:bg-brand/10 transition-all shadow-[0_0_15px_rgba(240,90,36,0.1)] group"
+        >
+          <ChevronUp size={20} className="group-hover:-translate-y-0.5 transition-transform" />
+        </button>
+      )}
     </SiteShell>
   );
 }
