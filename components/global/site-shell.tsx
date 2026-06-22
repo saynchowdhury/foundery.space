@@ -1,5 +1,6 @@
 import { Header } from "@/components/global/header";
 import { Footer } from "@/components/global/footer";
+import { BackToTop } from "@/components/global/back-to-top";
 
 interface SiteShellProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ export function SiteShell({ children }: SiteShellProps) {
       <Header />
       {children}
       <Footer />
+      <BackToTop />
     </div>
   );
 }
