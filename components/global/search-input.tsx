@@ -12,6 +12,7 @@ interface SearchInputProps {
   onSubmit?: () => void;
   size?: "default" | "lg";
   showAiBadge?: boolean;
+  ariaLabel?: string;
 }
 
 export function SearchInput({
@@ -21,6 +22,7 @@ export function SearchInput({
   onSubmit,
   size = "default",
   showAiBadge = true,
+  ariaLabel,
 }: SearchInputProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && value.trim() && onSubmit) {
@@ -57,6 +59,7 @@ export function SearchInput({
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         className={`pl-10 pr-28 ${size === "lg" ? "h-12 text-base" : ""}`}
+        aria-label={ariaLabel}
       />
       <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
         {!value && showAiBadge && (
@@ -85,6 +88,7 @@ export function SearchInput({
             size="sm"
             className="h-6 w-6 p-0"
             onClick={() => onChange("")}
+            aria-label="Clear search"
           >
             <X className="h-3 w-3" />
           </Button>
