@@ -9,6 +9,7 @@ interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  ariaLabel?: string;
   onSubmit?: () => void;
   size?: "default" | "lg";
   showAiBadge?: boolean;
@@ -18,6 +19,7 @@ export function SearchInput({
   value,
   onChange,
   placeholder = "Search for opportunities...",
+  ariaLabel,
   onSubmit,
   size = "default",
   showAiBadge = true,
@@ -53,6 +55,7 @@ export function SearchInput({
       <Input
         type="text"
         placeholder={placeholder}
+        aria-label={ariaLabel || placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -85,6 +88,7 @@ export function SearchInput({
             size="sm"
             className="h-6 w-6 p-0"
             onClick={() => onChange("")}
+            aria-label="Clear search"
           >
             <X className="h-3 w-3" />
           </Button>

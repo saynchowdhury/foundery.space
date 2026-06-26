@@ -51,6 +51,7 @@ export function Header() {
                 key={item.name}
                 href={item.href}
                 prefetch={true}
+                aria-current={isActive ? "page" : undefined}
                 className={`font-mono-technical text-[10px] tracking-[0.12em] xl:tracking-[0.2em] uppercase transition-all duration-200 py-1 whitespace-nowrap hover:text-white ${
                   isActive ? "text-brand" : "text-white/40"
                 }`}
@@ -75,6 +76,8 @@ export function Header() {
             size="sm"
             className="md:hidden text-foreground hover:text-brand"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </Button>
