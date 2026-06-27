@@ -265,6 +265,7 @@ function BrowsePageContent() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="EXECUTE_SEARCH_QUERY..."
+                aria-label="Search opportunities"
                 className="w-full bg-white/[0.02] border border-white/5 h-12 pl-16 pr-4 font-mono-technical text-xs tracking-wider focus:outline-none focus:border-brand/40 focus:bg-white/[0.04] transition-all uppercase"
               />
               <div className="absolute bottom-0 left-0 h-0.5 bg-brand/40 w-0 group-focus-within:w-full transition-all duration-500" />
