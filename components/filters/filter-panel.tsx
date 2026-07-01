@@ -405,6 +405,8 @@ export function FilterPanel({
                             variant="ghost"
                             size="sm"
                             className="ml-2 h-5 w-5 p-0"
+                            aria-label={expandedRegions.includes(region.name) ? `Collapse ${region.name}` : `Expand ${region.name}`}
+                            aria-expanded={expandedRegions.includes(region.name)}
                             onClick={(e) => {
                               e.preventDefault();
                               toggleRegionExpanded(region.name);

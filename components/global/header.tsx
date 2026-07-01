@@ -29,7 +29,7 @@ export function Header() {
           <div className="relative h-10 w-10 overflow-hidden rounded-sm border border-brand/20">
             <Image
               src="/logo.png"
-              alt="Foundery"
+              alt=""
               fill
               className="object-cover p-1.5 transform group-hover:scale-110 transition-transform duration-500"
             />
@@ -51,6 +51,7 @@ export function Header() {
                 key={item.name}
                 href={item.href}
                 prefetch={true}
+                aria-current={isActive ? "page" : undefined}
                 className={`font-mono-technical text-[10px] tracking-[0.12em] xl:tracking-[0.2em] uppercase transition-all duration-200 py-1 whitespace-nowrap hover:text-white ${
                   isActive ? "text-brand" : "text-white/40"
                 }`}
@@ -74,6 +75,8 @@ export function Header() {
             variant="ghost"
             size="sm"
             className="md:hidden text-foreground hover:text-brand"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -85,16 +88,22 @@ export function Header() {
       {isMenuOpen && (
         <div className="fixed inset-0 top-20 z-40 bg-[#050505]/95 backdrop-blur-2xl md:hidden">
           <nav className="flex flex-col items-center justify-center h-full space-y-12">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="font-mono-technical text-2xl tracking-[0.2em] uppercase text-foreground hover:text-brand"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {navigation.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`font-mono-technical text-2xl tracking-[0.2em] uppercase transition-colors ${
+                    isActive ? "text-brand" : "text-foreground hover:text-brand"
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
             <Link
               href="/browse"
               className="font-mono-technical text-xs tracking-widest uppercase bg-brand text-black h-12 px-8 flex items-center"
