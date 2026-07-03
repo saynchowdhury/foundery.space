@@ -2,13 +2,22 @@ import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
 // Mock IntersectionObserver
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
+class MockIntersectionObserver implements IntersectionObserver {
+  readonly root: Element | null = null;
+  readonly rootMargin: string = '';
+  readonly thresholds: ReadonlyArray<number> = [];
+  constructor(
+    private _callback: IntersectionObserverCallback,
+    private _options?: IntersectionObserverInit
+  ) {}
   disconnect() {}
   observe() {}
   unobserve() {}
-  takeRecords() { return []; }
-};
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+}
+global.IntersectionObserver = MockIntersectionObserver;
 
 // Mock requestAnimationFrame
 global.requestAnimationFrame = (cb: FrameRequestCallback) => setTimeout(cb, 0) as unknown as number;
