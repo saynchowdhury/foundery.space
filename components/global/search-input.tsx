@@ -85,6 +85,7 @@ export function SearchInput({
             size="sm"
             className="h-6 w-6 p-0"
             onClick={() => onChange("")}
+            aria-label="Clear search"
           >
             <X className="h-3 w-3" />
           </Button>
