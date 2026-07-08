@@ -10,9 +10,9 @@ interface ShareButtonProps {
 
 export function ShareButton({ opportunity, className }: ShareButtonProps) {
   const handleShare = () => {
-    const tweetText = `Excited to share that I'm applying to ${opportunity.name}! This could be the start of an incredible new chapter.
-
-Working toward my goals and grateful for the amazing community that keeps me motivated. Will definitely share updates as the journey unfolds!`;
+    const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://foundery.space";
+    const opportunityUrl = `${siteUrl}/opportunity/${opportunity.id}`;
+    const tweetText = `Check out this opportunity: ${opportunity.name} on @FounderySpace\n\n${opportunityUrl}`;
     const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       tweetText
     )}`;
@@ -23,12 +23,13 @@ Working toward my goals and grateful for the amazing community that keeps me mot
     <button
       type="button"
       onClick={handleShare}
-      className={`inline-flex items-center justify-center gap-1.5 h-10 px-4 text-[14px] border border-border bg-card hover:bg-accent transition-colors ${
+      aria-label={`Share ${opportunity.name} on X`}
+      className={`inline-flex items-center justify-center gap-2 h-10 px-4 font-mono-technical text-[10px] tracking-widest uppercase border border-white/10 bg-white/[0.02] hover:bg-brand/10 hover:border-brand/50 hover:text-brand transition-all rounded-sm ${
         className || ""
       }`}
     >
-      <Share2 className="h-4 w-4" />
-      Share on X
+      <Share2 size={14} />
+      SHARE_ON_X
     </button>
   );
 }

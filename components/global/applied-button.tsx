@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 
 interface AppliedButtonProps {
   opportunityId: string;
+  className?: string;
 }
 
 function getAppliedSet(): Set<string> {
@@ -21,7 +22,7 @@ function setAppliedSet(set: Set<string>) {
   localStorage.setItem("fs_applied", JSON.stringify(Array.from(set)));
 }
 
-export function AppliedButton({ opportunityId }: AppliedButtonProps) {
+export function AppliedButton({ opportunityId, className }: AppliedButtonProps) {
   const [applied, setApplied] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -43,14 +44,15 @@ export function AppliedButton({ opportunityId }: AppliedButtonProps) {
       type="button"
       onClick={toggle}
       aria-pressed={applied}
-      className={`inline-flex items-center justify-center gap-1.5 h-10 px-4 text-[14px] border transition-colors ${
+      aria-label={applied ? "Mark as not applied" : "Mark as applied"}
+      className={`inline-flex items-center justify-center gap-2 h-10 px-4 font-mono-technical text-[10px] tracking-widest uppercase border transition-all rounded-sm ${
         mounted && applied
-          ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-          : "border-green-600 text-green-700 dark:text-green-400 bg-transparent hover:bg-green-600/10"
-      }`}
+          ? "bg-brand/20 border-brand/50 text-brand hover:bg-brand/30 shadow-[0_0_10px_rgba(240,90,36,0.1)]"
+          : "border-white/10 text-white/40 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 hover:text-white"
+      } ${className || ""}`}
     >
-      <Check className="h-4 w-4" />
-      {mounted && applied ? "Applied" : "I applied"}
+      <Check size={14} className={mounted && applied ? "text-brand" : "text-white/20"} />
+      {mounted && applied ? "APPLIED" : "MARK_APPLIED"}
     </button>
   );
 }
