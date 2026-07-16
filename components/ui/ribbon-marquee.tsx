@@ -18,34 +18,32 @@ export function RibbonMarquee({ items, speed = 80 }: RibbonMarqueeProps) {
     const track1 = track1Ref.current;
     const track2 = track2Ref.current;
 
-    // Clone items for seamless loop
+    // Clone tracks for seamless infinite loop
     const clone1 = track1.cloneNode(true) as HTMLDivElement;
     const clone2 = track2.cloneNode(true) as HTMLDivElement;
+    clone1.setAttribute("aria-hidden", "true");
+    clone2.setAttribute("aria-hidden", "true");
     track1.parentElement?.appendChild(clone1);
     track2.parentElement?.appendChild(clone2);
 
-    // Animate with GSAP for smooth ribbon effect
+    // Ribbon 1 — scrolls left
     const tl1 = gsap.timeline({ repeat: -1 });
+    tl1.fromTo(
+      [track1, clone1],
+      { xPercent: 0 },
+      { xPercent: -100, duration: speed, ease: "none" }
+    );
+
+    // Ribbon 2 — scrolls right (starts off-screen left, moves to center)
+    gsap.set([track2, clone2], { xPercent: -100 });
     const tl2 = gsap.timeline({ repeat: -1 });
+    tl2.fromTo(
+      [track2, clone2],
+      { xPercent: -100 },
+      { xPercent: 0, duration: speed * 0.85, ease: "none" }
+    );
 
-    tl1.to([track1, clone1], {
-      x: "-100%",
-      duration: speed,
-      ease: "none",
-      onComplete: () => {
-        gsap.set(track1, { x: "0%" });
-        gsap.set(clone1, { x: "100%" });
-      },
-    });
-
-    tl2.to([track2, clone2], {
-      x: "0%",
-      duration: speed * 0.85,
-      ease: "none",
-      from: { x: "-100%" },
-    });
-
-    // Ribbon wave effect
+    // Ribbon wave effect — subtle vertical bob
     const waveItems = track1.querySelectorAll("span");
     waveItems.forEach((item, i) => {
       gsap.to(item, {
@@ -61,6 +59,7 @@ export function RibbonMarquee({ items, speed = 80 }: RibbonMarqueeProps) {
     return () => {
       tl1.kill();
       tl2.kill();
+      gsap.killTweensOf(waveItems);
       clone1.remove();
       clone2.remove();
     };
@@ -68,7 +67,7 @@ export function RibbonMarquee({ items, speed = 80 }: RibbonMarqueeProps) {
 
   return (
     <div className="relative w-full overflow-hidden py-24 border-y border-white/5 bg-[#050505]">
-      {/* Ribbon 1 — moving right */}
+      {/* Ribbon 1 — moving left */}
       <div className="flex whitespace-nowrap mb-6 relative">
         <div ref={track1Ref} className="flex items-center gap-12 px-6 will-change-transform">
           {items.map((item, i) => (
@@ -84,7 +83,7 @@ export function RibbonMarquee({ items, speed = 80 }: RibbonMarqueeProps) {
         </div>
       </div>
 
-      {/* Ribbon 2 — moving left */}
+      {/* Ribbon 2 — moving right */}
       <div className="flex whitespace-nowrap relative">
         <div ref={track2Ref} className="flex items-center gap-12 px-6 will-change-transform">
           {items.map((item, i) => (

@@ -1,10 +1,21 @@
 import { ImageResponse } from "next/og";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 export const contentType = "image/png";
 export const size = { width: 1200, height: 630 };
 export const alt = "Foundery.Space — Discover Fellowships, Grants & Startup Opportunities";
 
 export default function OpenGraphImage() {
+  let logoDataUri = "";
+  try {
+    const logoPath = join(process.cwd(), "public/logo.png");
+    const logoData = readFileSync(logoPath).toString("base64");
+    logoDataUri = `data:image/png;base64,${logoData}`;
+  } catch (error) {
+    console.error("Error reading logo.png for OG image:", error);
+  }
+
   return new ImageResponse(
     (
       <div
@@ -15,7 +26,7 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%)",
+          background: "linear-gradient(135deg, #050505 0%, #140d0a 50%, #0a0503 100%)",
           position: "relative",
           overflow: "hidden",
         }}
@@ -28,7 +39,7 @@ export default function OpenGraphImage() {
             width: "800px",
             height: "800px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(91,108,255,0.15) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(240,90,36,0.15) 0%, transparent 70%)",
           }}
         />
         <div
@@ -39,7 +50,7 @@ export default function OpenGraphImage() {
             width: "600px",
             height: "600px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(240,90,36,0.08) 0%, transparent 70%)",
           }}
         />
         <div
@@ -50,22 +61,33 @@ export default function OpenGraphImage() {
             marginBottom: "16px",
           }}
         >
-          <div
-            style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "10px",
-              background: "linear-gradient(135deg, #5b6cff 0%, #a855f7 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "24px",
-              fontWeight: 700,
-              color: "white",
-            }}
-          >
-            F
-          </div>
+          {logoDataUri ? (
+            <img
+              src={logoDataUri}
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "12px",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "12px",
+                background: "#F05A24",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "28px",
+                fontWeight: 700,
+                color: "black",
+              }}
+            >
+              F
+            </div>
+          )}
           <span
             style={{
               fontSize: "48px",
@@ -97,17 +119,17 @@ export default function OpenGraphImage() {
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <span style={{ fontSize: "32px", fontWeight: 700, color: "#5b6cff" }}>93+</span>
+            <span style={{ fontSize: "32px", fontWeight: 700, color: "#F05A24" }}>100+</span>
             <span style={{ fontSize: "16px", color: "#6b7280" }}>Programs</span>
           </div>
           <div style={{ width: "1px", height: "32px", background: "#374151" }} />
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <span style={{ fontSize: "32px", fontWeight: 700, color: "#5b6cff" }}>73</span>
-            <span style={{ fontSize: "16px", color: "#6b7280" }}>Open Now</span>
+            <span style={{ fontSize: "32px", fontWeight: 700, color: "#F05A24" }}>Active</span>
+            <span style={{ fontSize: "16px", color: "#6b7280" }}>Funding</span>
           </div>
           <div style={{ width: "1px", height: "32px", background: "#374151" }} />
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <span style={{ fontSize: "32px", fontWeight: 700, color: "#5b6cff" }}>9</span>
+            <span style={{ fontSize: "32px", fontWeight: 700, color: "#F05A24" }}>10</span>
             <span style={{ fontSize: "16px", color: "#6b7280" }}>Categories</span>
           </div>
         </div>
@@ -128,3 +150,4 @@ export default function OpenGraphImage() {
     },
   );
 }
+

@@ -40,8 +40,6 @@ export function InfiniteCarousel({
         className={cn(
           "flex min-w-full shrink-0 gap-2 sm:gap-3 lg:gap-4 py-2 sm:py-4 w-max flex-nowrap",
           direction === "left" ? "animate-scroll" : "animate-scroll-reverse",
-          speed === "slow" && "animation-duration-slow",
-          speed === "fast" && "animation-duration-fast",
           "hover:[animation-play-state:paused]",
           "will-change-transform" // GPU acceleration hint
         )}

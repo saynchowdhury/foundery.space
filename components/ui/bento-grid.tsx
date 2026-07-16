@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -36,15 +36,24 @@ export const BentoCard: React.FC<BentoCardProps> = ({
   href,
   index = 0,
 }) => {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const [mousePos, setMousePos] = React.useState({ x: 0, y: 0 });
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (rafRef.current) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    rafRef.current = requestAnimationFrame(() => {
+      setMousePos({ x: clientX - rect.left, y: clientY - rect.top });
+      rafRef.current = null;
+    });
+  }, []);
 
   const card = (
     <motion.div
+      ref={cardRef}
       onMouseMove={handleMouseMove}
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}

@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, VT323, DM_Mono } from "next/font/google";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { QueryProvider } from "@/providers/query-provider";
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://foundery.space/og-image.jpg",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Foundery.Space — Discover Fellowships, Grants & Startup Opportunities",
@@ -74,15 +74,17 @@ export const metadata: Metadata = {
     title: "Foundery.Space — Discover Fellowships, Grants & Startup Opportunities",
     description:
       "Find and track 100+ tech fellowships, grants, accelerators, incubators, and competitions. Get deadline reminders, compare programs, and never miss funding opportunities for founders and startups.",
-    images: ["https://foundery.space/og-image.jpg"],
+    images: ["https://foundery.space/opengraph-image"],
   },
-  applicationName: "Foundery.Space",
   referrer: "origin",
-  formatDetection: {
-    telephone: false,
-    email: false,
-    address: false,
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#F05A24",
 };
 
 export default function RootLayout({
@@ -112,13 +114,9 @@ export default function RootLayout({
         
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#F05A24" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Foundery" />
-        
-        {/* Viewport optimization for mobile */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
       </head>
       <body className="font-sans antialiased bg-[#050505]">
         <Script
@@ -144,7 +142,7 @@ export default function RootLayout({
           <SpeedInsights />
           <Analytics />
           <QueryProvider>
-            <main className="min-h-screen">{children}</main>
+            <div className="min-h-screen">{children}</div>
           </QueryProvider>
         </ThemeProvider>
         <Toaster richColors theme="dark" />
