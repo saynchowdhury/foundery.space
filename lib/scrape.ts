@@ -7,9 +7,9 @@ export const CATEGORIES = [
 export type Category = typeof CATEGORIES[number];
 
 export const CATEGORY_QUERIES: Record<Category, string> = {
-  fellowship: '"fellowship" AND ("applications open" OR "apply now" OR "call for applications") 2026',
-  accelerator: '"accelerator" AND ("startup" OR "applications open" OR "batch" OR "apply") 2026',
-  grant: '"grant" AND ("open source" OR "developers" OR "research" OR "funding") 2026',
+  fellowship: '"fellowship" AND ("applications open" OR "apply now" OR "call for applications" OR "AI" OR "climate" OR "web3") 2026',
+  accelerator: '"accelerator" AND ("startup" OR "applications open" OR "batch" OR "apply" OR "AI" OR "climate" OR "web3") 2026',
+  grant: '"grant" AND ("open source" OR "developers" OR "research" OR "funding" OR "AI" OR "climate" OR "web3") 2026',
   developer_programs: '"developer program" OR "developer relations" OR "community program" OR "devrel" 2026',
   competition: '"hackathon" OR "coding competition" OR "buildathon" OR "challenge" 2026',
   entrepreneurship: '"entrepreneurship program" OR "founder program" OR "startup competition" OR "pitch competition" 2026',
@@ -227,28 +227,11 @@ function markdownToPlainText(md: string, maxLen = 300): string {
 }
 
 /** Validate that scraped content looks like a real opportunity (not a blog, 404, or cookie page). */
-function isValidOpportunity(name: string, description: string, fullDesc: string): { valid: boolean; reason?: string } {
-  const lower = (name + " " + description + " " + fullDesc).toLowerCase();
-  // Reject 404 / error pages
-  if (/\b(404|page not found|not found|couldn'?t find|does not exist)\b/i.test(name)) {
-    return { valid: false, reason: "Entry is a 404/error page" };
-  }
-  // Reject cookie policy pages
-  if (/cookie (policy|settings|preferences|consent)/i.test(fullDesc.slice(0, 500)) && fullDesc.length < 1000) {
-    return { valid: false, reason: "Entry contains only cookie policy text" };
-  }
-  // Reject Wikipedia / generic blog posts
-  if (/wikipedia|wikimedia/i.test(name)) {
-    return { valid: false, reason: "Entry is a Wikipedia article" };
-  }
-  // Reject entries with no meaningful content
-  if (!description || description.length < 20) {
-    return { valid: false, reason: "Description too short or empty" };
-  }
-  if (name === "Unknown" || name.trim().length < 3) {
-    return { valid: false, reason: "Name is missing or too short" };
-  }
-  return { valid: true };
+function isValidOpportunity(name: string, description: string, fullDesc: string): boolean {
+  if (/\b(404|page not found|not found|couldn'?t find|does not exist)\b/i.test(name)) return false;
+  if (/cookie (policy|settings|preferences|consent)/i.test(fullDesc.slice(0, 500)) && fullDesc.length < 1000) return false;
+  if (/wikipedia|wikimedia/i.test(name)) return false;
+  return description.length >= 20 && name !== "Unknown" && name.trim().length >= 3;
 }
 
 /** Clean a scraped name by stripping whitespace, newlines, and tabs. */
@@ -483,9 +466,8 @@ export function parseOpportunity(
   const fullDesc = stripHtml(md.slice(0, 5000));
 
   // Validate this is actually an opportunity
-  const validation = isValidOpportunity(name, desc, fullDesc);
-  if (!validation.valid) {
-    console.log(`[scrape] Skipping "${name}": ${validation.reason}`);
+  if (!isValidOpportunity(name, desc, fullDesc)) {
+    console.log(`[scrape] Skipping "${name}": invalid content`);
     return null;
   }
 
@@ -497,7 +479,7 @@ export function parseOpportunity(
   const funding = parseFundingValue(body);
   const tags = extractTags(category, body);
   const domain = extractDomain(result.url);
-  const logo = meta?.ogImage || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  const logo = meta?.ogImage || (domain ? `https://logo.clearbit.com/${domain}` : null) || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
   const organizer = extractOrganizer(meta, result.url);
 
   return {

@@ -6,30 +6,15 @@ import { toCanonicalCategory } from "@/lib/categories";
 export function normalizeCategory(raw: unknown): Opportunity["category"] {
   const val = String(raw || "fellowship").toLowerCase().trim();
   const friendlyAliases: Record<string, Opportunity["category"]> = {
-    startup: "startup_program",
-    "startup program": "startup_program",
-    "startup programs": "startup_program",
-    incubation: "incubator",
-    vc: "venture_capital",
-    "venture capital": "venture_capital",
-    hackathon: "competition",
-    contest: "competition",
-    scholarship: "fellowship",
-    "developer programs": "developer_program",
+    startup: "startup_program", "startup program": "startup_program", "startup programs": "startup_program",
+    incubation: "incubator", vc: "venture_capital", "venture capital": "venture_capital",
+    hackathon: "competition", contest: "competition", scholarship: "fellowship", "developer programs": "developer_program",
   };
-  if (friendlyAliases[val]) return friendlyAliases[val];
-  const canonical = toCanonicalCategory(val);
-  if (canonical) return canonical as Opportunity["category"];
-  return "fellowship";
+  return friendlyAliases[val] || (toCanonicalCategory(val) as Opportunity["category"]) || "fellowship";
 }
 
-function normalizeDate(
-  value: unknown
-): Opportunity["closeDate"] | Opportunity["openDate"] {
-  if (value === undefined || value === null) return null;
-  if (value === "closed") return "closed";
-  if (value instanceof Date) return value.toISOString();
-  return String(value);
+function normalizeDate(value: unknown): Opportunity["closeDate"] | Opportunity["openDate"] {
+  return value === undefined || value === null ? null : value === "closed" ? "closed" : value instanceof Date ? value.toISOString() : String(value);
 }
 
 interface MapRowOptions {
@@ -124,7 +109,7 @@ export function isOpportunityOpen(o: Opportunity): boolean {
 // Supabase column list for the slim card payload. Keep this aligned
 // with the OpportunityCardData fields in lib/data.ts.
 export const CARD_COLUMNS =
-  "id,name,logo_url,description,category,region,close_date,tags,funding,organizer,created_at,apply_link";
+  "id,name,logo_url,description,category,region,close_date,tags,funding,organizer,created_at,apply_link,benefits,duration";
 
 /**
  * Map a Supabase row to the slim OpportunityCardData shape used by
@@ -148,6 +133,8 @@ export function mapRowToCardData(
     organizer: String(row.organizer || ""),
     createdAt: row.created_at ? String(row.created_at) : undefined,
     applyLink: String(row.apply_link || ""),
+    benefits: Array.isArray(row.benefits) ? (row.benefits as string[]) : [],
+    duration: row.duration as Opportunity["duration"],
   };
 }
 

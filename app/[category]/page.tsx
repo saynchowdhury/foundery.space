@@ -3,13 +3,13 @@ import { generateGuideConfigs } from "@/lib/guide-generator";
 import { GuideContent } from "@/components/features/guide-content";
 import type { GuideConfig } from "@/lib/guide-generator";
 import type { Opportunity } from "@/lib/data";
-import { fetchAllOpportunities } from "@/lib/opportunities-public";
+import { fetchOpportunityCardData } from "@/lib/opportunities-public";
 
 export const revalidate = 600; // 10 minutes
 
 export async function generateStaticParams() {
   try {
-    const opportunities = await fetchAllOpportunities();
+    const opportunities = (await fetchOpportunityCardData()) as unknown as Opportunity[];
     const configs = generateGuideConfigs(opportunities);
     return Object.values(configs).map((config) => ({
       category: config.slug,
@@ -26,7 +26,7 @@ export async function generateMetadata({
 }) {
   const { category } = await params;
   const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://foundery.space";
-  const opportunities = await fetchAllOpportunities();
+  const opportunities = (await fetchOpportunityCardData()) as unknown as Opportunity[];
   const configs = generateGuideConfigs(opportunities);
   const config = Object.values(configs).find((c) => c.slug === category);
   if (!config) return { title: "Not Found" };
@@ -67,7 +67,7 @@ export default async function CategoryPage({
   params: Promise<{ category: string }>;
 }) {
   const { category } = await params;
-  const opportunities = await fetchAllOpportunities();
+  const opportunities = (await fetchOpportunityCardData()) as unknown as Opportunity[];
   const configs = generateGuideConfigs(opportunities);
   const config = Object.values(configs).find((c) => c.slug === category);
   if (!config) notFound();

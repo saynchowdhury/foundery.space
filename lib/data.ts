@@ -106,6 +106,8 @@ export type OpportunityCardData = Pick<
   | "organizer"
   | "createdAt"
   | "applyLink"
+  | "benefits"
+  | "duration"
 >;
 
 export function getDaysUntilDeadline(closeDate: string): number {
