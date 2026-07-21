@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { cn, cleanDisplayText, formatFunding, normalizeTagDisplay, normalizeTagSlug } from "@/lib/utils";
+import { describe, it, expect, vi } from "vitest";
+import { cn, cleanDisplayText, formatFunding, normalizeTagDisplay, normalizeTagSlug, safeJsonLd } from "@/lib/utils";
 
 describe("lib/utils", () => {
   describe("cn (className merger)", () => {
@@ -124,6 +124,37 @@ describe("lib/utils", () => {
 
     it("removes invalid characters", () => {
       expect(normalizeTagSlug("Tech!@#$%")).toBe("tech");
+    });
+  });
+
+  describe("safeJsonLd", () => {
+    it("returns empty string for null or undefined", () => {
+      expect(safeJsonLd(null)).toBe("");
+      expect(safeJsonLd(undefined)).toBe("");
+    });
+
+    it("escapes < and > characters", () => {
+      const data = { xss: "</script><script>alert(1)</script>" };
+      const result = safeJsonLd(data);
+      expect(result).not.toContain("<");
+      expect(result).not.toContain(">");
+      expect(result).toContain("\\u003c/script\\u003e\\u003cscript\\u003e");
+    });
+
+    it("handles objects and arrays correctly", () => {
+      const data = { a: 1, b: [2, 3] };
+      const result = safeJsonLd(data);
+      expect(JSON.parse(result)).toEqual(data);
+    });
+
+    it("handles stringification errors gracefully", () => {
+      const circular: any = {};
+      circular.self = circular;
+
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(safeJsonLd(circular)).toBe("");
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
     });
   });
 });

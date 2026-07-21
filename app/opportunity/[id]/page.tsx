@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import OpportunityPageClient from "./opportunity-client";
 import { fetchOpportunityById, fetchAllOpportunities } from "@/lib/opportunities-public";
 import { categoryLabel } from "@/lib/categories";
-import { cleanDisplayText } from "@/lib/utils";
+import { cleanDisplayText, safeJsonLd } from "@/lib/utils";
 
 function getSiteUrl() {
   return process.env.NEXT_PUBLIC_APP_URL || "https://foundery.space";
@@ -103,7 +103,7 @@ export default async function OpportunityPage({ params }: OpportunityPageProps) 
       <Script
         id="opportunity-structured-data"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(scholarshipSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(scholarshipSchema) }}
       />
       <OpportunityPageClient opportunity={opportunity} />
     </>
