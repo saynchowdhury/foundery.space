@@ -94,3 +94,17 @@ export function safeParseDate(dateStr: string | null | undefined): Date | null {
   const d = new Date(dateStr);
   return Number.isNaN(d.getTime()) ? null : d;
 }
+
+/**
+ * Safely stringify data for JSON-LD script tags.
+ * Prevents XSS by escaping < and > characters to avoid script tag breakouts.
+ */
+export function safeJsonLd(data: any): string {
+  if (!data) return "";
+  try {
+    return JSON.stringify(data).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
+  } catch (e) {
+    console.error("[safeJsonLd] failed to stringify data:", e);
+    return "";
+  }
+}
