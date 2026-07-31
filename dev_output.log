@@ -1,0 +1,19 @@
+
+> foundery.space@0.1.0 dev /app
+> node_modules/.bin/next dev
+
+   ▲ Next.js 15.4.10
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.2:3000
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Compiled /instrumentation in 280ms (21 modules)
+
+❌ [env-check] Missing environment variables:
+   • NEXT_PUBLIC_SUPABASE_URL is not set
+   • NEXT_PUBLIC_SUPABASE_ANON_KEY is not set
+   • SUPABASE_SERVICE_ROLE_KEY is not set
+
+ ✓ Ready in 2.4s
