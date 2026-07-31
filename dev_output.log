@@ -1,0 +1,53 @@
+
+> foundery.space@0.1.0 dev /app
+> node_modules/.bin/next dev
+
+   ▲ Next.js 15.4.10
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.2:3000
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Compiled /instrumentation in 276ms (21 modules)
+
+❌ [env-check] Missing environment variables:
+   • NEXT_PUBLIC_SUPABASE_URL is not set
+   • NEXT_PUBLIC_SUPABASE_ANON_KEY is not set
+   • SUPABASE_SERVICE_ROLE_KEY is not set
+
+ ✓ Ready in 2.3s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 916ms (110 modules)
+ ○ Compiling /opportunity/[id] ...
+ ✓ Compiled /opportunity/[id] in 9.9s (967 modules)
+ ✓ Compiled in 1277ms (356 modules)
+ ⨯ Error: Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY
+    at getAnonClient (lib/supabase.ts:19:12)
+    at eval (lib/opportunities-public.ts:105:47)
+    at OpportunityPage (app/opportunity/[id]/page.tsx:73:49)
+  17 |     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  18 |     if (!url || !key) {
+> 19 |       throw new Error(
+     |            ^
+  20 |         "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  21 |       );
+  22 |     } {
+  digest: '119198454'
+}
+ GET /opportunity/test-id 200 in 13865ms
+ ○ Compiling /browse ...
+ ✓ Compiled /browse in 4.9s (1757 modules)
+ GET /browse 200 in 5757ms
+ ○ Compiling /api/opportunities ...
+ ✓ Compiled /api/opportunities in 788ms (1775 modules)
+Error fetching opportunities: Error: Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY
+    at getAnonClient (lib/supabase.ts:19:12)
+    at GET (app/api/opportunities/route.ts:32:47)
+  17 |     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  18 |     if (!url || !key) {
+> 19 |       throw new Error(
+     |            ^
+  20 |         "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  21 |       );
+  22 |     }
