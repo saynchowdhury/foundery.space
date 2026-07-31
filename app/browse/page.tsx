@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, Loader2, ChevronUp } from "lucide-react";
+import { Search, Loader2, ChevronUp, X } from "lucide-react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Select,
@@ -265,8 +265,18 @@ function BrowsePageContent() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="EXECUTE_SEARCH_QUERY..."
-                className="w-full bg-white/[0.02] border border-white/5 h-12 pl-16 pr-4 font-mono-technical text-xs tracking-wider focus:outline-none focus:border-brand/40 focus:bg-white/[0.04] transition-all uppercase"
+                aria-label="Search opportunities"
+                className="w-full bg-white/[0.02] border border-white/5 h-12 pl-16 pr-12 font-mono-technical text-xs tracking-wider focus:outline-none focus:border-brand/40 focus:bg-white/[0.04] transition-all uppercase"
               />
+              {q && (
+                <button
+                  onClick={() => setQ("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-brand transition-colors p-1"
+                  aria-label="Clear search"
+                >
+                  <X size={16} />
+                </button>
+              )}
               <div className="absolute bottom-0 left-0 h-0.5 bg-brand/40 w-0 group-focus-within:w-full transition-all duration-500" />
             </div>
 
@@ -301,6 +311,7 @@ function BrowsePageContent() {
             <div className="flex gap-4">
               <button 
                 onClick={() => setStatus("open")}
+                aria-pressed={status === "open"}
                 className={cn(
                   "font-mono-technical text-[9px] tracking-widest uppercase px-4 py-2 transition-all",
                   status === "open" ? "text-brand bg-brand/10 border border-brand/20" : "text-white/20 hover:text-white/40"
@@ -310,6 +321,7 @@ function BrowsePageContent() {
               </button>
               <button 
                 onClick={() => setStatus("all")}
+                aria-pressed={status === "all"}
                 className={cn(
                   "font-mono-technical text-[9px] tracking-widest uppercase px-4 py-2 transition-all",
                   status === "all" ? "text-brand bg-brand/10 border border-brand/20" : "text-white/20 hover:text-white/40"
