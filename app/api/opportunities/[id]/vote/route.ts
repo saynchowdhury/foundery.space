@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { checkBotId } from "botid/server";
 import { getServiceClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
@@ -8,6 +9,12 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const verification = await checkBotId();
+
+  if (verification.isBot) {
+    return NextResponse.json({ error: "Access denied" }, { status: 403 });
+  }
+
   try {
     const { id } = await params;
     const body = (await request.json().catch(() => ({}))) as {
