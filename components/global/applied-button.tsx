@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AppliedButtonProps {
   opportunityId: string;
+  className?: string;
 }
 
 function getAppliedSet(): Set<string> {
@@ -21,7 +23,7 @@ function setAppliedSet(set: Set<string>) {
   localStorage.setItem("fs_applied", JSON.stringify(Array.from(set)));
 }
 
-export function AppliedButton({ opportunityId }: AppliedButtonProps) {
+export function AppliedButton({ opportunityId, className }: AppliedButtonProps) {
   const [applied, setApplied] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -43,11 +45,13 @@ export function AppliedButton({ opportunityId }: AppliedButtonProps) {
       type="button"
       onClick={toggle}
       aria-pressed={applied}
-      className={`inline-flex items-center justify-center gap-1.5 h-10 px-4 text-[14px] border transition-colors ${
+      className={cn(
+        "inline-flex items-center justify-center gap-1.5 h-10 px-4 text-[14px] border transition-colors",
         mounted && applied
           ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-          : "border-green-600 text-green-700 dark:text-green-400 bg-transparent hover:bg-green-600/10"
-      }`}
+          : "border-green-600 text-green-700 dark:text-green-400 bg-transparent hover:bg-green-600/10",
+        className
+      )}
     >
       <Check className="h-4 w-4" />
       {mounted && applied ? "Applied" : "I applied"}
