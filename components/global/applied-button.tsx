@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface AppliedButtonProps {
   opportunityId: string;
+  variant?: "default" | "technical";
+  className?: string;
 }
 
 function getAppliedSet(): Set<string> {
@@ -21,7 +25,11 @@ function setAppliedSet(set: Set<string>) {
   localStorage.setItem("fs_applied", JSON.stringify(Array.from(set)));
 }
 
-export function AppliedButton({ opportunityId }: AppliedButtonProps) {
+export function AppliedButton({
+  opportunityId,
+  variant = "default",
+  className,
+}: AppliedButtonProps) {
   const [applied, setApplied] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -32,25 +40,41 @@ export function AppliedButton({ opportunityId }: AppliedButtonProps) {
 
   function toggle() {
     const next = getAppliedSet();
-    if (applied) next.delete(opportunityId);
-    else next.add(opportunityId);
+    if (applied) {
+      next.delete(opportunityId);
+      toast.info("Marked as not applied");
+    } else {
+      next.add(opportunityId);
+      toast.success("Marked as applied!");
+    }
     setAppliedSet(next);
     setApplied(!applied);
   }
+
+  const isTechnical = variant === "technical";
 
   return (
     <button
       type="button"
       onClick={toggle}
       aria-pressed={applied}
-      className={`inline-flex items-center justify-center gap-1.5 h-10 px-4 text-[14px] border transition-colors ${
+      className={cn(
+        "inline-flex items-center justify-center gap-1.5 h-10 px-4 text-[14px] border transition-colors rounded-sm",
         mounted && applied
           ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-          : "border-green-600 text-green-700 dark:text-green-400 bg-transparent hover:bg-green-600/10"
-      }`}
+          : "border-green-600 text-green-700 dark:text-green-400 bg-transparent hover:bg-green-600/10",
+        isTechnical && "font-mono-technical",
+        className
+      )}
     >
       <Check className="h-4 w-4" />
-      {mounted && applied ? "Applied" : "I applied"}
+      {mounted && applied
+        ? isTechnical
+          ? "STATUS_APPLIED"
+          : "Applied"
+        : isTechnical
+          ? "MARK_AS_APPLIED"
+          : "I applied"}
     </button>
   );
 }

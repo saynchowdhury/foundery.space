@@ -82,7 +82,7 @@ export function StickyApplyBar({
             Apply now
             <ExternalLink className="w-4 h-4" />
           </a>
-          <AppliedButton opportunityId={opportunityId} />
+          <AppliedButton opportunityId={opportunityId} className="flex-1 sm:flex-none" />
         </div>
       </div>
     </>
