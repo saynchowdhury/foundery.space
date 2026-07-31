@@ -75,15 +75,21 @@ export function Header() {
             size="sm"
             className="md:hidden text-foreground hover:text-brand"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
           >
-            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {isMenuOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
           </Button>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="fixed inset-0 top-20 z-40 bg-[#050505]/95 backdrop-blur-2xl md:hidden">
+        <div
+          id="mobile-menu"
+          className="fixed inset-0 top-20 z-40 bg-[#050505]/95 backdrop-blur-2xl md:hidden"
+        >
           <nav className="flex flex-col items-center justify-center h-full space-y-12">
             {navigation.map((item) => (
               <Link
