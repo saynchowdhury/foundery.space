@@ -4,6 +4,7 @@ import Script from "next/script";
 import { getAllBlogPosts } from "@/lib/blog-posts";
 import { ORGANIZATION_ID } from "@/lib/schema";
 import { Header } from "@/components/global/header";
+import { safeJsonLd } from "@/lib/utils";
 import { Footer } from "@/components/global/footer";
 
 export const revalidate = 3600;
@@ -60,7 +61,7 @@ export default function BlogIndex() {
       <Script
         id="blog-list-schema"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(blogListSchema) }}
       />
 
       <div className="max-w-4xl mx-auto px-6 pt-32 pb-24">
