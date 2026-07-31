@@ -8,6 +8,7 @@ import Script from "next/script";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { safeJsonLd } from "@/lib/utils";
 import { generateWebsiteSchema, generateFAQSchema, generateOrganizationSchema } from "@/lib/schema";
 
 const dmSans = DM_Sans({
@@ -122,17 +123,17 @@ export default function RootLayout({
         <Script
           id="website-structured-data"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(websiteSchema) }}
         />
         <Script
           id="org-structured-data"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(orgSchema) }}
         />
         <Script
           id="faq-structured-data"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(faqSchema) }}
         />
         <ThemeProvider
           attribute="class"
