@@ -7,6 +7,7 @@ import { ExternalLink, MapPin, Clock, Globe, Tag, Building2, DollarSign, Users, 
 import { SiteShell } from "@/components/global/site-shell";
 import { PageBreadcrumb } from "@/components/global/page-breadcrumb";
 import { AppliedButton } from "@/components/global/applied-button";
+import { ShareButton } from "@/components/global/share-button";
 import { StickyApplyBar } from "@/app/opportunity/[id]/sticky-apply-bar";
 import { AsciiHeading } from "@/components/ui/ascii-heading";
 
@@ -170,6 +171,7 @@ export default function OpportunityPageClient({ opportunity }: { opportunity: Op
                     INITIALIZE_APPLICATION <ExternalLink size={14} />
                   </a>
                   <AppliedButton opportunityId={opportunity.id} />
+                  <ShareButton opportunity={opportunity} />
                 </div>
               </div>
             </div>
