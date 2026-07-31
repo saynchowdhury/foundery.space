@@ -169,7 +169,7 @@ export default function OpportunityPageClient({ opportunity }: { opportunity: Op
                   >
                     INITIALIZE_APPLICATION <ExternalLink size={14} />
                   </a>
-                  <AppliedButton opportunityId={opportunity.id} />
+                  <AppliedButton opportunityId={opportunity.id} variant="technical" />
                 </div>
               </div>
             </div>
