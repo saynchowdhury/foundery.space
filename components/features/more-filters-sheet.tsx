@@ -87,7 +87,12 @@ export function MoreFiltersSheet({ state, onChange }: MoreFiltersSheetProps) {
         <SheetHeader className="px-5 py-4 border-b flex-row items-center justify-between">
           <SheetTitle>More filters</SheetTitle>
           <SheetClose asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 -mr-2"
+              aria-label="Close filters"
+            >
               <X className="h-4 w-4" />
             </Button>
           </SheetClose>
