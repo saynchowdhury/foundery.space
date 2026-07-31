@@ -409,6 +409,8 @@ export function FilterPanel({
                               e.preventDefault();
                               toggleRegionExpanded(region.name);
                             }}
+                            aria-label={expandedRegions.includes(region.name) ? `Collapse ${region.name}` : `Expand ${region.name}`}
+                            aria-expanded={expandedRegions.includes(region.name)}
                           >
                             {expandedRegions.includes(region.name) ? (
                               <ChevronDown className="h-4 w-4" />
