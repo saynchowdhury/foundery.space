@@ -4,6 +4,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { getAllBlogPosts, getBlogPostBySlug, getRelatedPosts } from "@/lib/blog-posts";
 import { ORGANIZATION_ID } from "@/lib/schema";
+import { safeJsonLd } from "@/lib/utils";
 import { Header } from "@/components/global/header";
 import { Footer } from "@/components/global/footer";
 
@@ -147,18 +148,18 @@ export default async function BlogPostPage({
       <Script
         id="article-schema"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(articleSchema) }}
       />
       <Script
         id="breadcrumb-schema"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbSchema) }}
       />
       {faqSchema && (
         <Script
           id="faq-schema"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(faqSchema) }}
         />
       )}
 
